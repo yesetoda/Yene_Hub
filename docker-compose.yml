@@ -1,0 +1,29 @@
+services:
+  api:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: a2sv_hub_api
+    ports:
+      - "8000:8080"
+    environment:
+      - PORT=8080
+      - HOST=0.0.0.0
+      - GIN_MODE=release
+      # Use a mocked database URL for testing purposes
+      - DATABASE_URL=postgresql://neondb_owner:npg_rHOKyQwln4m5@ep-long-unit-a5t9gq7b-pooler.us-east-2.aws.neon.tech/A2SV_HUB_1.0?sslmode=require
+    env_file:
+      - .env
+    restart: unless-stopped
+    networks:
+      - a2sv_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+networks:
+  a2sv_network:
+    driver: bridge 

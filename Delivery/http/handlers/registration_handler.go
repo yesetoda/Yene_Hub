@@ -1,0 +1,142 @@
+package handlers
+
+import (
+	"net/http"
+	"strconv"
+
+	"a2sv.org/hub/usecases"
+	"github.com/gin-gonic/gin"
+)
+
+// RegistrationHandler handles HTTP requests for user registration operations
+type RegistrationHandler struct {
+	bulkRegistrationUseCase usecases.BulkRegistrationUseCase
+}
+
+// NewRegistrationHandler creates a new RegistrationHandler instance
+func NewRegistrationHandler(bulkRegistrationUseCase usecases.BulkRegistrationUseCase) *RegistrationHandler {
+	return &RegistrationHandler{
+		bulkRegistrationUseCase: bulkRegistrationUseCase,
+	}
+}
+
+// BulkRegistrationRequest defines the structure for bulk registration requests
+type BulkRegistrationRequest struct {
+	Emails    string `json:"emails" binding:"required"`
+	RoleID    uint   `json:"role_id" binding:"required"`
+	GroupID   uint   `json:"group_id" binding:"required"`
+	CountryID *uint  `json:"country_id"`
+}
+
+// RegisterBulkUsers handles registering multiple users at once
+func (h *RegistrationHandler) RegisterBulkUsers(c *gin.Context) {
+	var request BulkRegistrationRequest
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "Invalid request body",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	// Validate role ID (must be positive)
+	if request.RoleID <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid role ID"})
+		return
+	}
+
+	// Validate group ID (must be positive)
+	if request.GroupID <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid group ID"})
+		return
+	}
+
+	// Validate country ID if provided (must be positive)
+	if request.CountryID != nil && *request.CountryID <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid country ID"})
+		return
+	}
+
+	// Register users
+	results, err := h.bulkRegistrationUseCase.RegisterUsers(request.Emails, request.RoleID, request.GroupID, request.CountryID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Count successful registrations
+	successCount := 0
+	for _, result := range results {
+		if result.Success {
+			successCount++
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":    "Bulk registration processed",
+		"total":      len(results),
+		"successful": successCount,
+		"failed":     len(results) - successCount,
+		"results":    results,
+	})
+}
+
+// RegisterUsersWithRole handles registering multiple users with a specific role ID from the URL
+func (h *RegistrationHandler) RegisterUsersWithRole(c *gin.Context) {
+	// Get role ID from URL parameter
+	roleIDStr := c.Param("role_id")
+	roleID, err := strconv.ParseUint(roleIDStr, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid role ID format"})
+		return
+	}
+
+	// Get emails and required IDs from request body
+	var request struct {
+		Emails    string `json:"emails" binding:"required"`
+		GroupID   uint   `json:"group_id" binding:"required"`
+		CountryID *uint  `json:"country_id"`
+	}
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "Invalid request body",
+			"details": "The request must include 'emails' and 'group_id' fields",
+		})
+		return
+	}
+
+	// Validate group ID (must be positive)
+	if request.GroupID <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid group ID"})
+		return
+	}
+
+	// Validate country ID if provided (must be positive)
+	if request.CountryID != nil && *request.CountryID <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid country ID"})
+		return
+	}
+
+	// Register users
+	results, err := h.bulkRegistrationUseCase.RegisterUsers(request.Emails, uint(roleID), request.GroupID, request.CountryID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Count successful registrations
+	successCount := 0
+	for _, result := range results {
+		if result.Success {
+			successCount++
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":    "Bulk registration processed",
+		"total":      len(results),
+		"successful": successCount,
+		"failed":     len(results) - successCount,
+		"results":    results,
+	})
+}

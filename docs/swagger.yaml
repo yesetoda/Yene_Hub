@@ -1,0 +1,1234 @@
+definitions:
+  entity.APIToken:
+    properties:
+      created_at:
+        type: string
+      expires_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      token:
+        type: string
+      type:
+        type: string
+      user:
+        $ref: '#/definitions/entity.User'
+      user_id:
+        type: integer
+    type: object
+  entity.Attendance:
+    properties:
+      at:
+        description: Time when attendance was taken
+        type: string
+      created_at:
+        type: string
+      head:
+        $ref: '#/definitions/entity.User'
+      head_id:
+        description: The head who recorded this attendance
+        type: integer
+      id:
+        type: integer
+      session:
+        $ref: '#/definitions/entity.Session'
+      session_id:
+        type: integer
+      status:
+        description: e.g., 0=absent, 1=present, 2=excused
+        type: integer
+      type:
+        description: Type of attendance record
+        type: integer
+      updated_at:
+        type: string
+      user:
+        $ref: '#/definitions/entity.User'
+      user_id:
+        type: integer
+    type: object
+  entity.Comment:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      post:
+        $ref: '#/definitions/entity.Post'
+      post_id:
+        type: integer
+      problem:
+        $ref: '#/definitions/entity.Problem'
+      problem_id:
+        type: integer
+      replies:
+        description: Relations
+        items:
+          $ref: '#/definitions/entity.Comment'
+        type: array
+      reply:
+        $ref: '#/definitions/entity.Comment'
+      reply_id:
+        type: integer
+      submission:
+        $ref: '#/definitions/entity.Submission'
+      submission_id:
+        type: integer
+      text:
+        type: string
+      track:
+        $ref: '#/definitions/entity.Track'
+      track_id:
+        type: integer
+      updated_at:
+        type: string
+      user:
+        $ref: '#/definitions/entity.User'
+      user_id:
+        type: integer
+      votes:
+        items:
+          $ref: '#/definitions/entity.Vote'
+        type: array
+    type: object
+  entity.Contest:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      link:
+        type: string
+      link2:
+        type: string
+      link3:
+        type: string
+      name:
+        type: string
+      problem_count:
+        type: integer
+      problems:
+        description: Relations
+        items:
+          $ref: '#/definitions/entity.Problem'
+        type: array
+      super_group:
+        $ref: '#/definitions/entity.SuperGroup'
+      super_group_id:
+        type: integer
+      type:
+        type: string
+      unrated:
+        type: boolean
+      updated_at:
+        type: string
+      votes:
+        description: |-
+          Ratings       []Rating       `json:"ratings,omitempty" gorm:"foreignKey:ContestID"`
+          DivisionUsers []DivisionUser `json:"division_users,omitempty" gorm:"foreignKey:ContestID"`
+        items:
+          $ref: '#/definitions/entity.Vote'
+        type: array
+    type: object
+  entity.Country:
+    properties:
+      created_at:
+        type: string
+      groups:
+        items:
+          $ref: '#/definitions/entity.Group'
+        type: array
+      id:
+        type: integer
+      name:
+        type: string
+      short_code:
+        type: string
+      updated_at:
+        type: string
+      users:
+        description: Relations
+        items:
+          $ref: '#/definitions/entity.User'
+        type: array
+    type: object
+  entity.DailyProblem:
+    properties:
+      created_at:
+        type: string
+      for_date:
+        type: string
+      id:
+        type: integer
+      problem:
+        $ref: '#/definitions/entity.Problem'
+      problem_id:
+        type: integer
+      super_group:
+        $ref: '#/definitions/entity.SuperGroup'
+      super_group_id:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  entity.Exercise:
+    properties:
+      created_at:
+        type: string
+      group:
+        $ref: '#/definitions/entity.Group'
+      group_id:
+        type: integer
+      id:
+        type: integer
+      problem:
+        $ref: '#/definitions/entity.Problem'
+      problem_id:
+        type: integer
+      track:
+        $ref: '#/definitions/entity.Track'
+      track_id:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  entity.Fund:
+    properties:
+      amount:
+        type: number
+      created_at:
+        type: string
+      currency:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      sessions:
+        description: Relations
+        items:
+          $ref: '#/definitions/entity.Session'
+        type: array
+      stipends:
+        items:
+          $ref: '#/definitions/entity.Stipend'
+        type: array
+      updated_at:
+        type: string
+    type: object
+  entity.GoogleOAuth:
+    properties:
+      calendar_id:
+        type: string
+      created_at:
+        type: string
+      encrypted_token_string:
+        type: string
+      group:
+        $ref: '#/definitions/entity.Group'
+      group_id:
+        type: integer
+      id:
+        type: integer
+      updated_at:
+        type: string
+      user:
+        $ref: '#/definitions/entity.User'
+      user_id:
+        type: integer
+    type: object
+  entity.Group:
+    properties:
+      country:
+        $ref: '#/definitions/entity.Country'
+      country_id:
+        type: integer
+      created_at:
+        type: string
+      description:
+        type: string
+      exercises:
+        items:
+          $ref: '#/definitions/entity.Exercise'
+        type: array
+      google_oauths:
+        items:
+          $ref: '#/definitions/entity.GoogleOAuth'
+        type: array
+      group_sessions:
+        items:
+          $ref: '#/definitions/entity.GroupSession'
+        type: array
+      hoa_id:
+        description: Head of Academy ID
+        type: integer
+      hoas:
+        items:
+          $ref: '#/definitions/entity.HOA'
+        type: array
+      id:
+        type: integer
+      invites:
+        items:
+          $ref: '#/definitions/entity.Invite'
+        type: array
+      name:
+        type: string
+      short_name:
+        type: string
+      super_to_groups:
+        items:
+          $ref: '#/definitions/entity.SuperToGroup'
+        type: array
+      updated_at:
+        type: string
+      users:
+        description: Relations
+        items:
+          $ref: '#/definitions/entity.User'
+        type: array
+    type: object
+  entity.GroupSession:
+    properties:
+      created_at:
+        type: string
+      group:
+        $ref: '#/definitions/entity.Group'
+      group_id:
+        type: integer
+      id:
+        type: integer
+      session:
+        $ref: '#/definitions/entity.Session'
+      session_id:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  entity.HOA:
+    properties:
+      created_at:
+        type: string
+      group:
+        $ref: '#/definitions/entity.Group'
+      group_id:
+        type: integer
+      id:
+        type: integer
+      updated_at:
+        type: string
+      user:
+        $ref: '#/definitions/entity.User'
+      user_id:
+        type: integer
+    type: object
+  entity.Invite:
+    properties:
+      created_at:
+        type: string
+      group:
+        $ref: '#/definitions/entity.Group'
+      group_id:
+        type: integer
+      id:
+        type: integer
+      key:
+        description: Unique invite key
+        type: string
+      role:
+        $ref: '#/definitions/entity.Role'
+      role_id:
+        type: integer
+      updated_at:
+        type: string
+      used:
+        description: Whether the invite has been used
+        type: boolean
+      user:
+        $ref: '#/definitions/entity.User'
+      user_id:
+        description: User who created the invite
+        type: integer
+    type: object
+  entity.Post:
+    properties:
+      body:
+        type: string
+      comments:
+        description: Relations
+        items:
+          $ref: '#/definitions/entity.Comment'
+        type: array
+      created_at:
+        type: string
+      id:
+        type: integer
+      post_to_tags:
+        items:
+          $ref: '#/definitions/entity.PostToTag'
+        type: array
+      title:
+        type: string
+      updated_at:
+        type: string
+      user:
+        $ref: '#/definitions/entity.User'
+      user_id:
+        type: integer
+      votes:
+        items:
+          $ref: '#/definitions/entity.Vote'
+        type: array
+    type: object
+  entity.PostTag:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      post_to_tags:
+        description: Relations
+        items:
+          $ref: '#/definitions/entity.PostToTag'
+        type: array
+      updated_at:
+        type: string
+    type: object
+  entity.PostToTag:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      post:
+        $ref: '#/definitions/entity.Post'
+      post_id:
+        type: integer
+      post_tag:
+        $ref: '#/definitions/entity.PostTag'
+      post_tag_id:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  entity.Problem:
+    properties:
+      comments:
+        items:
+          $ref: '#/definitions/entity.Comment'
+        type: array
+      contest:
+        $ref: '#/definitions/entity.Contest'
+      contest_id:
+        type: integer
+      created_at:
+        type: string
+      daily_problems:
+        items:
+          $ref: '#/definitions/entity.DailyProblem'
+        type: array
+      difficulty:
+        type: string
+      exercises:
+        items:
+          $ref: '#/definitions/entity.Exercise'
+        type: array
+      id:
+        type: integer
+      link:
+        type: string
+      name:
+        type: string
+      platform:
+        type: string
+      problem_tracks:
+        items:
+          $ref: '#/definitions/entity.ProblemTrack'
+        type: array
+      submissions:
+        description: Relations
+        items:
+          $ref: '#/definitions/entity.Submission'
+        type: array
+      tag:
+        type: string
+      track:
+        $ref: '#/definitions/entity.Track'
+      track_id:
+        type: integer
+      updated_at:
+        type: string
+      votes:
+        items:
+          $ref: '#/definitions/entity.Vote'
+        type: array
+    type: object
+  entity.ProblemTrack:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      problem:
+        $ref: '#/definitions/entity.Problem'
+      problem_id:
+        type: integer
+      track:
+        $ref: '#/definitions/entity.Track'
+      track_id:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  entity.RecentAction:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      type:
+        type: string
+      updated_at:
+        type: string
+      user:
+        $ref: '#/definitions/entity.User'
+      user_id:
+        type: integer
+    type: object
+  entity.Role:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      invites:
+        items:
+          $ref: '#/definitions/entity.Invite'
+        type: array
+      type:
+        type: string
+      updated_at:
+        type: string
+      users:
+        description: Relations
+        items:
+          $ref: '#/definitions/entity.User'
+        type: array
+    type: object
+  entity.Session:
+    properties:
+      attendances:
+        description: Relations
+        items:
+          $ref: '#/definitions/entity.Attendance'
+        type: array
+      calendar_event_id:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      end_time:
+        type: string
+      fund:
+        $ref: '#/definitions/entity.Fund'
+      fund_id:
+        type: integer
+      group_sessions:
+        items:
+          $ref: '#/definitions/entity.GroupSession'
+        type: array
+      id:
+        type: integer
+      lecturer:
+        $ref: '#/definitions/entity.User'
+      lecturer_id:
+        type: integer
+      location:
+        type: string
+      meet_link:
+        type: string
+      name:
+        type: string
+      recording_link:
+        type: string
+      resource_link:
+        type: string
+      start_time:
+        type: string
+      stipends:
+        items:
+          $ref: '#/definitions/entity.Stipend'
+        type: array
+      updated_at:
+        type: string
+    type: object
+  entity.Stipend:
+    properties:
+      created_at:
+        type: string
+      fund:
+        $ref: '#/definitions/entity.Fund'
+      fund_id:
+        type: integer
+      id:
+        type: integer
+      paid:
+        type: boolean
+      session:
+        $ref: '#/definitions/entity.Session'
+      session_id:
+        type: integer
+      share:
+        description: Share of the fund amount
+        type: number
+      updated_at:
+        type: string
+      user:
+        $ref: '#/definitions/entity.User'
+      user_id:
+        type: integer
+    type: object
+  entity.Submission:
+    properties:
+      code:
+        type: string
+      comments:
+        description: Relations
+        items:
+          $ref: '#/definitions/entity.Comment'
+        type: array
+      created_at:
+        type: string
+      id:
+        type: integer
+      in_contest:
+        description: Whether it was solved in a contest
+        type: integer
+      language:
+        type: string
+      problem:
+        $ref: '#/definitions/entity.Problem'
+      problem_id:
+        type: integer
+      time_spent:
+        description: Time spent in seconds
+        type: integer
+      tries:
+        description: Number of attempts
+        type: integer
+      updated_at:
+        type: string
+      user:
+        $ref: '#/definitions/entity.User'
+      user_id:
+        type: integer
+      verified:
+        type: boolean
+      votes:
+        items:
+          $ref: '#/definitions/entity.Vote'
+        type: array
+    type: object
+  entity.SuperGroup:
+    properties:
+      contests:
+        items:
+          $ref: '#/definitions/entity.Contest'
+        type: array
+      created_at:
+        type: string
+      daily_problems:
+        items:
+          $ref: '#/definitions/entity.DailyProblem'
+        type: array
+      id:
+        type: integer
+      name:
+        type: string
+      super_to_groups:
+        items:
+          $ref: '#/definitions/entity.SuperToGroup'
+        type: array
+      tracks:
+        description: Relations
+        items:
+          $ref: '#/definitions/entity.Track'
+        type: array
+      updated_at:
+        type: string
+    type: object
+  entity.SuperToGroup:
+    properties:
+      created_at:
+        type: string
+      group:
+        $ref: '#/definitions/entity.Group'
+      group_id:
+        type: integer
+      id:
+        type: integer
+      super_group:
+        $ref: '#/definitions/entity.SuperGroup'
+      super_group_id:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  entity.Track:
+    properties:
+      active:
+        type: boolean
+      comments:
+        items:
+          $ref: '#/definitions/entity.Comment'
+        type: array
+      created_at:
+        type: string
+      exercises:
+        items:
+          $ref: '#/definitions/entity.Exercise'
+        type: array
+      id:
+        type: integer
+      name:
+        type: string
+      problem_tracks:
+        items:
+          $ref: '#/definitions/entity.ProblemTrack'
+        type: array
+      problems:
+        description: Relations
+        items:
+          $ref: '#/definitions/entity.Problem'
+        type: array
+      super_group:
+        $ref: '#/definitions/entity.SuperGroup'
+      super_group_id:
+        type: integer
+      updated_at:
+        type: string
+      votes:
+        items:
+          $ref: '#/definitions/entity.Vote'
+        type: array
+    type: object
+  entity.User:
+    properties:
+      api_tokens:
+        items:
+          $ref: '#/definitions/entity.APIToken'
+        type: array
+      attendances:
+        items:
+          $ref: '#/definitions/entity.Attendance'
+        type: array
+      birthday:
+        description: Personal Information
+        type: string
+      code_of_conduct:
+        type: string
+      codeforces:
+        type: string
+      comments:
+        items:
+          $ref: '#/definitions/entity.Comment'
+        type: array
+      config:
+        type: string
+      country:
+        $ref: '#/definitions/entity.Country'
+      country_id:
+        type: integer
+      created_at:
+        description: Timestamps
+        type: string
+      cv:
+        description: Professional Details
+        type: string
+      department:
+        type: string
+      email:
+        type: string
+      expected_graduation_date:
+        type: string
+      gender:
+        type: string
+      github:
+        type: string
+      group:
+        $ref: '#/definitions/entity.Group'
+      group_id:
+        type: integer
+      hackerrank:
+        type: string
+      head_attendances:
+        items:
+          $ref: '#/definitions/entity.Attendance'
+        type: array
+      id:
+        description: Core Identity Fields
+        type: integer
+      inactive:
+        type: boolean
+      instagram:
+        type: string
+      joined_date:
+        type: string
+      leetcode:
+        description: |-
+          Coding Profiles (optional)
+          Use pointer types so that if no value is provided, they remain nil.
+        type: string
+      linkedin:
+        description: Social Media (all optional)
+        type: string
+      mentor_name:
+        type: string
+      name:
+        type: string
+      phone:
+        description: Contact Information
+        type: string
+      photo:
+        description: System Fields
+        type: string
+      posts:
+        items:
+          $ref: '#/definitions/entity.Post'
+        type: array
+      preferred_language:
+        type: string
+      recent_actions:
+        items:
+          $ref: '#/definitions/entity.RecentAction'
+        type: array
+      role:
+        $ref: '#/definitions/entity.Role'
+      role_id:
+        description: Role and Relationships
+        type: integer
+      short_bio:
+        type: string
+      student_id:
+        type: string
+      submissions:
+        description: Relations (using GORM associations)
+        items:
+          $ref: '#/definitions/entity.Submission'
+        type: array
+      telegram_uid:
+        type: string
+      telegram_username:
+        type: string
+      tshirt_color:
+        description: Physical Attributes
+        type: string
+      tshirt_size:
+        type: string
+      university:
+        description: Academic Information
+        type: string
+      updated_at:
+        type: string
+    type: object
+  entity.Vote:
+    properties:
+      comment:
+        $ref: '#/definitions/entity.Comment'
+      comment_id:
+        type: integer
+      contest:
+        $ref: '#/definitions/entity.Contest'
+      contest_id:
+        type: integer
+      created_at:
+        type: string
+      id:
+        type: integer
+      post:
+        $ref: '#/definitions/entity.Post'
+      post_id:
+        type: integer
+      problem:
+        $ref: '#/definitions/entity.Problem'
+      problem_id:
+        type: integer
+      submission:
+        $ref: '#/definitions/entity.Submission'
+      submission_id:
+        type: integer
+      track:
+        $ref: '#/definitions/entity.Track'
+      track_id:
+        type: integer
+      type:
+        description: e.g., 1=upvote, -1=downvote
+        type: integer
+      updated_at:
+        type: string
+      user:
+        $ref: '#/definitions/entity.User'
+      user_id:
+        type: integer
+    type: object
+  schemas.AuthTokenResponse:
+    properties:
+      token:
+        type: string
+      user:
+        $ref: '#/definitions/entity.User'
+    type: object
+  schemas.ErrorResponse:
+    properties:
+      code:
+        type: integer
+      details:
+        type: string
+      message:
+        type: string
+    type: object
+  schemas.LoginResponse:
+    properties:
+      message:
+        type: string
+      token:
+        type: string
+      user:
+        $ref: '#/definitions/entity.User'
+    type: object
+  schemas.PaginatedUsers:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/entity.User'
+        type: array
+      meta:
+        $ref: '#/definitions/schemas.PaginationMeta'
+    type: object
+  schemas.PaginationMeta:
+    properties:
+      page:
+        type: integer
+      page_size:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  schemas.SuccessResponse:
+    properties:
+      data: {}
+      message:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /api/auth/google:
+    get:
+      description: Redirects to Google's OAuth2 authentication page
+      produces:
+      - application/json
+      responses:
+        "302":
+          description: Redirect to Google OAuth
+        "500":
+          description: OAuth configuration error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: Start Google OAuth
+      tags:
+      - Authentication
+  /api/auth/google/callback:
+    get:
+      description: Handle Google OAuth callback and return JWT token
+      parameters:
+      - description: Authorization code from Google
+        in: query
+        name: code
+        required: true
+        type: string
+      - description: OAuth state parameter
+        in: query
+        name: state
+        type: string
+      - description: OAuth error description
+        in: query
+        name: error
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Authentication token
+          schema:
+            $ref: '#/definitions/schemas.AuthTokenResponse'
+        "400":
+          description: Missing code parameter
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "401":
+          description: Unauthorized/Unverified email
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Token exchange error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: Google OAuth callback
+      tags:
+      - Authentication
+  /api/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user and return JWT token
+      parameters:
+      - description: User email
+        in: body
+        name: email
+        required: true
+        schema:
+          type: string
+      - description: User password
+        in: body
+        name: password
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Login successful
+          schema:
+            $ref: '#/definitions/schemas.LoginResponse'
+        "400":
+          description: Invalid request format
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "401":
+          description: Invalid email or password
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: User login
+      tags:
+      - Auth
+  /api/users:
+    get:
+      description: Get paginated list of users with optional filters
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        minimum: 1
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        maximum: 100
+        minimum: 1
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of users
+          schema:
+            $ref: '#/definitions/schemas.PaginatedUsers'
+        "400":
+          description: Invalid pagination parameters
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List users
+      tags:
+      - Users
+    post:
+      consumes:
+      - application/json
+      description: Create a new user account with required information
+      parameters:
+      - description: User creation data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/entity.User'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Successfully created user
+          schema:
+            $ref: '#/definitions/entity.User'
+        "400":
+          description: Invalid request format
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "409":
+          description: User already exists
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a new user
+      tags:
+      - Users
+  /api/users/{id}:
+    delete:
+      description: Permanently delete a user account and associated data
+      parameters:
+      - description: User ID
+        format: uint32
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User deleted successfully
+          schema:
+            $ref: '#/definitions/schemas.SuccessResponse'
+        "400":
+          description: Invalid ID format
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete user account
+      tags:
+      - Users
+    get:
+      description: Get detailed information about a specific user
+      parameters:
+      - description: User ID
+        format: int64
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User details
+          schema:
+            $ref: '#/definitions/entity.User'
+        "400":
+          description: Invalid user ID
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get user details
+      tags:
+      - Users
+    put:
+      consumes:
+      - application/json
+      description: Update existing user information. Only provided fields will be
+        updated.
+      parameters:
+      - description: User ID
+        format: uint32
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Partial user data for update
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/entity.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User updated successfully
+          schema:
+            $ref: '#/definitions/schemas.SuccessResponse'
+        "400":
+          description: Invalid ID format or request body
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update user details
+      tags:
+      - Users
+swagger: "2.0"
