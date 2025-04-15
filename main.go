@@ -13,6 +13,20 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// @title           Hub API
+// @version         1.0
+// @description     This is the API documentation for the Hub backend.
+// @termsOfService  http://swagger.io/terms/
+// @contact.name   API Support
+// @contact.email  support@hub.a2sv.org
+// @license.name  MIT
+// @license.url   https://opensource.org/licenses/MIT
+// @host      localhost:8080
+// @BasePath  /
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Type "Bearer" followed by a space and JWT token.
 func main() {
 	// Load .env file
 	if err := godotenv.Load(); err != nil {

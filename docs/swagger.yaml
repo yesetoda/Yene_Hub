@@ -1,3 +1,4 @@
+basePath: /
 definitions:
   entity.APIToken:
     properties:
@@ -887,6 +888,45 @@ definitions:
       user:
         $ref: '#/definitions/entity.User'
     type: object
+  schemas.CreateUserInput:
+    properties:
+      birthday:
+        type: string
+      codeforces:
+        type: string
+      department:
+        type: string
+      email:
+        type: string
+      expected_graduation_date:
+        type: string
+      github:
+        type: string
+      hackerrank:
+        type: string
+      instagram:
+        type: string
+      leetcode:
+        type: string
+      linkedin:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+      role_id:
+        type: integer
+      student_id:
+        type: string
+      telegram_uid:
+        type: string
+      telegram_username:
+        type: string
+      university:
+        type: string
+    required:
+    - email
+    type: object
   schemas.ErrorResponse:
     properties:
       code:
@@ -896,6 +936,16 @@ definitions:
       message:
         type: string
     type: object
+  schemas.LoginInput:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
   schemas.LoginResponse:
     properties:
       message:
@@ -903,7 +953,7 @@ definitions:
       token:
         type: string
       user:
-        $ref: '#/definitions/entity.User'
+        $ref: '#/definitions/schemas.ResponseUser'
     type: object
   schemas.PaginatedUsers:
     properties:
@@ -925,14 +975,145 @@ definitions:
       total_pages:
         type: integer
     type: object
+  schemas.ResponseUser:
+    properties:
+      birthday:
+        description: Personal Information
+        type: string
+      code_of_conduct:
+        type: string
+      codeforces:
+        type: string
+      config:
+        type: string
+      country_id:
+        type: integer
+      created_at:
+        description: Timestamps
+        type: string
+      cv:
+        description: Professional Details
+        type: string
+      department:
+        type: string
+      email:
+        type: string
+      expected_graduation_date:
+        type: string
+      gender:
+        type: string
+      github:
+        type: string
+      group_id:
+        type: integer
+      hackerrank:
+        type: string
+      id:
+        description: Core Identity Fields
+        type: integer
+      inactive:
+        type: boolean
+      instagram:
+        type: string
+      joined_date:
+        type: string
+      leetcode:
+        description: |-
+          Coding Profiles (optional)
+          Use pointer types so that if no value is provided, they remain nil.
+        type: string
+      linkedin:
+        description: Social Media (all optional)
+        type: string
+      mentor_name:
+        type: string
+      name:
+        type: string
+      phone:
+        description: Contact Information
+        type: string
+      photo:
+        description: System Fields
+        type: string
+      preferred_language:
+        type: string
+      role_id:
+        description: Default role ID (adjust as necessary)
+        type: integer
+      short_bio:
+        type: string
+      student_id:
+        type: string
+      telegram_uid:
+        type: string
+      telegram_username:
+        type: string
+      tshirt_color:
+        description: Physical Attributes
+        type: string
+      tshirt_size:
+        type: string
+      university:
+        description: Academic Information
+        type: string
+      updated_at:
+        type: string
+    type: object
   schemas.SuccessResponse:
     properties:
       data: {}
       message:
         type: string
     type: object
+  schemas.UpdateUserInput:
+    properties:
+      birthday:
+        type: string
+      codeforces:
+        type: string
+      department:
+        type: string
+      email:
+        type: string
+      expected_graduation_date:
+        type: string
+      github:
+        type: string
+      hackerrank:
+        type: string
+      instagram:
+        type: string
+      leetcode:
+        type: string
+      linkedin:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+      role_id:
+        type: integer
+      student_id:
+        type: string
+      telegram_uid:
+        type: string
+      telegram_username:
+        type: string
+      university:
+        type: string
+    type: object
+host: localhost:8080
 info:
-  contact: {}
+  contact:
+    email: support@hub.a2sv.org
+    name: API Support
+  description: This is the API documentation for the Hub backend.
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://swagger.io/terms/
+  title: Hub API
+  version: "1.0"
 paths:
   /api/auth/google:
     get:
@@ -951,7 +1132,9 @@ paths:
       - Authentication
   /api/auth/google/callback:
     get:
-      description: Handle Google OAuth callback and return JWT token
+      description: |-
+        Handle Google OAuth callback and return JWT token
+        [Login with Google](http://localhost:8080/api/auth/google)
       parameters:
       - description: Authorization code from Google
         in: query
@@ -994,18 +1177,12 @@ paths:
       - application/json
       description: Authenticate user and return JWT token
       parameters:
-      - description: User email
+      - description: Login credentials
         in: body
-        name: email
+        name: login
         required: true
         schema:
-          type: string
-      - description: User password
-        in: body
-        name: password
-        required: true
-        schema:
-          type: string
+          $ref: '#/definitions/schemas.LoginInput'
       produces:
       - application/json
       responses:
@@ -1025,8 +1202,6 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/schemas.ErrorResponse'
-      security:
-      - BearerAuth: []
       summary: User login
       tags:
       - Auth
@@ -1034,10 +1209,10 @@ paths:
     get:
       description: Get paginated list of users with optional filters
       parameters:
-      - default: 1
+      - default: 0
         description: Page number
         in: query
-        minimum: 1
+        minimum: 0
         name: page
         type: integer
       - default: 20
@@ -1077,14 +1252,14 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/entity.User'
+          $ref: '#/definitions/schemas.CreateUserInput'
       produces:
       - application/json
       responses:
         "201":
           description: Successfully created user
           schema:
-            $ref: '#/definitions/entity.User'
+            $ref: '#/definitions/schemas.ResponseUser'
         "400":
           description: Invalid request format
           schema:
@@ -1163,7 +1338,7 @@ paths:
         "200":
           description: User details
           schema:
-            $ref: '#/definitions/entity.User'
+            $ref: '#/definitions/schemas.ResponseUser'
         "400":
           description: Invalid user ID
           schema:
@@ -1181,7 +1356,7 @@ paths:
       summary: Get user details
       tags:
       - Users
-    put:
+    patch:
       consumes:
       - application/json
       description: Update existing user information. Only provided fields will be
@@ -1198,7 +1373,7 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/entity.User'
+          $ref: '#/definitions/schemas.UpdateUserInput'
       produces:
       - application/json
       responses:
@@ -1231,4 +1406,10 @@ paths:
       summary: Update user details
       tags:
       - Users
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

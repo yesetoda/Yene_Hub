@@ -9,7 +9,15 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "contact": {},
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "API Support",
+            "email": "support@hub.a2sv.org"
+        },
+        "license": {
+            "name": "MIT",
+            "url": "https://opensource.org/licenses/MIT"
+        },
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
@@ -40,7 +48,7 @@ const docTemplate = `{
         },
         "/api/auth/google/callback": {
             "get": {
-                "description": "Handle Google OAuth callback and return JWT token",
+                "description": "Handle Google OAuth callback and return JWT token\n[Login with Google](http://localhost:8080/api/auth/google)",
                 "produces": [
                     "application/json"
                 ],
@@ -99,11 +107,6 @@ const docTemplate = `{
         },
         "/api/auth/login": {
             "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
                 "description": "Authenticate user and return JWT token",
                 "consumes": [
                     "application/json"
@@ -117,21 +120,12 @@ const docTemplate = `{
                 "summary": "User login",
                 "parameters": [
                     {
-                        "description": "User email",
-                        "name": "email",
+                        "description": "Login credentials",
+                        "name": "login",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "User password",
-                        "name": "password",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/schemas.LoginInput"
                         }
                     }
                 ],
@@ -180,9 +174,9 @@ const docTemplate = `{
                 "summary": "List users",
                 "parameters": [
                     {
-                        "minimum": 1,
+                        "minimum": 0,
                         "type": "integer",
-                        "default": 1,
+                        "default": 0,
                         "description": "Page number",
                         "name": "page",
                         "in": "query"
@@ -242,7 +236,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.User"
+                            "$ref": "#/definitions/schemas.CreateUserInput"
                         }
                     }
                 ],
@@ -250,7 +244,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Successfully created user",
                         "schema": {
-                            "$ref": "#/definitions/entity.User"
+                            "$ref": "#/definitions/schemas.ResponseUser"
                         }
                     },
                     "400": {
@@ -309,86 +303,11 @@ const docTemplate = `{
                     "200": {
                         "description": "User details",
                         "schema": {
-                            "$ref": "#/definitions/entity.User"
+                            "$ref": "#/definitions/schemas.ResponseUser"
                         }
                     },
                     "400": {
                         "description": "Invalid user ID",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "User not found",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrorResponse"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Update existing user information. Only provided fields will be updated.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Update user details",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "format": "uint32",
-                        "description": "User ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Partial user data for update",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/entity.User"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "User updated successfully",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.SuccessResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid ID format or request body",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrorResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
                         "schema": {
                             "$ref": "#/definitions/schemas.ErrorResponse"
                         }
@@ -440,6 +359,81 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Invalid ID format",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update existing user information. Only provided fields will be updated.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Update user details",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "format": "uint32",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Partial user data for update",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.UpdateUserInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid ID format or request body",
                         "schema": {
                             "$ref": "#/definitions/schemas.ErrorResponse"
                         }
@@ -1794,6 +1788,65 @@ const docTemplate = `{
                 }
             }
         },
+        "schemas.CreateUserInput": {
+            "type": "object",
+            "required": [
+                "email"
+            ],
+            "properties": {
+                "birthday": {
+                    "type": "string"
+                },
+                "codeforces": {
+                    "type": "string"
+                },
+                "department": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "expected_graduation_date": {
+                    "type": "string"
+                },
+                "github": {
+                    "type": "string"
+                },
+                "hackerrank": {
+                    "type": "string"
+                },
+                "instagram": {
+                    "type": "string"
+                },
+                "leetcode": {
+                    "type": "string"
+                },
+                "linkedin": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "role_id": {
+                    "type": "integer"
+                },
+                "student_id": {
+                    "type": "string"
+                },
+                "telegram_uid": {
+                    "type": "string"
+                },
+                "telegram_username": {
+                    "type": "string"
+                },
+                "university": {
+                    "type": "string"
+                }
+            }
+        },
         "schemas.ErrorResponse": {
             "type": "object",
             "properties": {
@@ -1808,6 +1861,21 @@ const docTemplate = `{
                 }
             }
         },
+        "schemas.LoginInput": {
+            "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
         "schemas.LoginResponse": {
             "type": "object",
             "properties": {
@@ -1818,7 +1886,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "user": {
-                    "$ref": "#/definitions/entity.User"
+                    "$ref": "#/definitions/schemas.ResponseUser"
                 }
             }
         },
@@ -1853,6 +1921,124 @@ const docTemplate = `{
                 }
             }
         },
+        "schemas.ResponseUser": {
+            "type": "object",
+            "properties": {
+                "birthday": {
+                    "description": "Personal Information",
+                    "type": "string"
+                },
+                "code_of_conduct": {
+                    "type": "string"
+                },
+                "codeforces": {
+                    "type": "string"
+                },
+                "config": {
+                    "type": "string"
+                },
+                "country_id": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "description": "Timestamps",
+                    "type": "string"
+                },
+                "cv": {
+                    "description": "Professional Details",
+                    "type": "string"
+                },
+                "department": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "expected_graduation_date": {
+                    "type": "string"
+                },
+                "gender": {
+                    "type": "string"
+                },
+                "github": {
+                    "type": "string"
+                },
+                "group_id": {
+                    "type": "integer"
+                },
+                "hackerrank": {
+                    "type": "string"
+                },
+                "id": {
+                    "description": "Core Identity Fields",
+                    "type": "integer"
+                },
+                "inactive": {
+                    "type": "boolean"
+                },
+                "instagram": {
+                    "type": "string"
+                },
+                "joined_date": {
+                    "type": "string"
+                },
+                "leetcode": {
+                    "description": "Coding Profiles (optional)\nUse pointer types so that if no value is provided, they remain nil.",
+                    "type": "string"
+                },
+                "linkedin": {
+                    "description": "Social Media (all optional)",
+                    "type": "string"
+                },
+                "mentor_name": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "description": "Contact Information",
+                    "type": "string"
+                },
+                "photo": {
+                    "description": "System Fields",
+                    "type": "string"
+                },
+                "preferred_language": {
+                    "type": "string"
+                },
+                "role_id": {
+                    "description": "Default role ID (adjust as necessary)",
+                    "type": "integer"
+                },
+                "short_bio": {
+                    "type": "string"
+                },
+                "student_id": {
+                    "type": "string"
+                },
+                "telegram_uid": {
+                    "type": "string"
+                },
+                "telegram_username": {
+                    "type": "string"
+                },
+                "tshirt_color": {
+                    "description": "Physical Attributes",
+                    "type": "string"
+                },
+                "tshirt_size": {
+                    "type": "string"
+                },
+                "university": {
+                    "description": "Academic Information",
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
         "schemas.SuccessResponse": {
             "type": "object",
             "properties": {
@@ -1861,18 +2047,82 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        },
+        "schemas.UpdateUserInput": {
+            "type": "object",
+            "properties": {
+                "birthday": {
+                    "type": "string"
+                },
+                "codeforces": {
+                    "type": "string"
+                },
+                "department": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "expected_graduation_date": {
+                    "type": "string"
+                },
+                "github": {
+                    "type": "string"
+                },
+                "hackerrank": {
+                    "type": "string"
+                },
+                "instagram": {
+                    "type": "string"
+                },
+                "leetcode": {
+                    "type": "string"
+                },
+                "linkedin": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "role_id": {
+                    "type": "integer"
+                },
+                "student_id": {
+                    "type": "string"
+                },
+                "telegram_uid": {
+                    "type": "string"
+                },
+                "telegram_username": {
+                    "type": "string"
+                },
+                "university": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "description": "Type \"Bearer\" followed by a space and JWT token.",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
-	Host:             "",
-	BasePath:         "",
+	Version:          "1.0",
+	Host:             "localhost:8080",
+	BasePath:         "/",
 	Schemes:          []string{},
-	Title:            "",
-	Description:      "",
+	Title:            "Hub API",
+	Description:      "This is the API documentation for the Hub backend.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

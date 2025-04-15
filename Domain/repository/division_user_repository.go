@@ -8,6 +8,7 @@ type DivisionUserRepository interface {
 	GetByUserID(userID uint) ([]*entity.DivisionUser, error)
 	GetByContestID(contestID uint) ([]*entity.DivisionUser, error)
 	GetByDivisionID(divisionID uint) ([]*entity.DivisionUser, error)
+	GetAll() ([]*entity.DivisionUser, error)
 	Update(divisionUser *entity.DivisionUser) error
 	Delete(id uint) error
 }

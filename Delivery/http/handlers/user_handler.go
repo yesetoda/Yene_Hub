@@ -5,9 +5,11 @@ import (
 	"net/http"
 	"strconv"
 
+	"a2sv.org/hub/Delivery/http/schemas"
 	"a2sv.org/hub/Domain/entity"
 	"a2sv.org/hub/usecases"
 	"github.com/gin-gonic/gin"
+	// "golang.org/x/crypto/bcrypt"
 )
 
 // UserHandler handles HTTP requests for user operations
@@ -28,9 +30,9 @@ func NewUserHandler(userUseCase usecases.UserUseCase) *UserHandler {
 // @Tags Users
 // @Accept json
 // @Produce json
-// @Param user body entity.User true "User creation data"
+// @Param user body schemas.CreateUserInput true "User creation data"
 // @Security BearerAuth
-// @Success 201 {object} entity.User "Successfully created user"
+// @Success 201 {object} schemas.ResponseUser "Successfully created user"
 // @Failure 400 {object} schemas.ErrorResponse "Invalid request format"
 // @Failure 401 {object} schemas.ErrorResponse "Unauthorized"
 // @Failure 409 {object} schemas.ErrorResponse "User already exists"
@@ -61,7 +63,7 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 // @Produce json
 // @Param id path int true "User ID" Format(int64)
 // @Security BearerAuth
-// @Success 200 {object} entity.User "User details"
+// @Success 200 {object} schemas.ResponseUser "User details"
 // @Failure 400 {object} schemas.ErrorResponse "Invalid user ID"
 // @Failure 404 {object} schemas.ErrorResponse "User not found"
 // @Failure 500 {object} schemas.ErrorResponse "Internal server error"
@@ -90,7 +92,7 @@ func (h *UserHandler) GetUserByID(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path int true "User ID" Format(uint32)
-// @Param user body entity.User true "Partial user data for update"
+// @Param user body schemas.UpdateUserInput true "Partial user data for update"
 // @Security BearerAuth
 // @Success 200 {object} schemas.SuccessResponse "User updated successfully"
 // @Failure 400 {object} schemas.ErrorResponse "Invalid ID format or request body"
@@ -98,7 +100,8 @@ func (h *UserHandler) GetUserByID(c *gin.Context) {
 // @Failure 403 {object} schemas.ErrorResponse "Forbidden"
 // @Failure 404 {object} schemas.ErrorResponse "User not found"
 // @Failure 500 {object} schemas.ErrorResponse "Internal server error"
-// @Router /api/users/{id} [put]
+// @Router /api/users/{id} [patch]
+// handlers/user_handler.go
 func (h *UserHandler) UpdateUser(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 32)
@@ -107,22 +110,20 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	var user entity.User
-	if err := c.ShouldBindJSON(&user); err != nil {
+	var input schemas.UpdateUserInput
+	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
 		return
 	}
 
-	user.ID = uint(id)
-	if err := h.userUseCase.Update(&user); err != nil {
+	if err := h.userUseCase.Update(uint(id), &input); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "User updated successfully",
-	})
+	c.JSON(http.StatusOK, gin.H{"message": "User updated successfully"})
 }
+
 // DeleteUser handles deleting a user
 // @Summary Delete user account
 // @Description Permanently delete a user account and associated data
@@ -160,7 +161,7 @@ func (h *UserHandler) DeleteUser(c *gin.Context) {
 // @Description Get paginated list of users with optional filters
 // @Tags Users
 // @Produce json
-// @Param page query int false "Page number" minimum(1) default(1)
+// @Param page query int false "Page number" minimum(0) default(0)
 // @Param page_size query int false "Items per page" minimum(1) maximum(100) default(20)
 // @Security BearerAuth
 // @Success 200 {object} schemas.PaginatedUsers "List of users"
@@ -178,7 +179,7 @@ func (h *UserHandler) ListUsers(c *gin.Context) {
 	if err != nil {
 		pageSize = -1
 	}
-	users, err := h.userUseCase.List(page,pageSize)
+	users, err := h.userUseCase.List(page, pageSize)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -187,30 +188,26 @@ func (h *UserHandler) ListUsers(c *gin.Context) {
 	c.JSON(http.StatusOK, users)
 }
 
-
 // Login handles user login
 // @Summary User login
 // @Description Authenticate user and return JWT token
 // @Tags Auth
 // @Accept json
 // @Produce json
-// @Param email body string true "User email"
-// @Param password body string true "User password"
+// @Param login body schemas.LoginInput true "Login credentials"
 // @Success 200 {object} schemas.LoginResponse "Login successful"
 // @Failure 400 {object} schemas.ErrorResponse "Invalid request format"
 // @Failure 401 {object} schemas.ErrorResponse "Invalid email or password"
 // @Failure 500 {object} schemas.ErrorResponse "Internal server error"
 // @Router /api/auth/login [post]
-// @Security BearerAuth
-func (h *UserHandler) Login(c *gin.Context){
-	email := c.Request.FormValue("email")
-	password := c.Request.FormValue("password")
-	if email == "" || password == "" {
+func (h *UserHandler) Login(c *gin.Context) {
+	var input schemas.LoginInput
+	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Email and password are required"})
 		return
 	}
-	fmt.Println("this is the email and the password",email,password)
-	user,token, err := h.userUseCase.Login(email, password)
+	fmt.Println("this is the email and the password", input.Email, input.Password)
+	user, token, err := h.userUseCase.Login(input.Email, input.Password)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
 		return

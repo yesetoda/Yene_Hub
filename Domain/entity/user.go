@@ -76,3 +76,4 @@ type User struct {
 	RecentActions   []RecentAction `json:"recent_actions,omitempty" gorm:"foreignKey:UserID"`
 	APITokens       []APIToken     `json:"api_tokens,omitempty" gorm:"foreignKey:UserID"`
 }
+

@@ -323,13 +323,15 @@ func (r *userRepository) ListUser(page, page_size int) ([]*entity.User, error) {
 // ====================
 
 // UpdateUser updates a user and updates corresponding cache entries.
+// repository/user_repository.go
+
 func (r *userRepository) UpdateUser(user *entity.User) error {
-	err := r.db.Save(user).Error
+	err := r.db.Model(&entity.User{}).Where("id = ?", user.ID).Updates(user).Error
 	if err != nil {
 		return err
 	}
 
-	// Update the cached detail entries.
+	// Optional: update Redis cache
 	userCache := entity.UserCache{
 		ID:        user.ID,
 		Name:      user.Name,
@@ -349,7 +351,6 @@ func (r *userRepository) UpdateUser(user *entity.User) error {
 		_ = caching.SetRedisValue(cacheKeyByEmail, string(data))
 	}
 
-	// Invalidate list caches in case the update affects query results.
 	_ = caching.DeleteRedisValue("listuser:*")
 	_ = caching.DeleteRedisValue("getuserbyname:*")
 	_ = caching.DeleteRedisValue("getuserbycountryid:*")
@@ -357,6 +358,7 @@ func (r *userRepository) UpdateUser(user *entity.User) error {
 
 	return nil
 }
+
 
 // ====================
 // DELETE
