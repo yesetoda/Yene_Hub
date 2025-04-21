@@ -21,7 +21,7 @@ import (
 // @contact.email  support@hub.a2sv.org
 // @license.name  MIT
 // @license.url   https://opensource.org/licenses/MIT
-// @host      localhost:8080
+// @host      https://yene-hub-ls0y.onrender.com
 // @BasePath  /
 // @securityDefinitions.apikey BearerAuth
 // @in header
