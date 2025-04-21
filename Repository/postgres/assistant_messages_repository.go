@@ -6,45 +6,90 @@ import (
 	"gorm.io/gorm"
 )
 
-type AssistantMessageRepository struct {
-	db *gorm.DB
-}
-func NewAssistantMessageRepository(db *gorm.DB) repository.AssistantMessagesRepository {
-	return &AssistantMessageRepository{db: db}
+type assistantMessagesRepository struct {
+	BaseRepository
 }
 
-func (r *AssistantMessageRepository) Create(assistantMessage *entity.AssistantMessage) error {
-	return r.db.Create(assistantMessage).Error
+func NewAssistantMessagesRepository(db *gorm.DB) repository.AssistantMessagesRepository {
+	return &assistantMessagesRepository{
+		BaseRepository: NewBaseRepository(db, "assistant_message"),
+	}
 }
 
-func (r *AssistantMessageRepository) GetByID(id uint) (*entity.AssistantMessage, error) {
-	var assistantMessage entity.AssistantMessage
-	if err := r.db.First(&assistantMessage, id).Error; err != nil {
+func (r *assistantMessagesRepository) Create(message *entity.AssistantMessage) error {
+	err := r.db.Create(message).Error
+	if err != nil {
+		return err
+	}
+
+	// Cache the newly created message
+	_ = r.cacheDetail("byid", message, message.ID)
+	_ = r.cacheDetail("byuser", message, message.UserID)
+
+	// Invalidate list caches
+	r.invalidateCache("list")
+	
+	return nil
+}
+
+func (r *assistantMessagesRepository) GetByID(id uint) (*entity.AssistantMessage, error) {
+	var message entity.AssistantMessage
+	err := r.getCachedDetail("byid", &message, func() error {
+		return r.db.First(&message, id).Error
+	}, id)
+	
+	if err != nil {
 		return nil, err
 	}
-	return &assistantMessage, nil
-}	
+	return &message, nil
+}
 
-func (r *AssistantMessageRepository) GetByUserID(userID uint) ([]*entity.AssistantMessage, error) {
-	var assistantMessages []*entity.AssistantMessage
-	if err := r.db.Where("user_id = ?", userID).Find(&assistantMessages).Error; err != nil {
-		return nil, err
+func (r *assistantMessagesRepository) GetByUserID(userID uint) ([]*entity.AssistantMessage, error) {
+	var messages []*entity.AssistantMessage
+	err := r.getCachedList("byuser", &messages, func() error {
+		return r.db.Where("user_id = ?", userID).Find(&messages).Error
+	}, userID)
+	
+	return messages, err
+}
+
+func (r *assistantMessagesRepository) List() ([]*entity.AssistantMessage, error) {
+	var messages []*entity.AssistantMessage
+	err := r.getCachedList("list", &messages, func() error {
+		return r.db.Find(&messages).Error
+	})
+	
+	return messages, err
+}
+
+func (r *assistantMessagesRepository) Update(message *entity.AssistantMessage) error {
+	err := r.db.Save(message).Error
+	if err != nil {
+		return err
 	}
-	return assistantMessages, nil
+
+	// Update detail caches
+	_ = r.cacheDetail("byid", message, message.ID)
+	_ = r.cacheDetail("byuser", message, message.UserID)
+
+	// Invalidate list caches
+	r.invalidateCache("list")
+	
+	return nil
 }
 
-func (r *AssistantMessageRepository) List() ([]*entity.AssistantMessage, error) {
-	var assistantMessages []*entity.AssistantMessage
-	if err := r.db.Find(&assistantMessages).Error; err != nil {
-		return nil, err
+func (r *assistantMessagesRepository) Delete(id uint) error {
+	var message entity.AssistantMessage
+	if err := r.db.First(&message, id).Error; err != nil {
+		return err
 	}
-	return assistantMessages, nil
-}
 
-func (r *AssistantMessageRepository) Update(assistantMessage *entity.AssistantMessage) error {
-	return r.db.Save(assistantMessage).Error
-}
+	if err := r.db.Delete(&message).Error; err != nil {
+		return err
+	}
 
-func (r *AssistantMessageRepository) Delete(id uint) error {
-	return r.db.Delete(&entity.AssistantMessage{}, id).Error
+	// Invalidate all caches for this message
+	r.invalidateAllCache()
+	
+	return nil
 }

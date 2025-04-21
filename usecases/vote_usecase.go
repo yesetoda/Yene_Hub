@@ -27,7 +27,7 @@ type VoteUseCaseInterface interface {
 type VoteUsecase struct {
 	VoteRepository repository.VoteRepository
 }
-func NewVoteUsecase(voteRepository repository.VoteRepository) VoteUseCaseInterface {
+func NewVoteUsecase(voteRepository repository.VoteRepository) *VoteUsecase{
 	return &VoteUsecase{
 		VoteRepository: voteRepository,
 	}

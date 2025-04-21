@@ -23,7 +23,7 @@ type RecentActionUseCaseInterface interface {
 type RecentActionUsecase struct {
 	RecentActionRepository repository.RecentActionRepository
 }
-func NewRecentActionUsecase(recentActionRepository repository.RecentActionRepository) RecentActionUseCaseInterface {
+func NewRecentActionUsecase(recentActionRepository repository.RecentActionRepository) *RecentActionUsecase{
 	return &RecentActionUsecase{
 		RecentActionRepository: recentActionRepository,
 	}

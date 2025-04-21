@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"a2sv.org/hub/Domain/entity"
+	"a2sv.org/hub/Domain/repository"
 	"gorm.io/gorm"
 )
 
@@ -9,7 +10,7 @@ type SuperGroupRepository struct {
 	db *gorm.DB
 }
 
-func NewSuperGroupRepository(db *gorm.DB) *SuperGroupRepository {
+func NewSuperGroupRepository(db *gorm.DB) repository.SuperGroupRepository {
 	return &SuperGroupRepository{
 		db: db,
 	}

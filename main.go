@@ -48,6 +48,14 @@ func main() {
 	groupRepo := postgres.NewGroupRepository(db)
 	countryRepo := postgres.NewCountryRepository(db)
 	superGroupRepo := postgres.NewSuperGroupRepository(db)
+	recentActionRepo := postgres.NewRecentActionRepository(db) // should implement repository.RecentActionRepository
+	voteRepo := postgres.NewVoteRepository(db)                 // should implement repository.VoteRepository
+	trackRepo := postgres.NewTrackRepository(db)               // should implement repository.TrackRepository
+	stippendRepo := postgres.NewStipendRepository(db)          // should implement repository.StipendRepository
+	submissionRepo := postgres.NewSubmissionRepository(db)     // should implement repository.SubmissionRepository
+	superToGroupRepo := postgres.NewSuperToGroupRepository(db) // should implement repository.SuperToGroupRepository
+	problemRepo := postgres.NewProblemRepository(db)           // should implement repository.ProblemRepository
+	sessionRepo := postgres.NewSessionRepository(db)           // should implement repository.SessionRepository
 
 	// Initialize use case
 	userUseCase := usecases.NewUserUseCase(userRepo)
@@ -56,7 +64,14 @@ func main() {
 	countryUseCase := usecases.NewCountryUseCase(countryRepo)
 	bulkRegistrationUseCase := usecases.NewBulkRegistrationUseCase(userRepo, roleRepo, groupRepo, countryRepo)
 	superGroupUseCase := usecases.NewSuperGroupUseCase(superGroupRepo)
-
+	recentActionUseCase := usecases.NewRecentActionUsecase(recentActionRepo)
+	voteUseCase := usecases.NewVoteUsecase(voteRepo)
+	trackUseCase := usecases.NewTrackUsecase(trackRepo)
+	stippendUseCase := usecases.NewStipendUsecase(stippendRepo)
+	submissionUseCase := usecases.NewSubmissionUsecase(submissionRepo)
+	superToGroupUseCase := usecases.NewSuperToGroupUsecase(superToGroupRepo)
+	problemUseCase := usecases.NewProblemUsecase(problemRepo)
+	sessionUsecase := usecases.NewSessionUsecase(sessionRepo)
 	// Setup router
 	router := deliveryHttp.SetupRouter(
 		*userUseCase,
@@ -65,8 +80,15 @@ func main() {
 		countryUseCase,
 		bulkRegistrationUseCase,
 		superGroupUseCase,
+		*recentActionUseCase,
+		*voteUseCase,
+		*trackUseCase,
+		*superToGroupUseCase,
+		*submissionUseCase,
+		*stippendUseCase,
+		problemUseCase,
+		*sessionUsecase,
 	)
-
 	// Print all registered routes for debugging
 	log.Println("Routes registered successfully")
 

@@ -22,6 +22,16 @@ func NewRoleHandler(roleUseCase usecases.RoleUseCase) *RoleHandler {
 }
 
 // CreateRole handles creating a new role
+// @Summary Create a new role
+// @Description Create a new role entry
+// @Tags Roles
+// @Accept json
+// @Produce json
+// @Param role body entity.Role true "Role data"
+// @Success 201 {object} entity.Role "Role created successfully"
+// @Failure 400 {object} map[string]string "Invalid request body"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /api/roles [post]
 func (h *RoleHandler) CreateRole(c *gin.Context) {
 	var role entity.Role
 	if err := c.ShouldBindJSON(&role); err != nil {
@@ -42,6 +52,15 @@ func (h *RoleHandler) CreateRole(c *gin.Context) {
 }
 
 // GetRoleByID handles getting a role by ID
+// @Summary Get role by ID
+// @Description Get a role by its ID
+// @Tags Roles
+// @Produce json
+// @Param id path int true "Role ID"
+// @Success 200 {object} entity.Role "Role details"
+// @Failure 400 {object} map[string]string "Invalid role ID"
+// @Failure 404 {object} map[string]string "Role not found"
+// @Router /api/roles/{id} [get]
 func (h *RoleHandler) GetRoleByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 32)
@@ -60,6 +79,17 @@ func (h *RoleHandler) GetRoleByID(c *gin.Context) {
 }
 
 // UpdateRole handles updating a role
+// @Summary Update a role
+// @Description Update a role by its ID
+// @Tags Roles
+// @Accept json
+// @Produce json
+// @Param id path int true "Role ID"
+// @Param role body entity.Role true "Role data"
+// @Success 200 {object} entity.Role "Role updated successfully"
+// @Failure 400 {object} map[string]string "Invalid input"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /api/roles/{id} [patch]
 func (h *RoleHandler) UpdateRole(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 32)
@@ -88,6 +118,15 @@ func (h *RoleHandler) UpdateRole(c *gin.Context) {
 }
 
 // DeleteRole handles deleting a role
+// @Summary Delete a role
+// @Description Delete a role by its ID
+// @Tags Roles
+// @Produce json
+// @Param id path int true "Role ID"
+// @Success 200 {object} map[string]string "Role deleted successfully"
+// @Failure 400 {object} map[string]string "Invalid role ID"
+// @Failure 404 {object} map[string]string "Role not found"
+// @Router /api/roles/{id} [delete]
 func (h *RoleHandler) DeleteRole(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 32)
@@ -107,6 +146,12 @@ func (h *RoleHandler) DeleteRole(c *gin.Context) {
 }
 
 // ListRoles handles listing all roles
+// @Summary List roles
+// @Description Get a list of all roles
+// @Tags Roles
+// @Produce json
+// @Success 200 {array} entity.Role "List of roles"
+// @Router /api/roles [get]
 func (h *RoleHandler) ListRoles(c *gin.Context) {
 	roles, err := h.roleUseCase.List()
 	if err != nil {

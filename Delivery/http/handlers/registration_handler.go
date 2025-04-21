@@ -28,7 +28,29 @@ type BulkRegistrationRequest struct {
 	CountryID *uint  `json:"country_id"`
 }
 
+// RegistrationParam defines the request body for user registration with a role
+// swagger:model
+// @Description Registration data for bulk user registration with a role
+// @Param emails body string true "Emails (comma-separated)"
+// @Param group_id body uint true "Group ID"
+// @Param country_id body uint false "Country ID"
+type RegistrationParam struct {
+	Emails    string `json:"emails" binding:"required"`
+	GroupID   uint   `json:"group_id" binding:"required"`
+	CountryID *uint  `json:"country_id"`
+}
+
 // RegisterBulkUsers handles registering multiple users at once
+// @Summary Register multiple users in bulk
+// @Description Register multiple users with the provided information
+// @Tags Registration
+// @Accept json
+// @Produce json
+// @Param bulk-registration body BulkRegistrationRequest true "Bulk registration data"
+// @Success 200 {object} map[string]interface{} "Bulk registration processed"
+// @Failure 400 {object} map[string]interface{} "Invalid input"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Router /api/registration/bulk [post]
 func (h *RegistrationHandler) RegisterBulkUsers(c *gin.Context) {
 	var request BulkRegistrationRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
@@ -82,6 +104,17 @@ func (h *RegistrationHandler) RegisterBulkUsers(c *gin.Context) {
 }
 
 // RegisterUsersWithRole handles registering multiple users with a specific role ID from the URL
+// @Summary Register multiple users with a specific role
+// @Description Register multiple users with the provided information and a specific role ID
+// @Tags Registration
+// @Accept json
+// @Produce json
+// @Param role_id path uint true "Role ID"
+// @Param registration body RegistrationParam true "Registration data"
+// @Success 200 {object} map[string]interface{} "Bulk registration processed"
+// @Failure 400 {object} map[string]interface{} "Invalid input"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Router /api/registration/role/{role_id} [post]
 func (h *RegistrationHandler) RegisterUsersWithRole(c *gin.Context) {
 	// Get role ID from URL parameter
 	roleIDStr := c.Param("role_id")
@@ -92,11 +125,7 @@ func (h *RegistrationHandler) RegisterUsersWithRole(c *gin.Context) {
 	}
 
 	// Get emails and required IDs from request body
-	var request struct {
-		Emails    string `json:"emails" binding:"required"`
-		GroupID   uint   `json:"group_id" binding:"required"`
-		CountryID *uint  `json:"country_id"`
-	}
+	var request RegistrationParam
 	if err := c.ShouldBindJSON(&request); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":   "Invalid request body",
@@ -140,3 +169,6 @@ func (h *RegistrationHandler) RegisterUsersWithRole(c *gin.Context) {
 		"results":    results,
 	})
 }
+
+// ForceSwaggoParse is a dummy function to ensure Swaggo parses this file.
+func ForceSwaggoParseRegistrationHandler() {}

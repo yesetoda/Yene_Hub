@@ -23,7 +23,7 @@ type TrackUsecase struct {
 	TrackRepository repository.TrackRepository
 }
 
-func NewTrackUsecase(trackRepository repository.TrackRepository) TrackUseCaseInterface {
+func NewTrackUsecase(trackRepository repository.TrackRepository) *TrackUsecase {
 	return &TrackUsecase{
 		TrackRepository: trackRepository,
 	}

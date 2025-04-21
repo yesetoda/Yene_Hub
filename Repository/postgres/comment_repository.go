@@ -6,44 +6,101 @@ import (
 	"gorm.io/gorm"
 )
 
-type CommentRepository struct {
-	db *gorm.DB
-}
-func NewCommentRepository(db *gorm.DB) repository.CommentRepository {
-	return &CommentRepository{db: db}
-}
-func (r *CommentRepository) Create(comment *entity.Comment) error {
-	return r.db.Create(comment).Error
+type commentRepository struct {
+	BaseRepository
 }
 
-func (r *CommentRepository) GetByID(id uint) (*entity.Comment, error) {
+func NewCommentRepository(db *gorm.DB) repository.CommentRepository {
+	return &commentRepository{
+		BaseRepository: NewBaseRepository(db, "comment"),
+	}
+}
+
+func (r *commentRepository) Create(comment *entity.Comment) error {
+	err := r.db.Create(comment).Error
+	if err != nil {
+		return err
+	}
+
+	// Cache the newly created comment
+	_ = r.cacheDetail("byid", comment, comment.ID)
+	_ = r.cacheDetail("byuser", comment, comment.UserID)
+	_ = r.cacheDetail("byproblem", comment, comment.ProblemID)
+
+	// Invalidate list caches
+	r.invalidateCache("list")
+	
+	return nil
+}
+
+func (r *commentRepository) GetByID(id uint) (*entity.Comment, error) {
 	var comment entity.Comment
-	if err := r.db.First(&comment, id).Error; err != nil {
+	err := r.getCachedDetail("byid", &comment, func() error {
+		return r.db.First(&comment, id).Error
+	}, id)
+	
+	if err != nil {
 		return nil, err
 	}
 	return &comment, nil
 }
 
-func (r *CommentRepository) GetByUserID(userID uint) ([]*entity.Comment, error) {
+func (r *commentRepository) GetByUserID(userID uint) ([]*entity.Comment, error) {
 	var comments []*entity.Comment
-	if err := r.db.Where("user_id = ?", userID).Find(&comments).Error; err != nil {
-		return nil, err
+	err := r.getCachedList("byuser", &comments, func() error {
+		return r.db.Where("user_id = ?", userID).Find(&comments).Error
+	}, userID)
+	
+	return comments, err
+}
+
+func (r *commentRepository) GetByProblemID(problemID uint) ([]*entity.Comment, error) {
+	var comments []*entity.Comment
+	err := r.getCachedList("byproblem", &comments, func() error {
+		return r.db.Where("problem_id = ?", problemID).Find(&comments).Error
+	}, problemID)
+	
+	return comments, err
+}
+
+func (r *commentRepository) List() ([]*entity.Comment, error) {
+	var comments []*entity.Comment
+	err := r.getCachedList("list", &comments, func() error {
+		return r.db.Find(&comments).Error
+	})
+	
+	return comments, err
+}
+
+func (r *commentRepository) Update(comment *entity.Comment) error {
+	err := r.db.Save(comment).Error
+	if err != nil {
+		return err
 	}
-	return comments, nil
-}	
 
-func (r *CommentRepository) List() ([]*entity.Comment, error) {
-	var comments []*entity.Comment
-	if err := r.db.Find(&comments).Error; err != nil {
-		return nil, err
-	}	
-	return comments, nil
+	// Update detail caches
+	_ = r.cacheDetail("byid", comment, comment.ID)
+	_ = r.cacheDetail("byuser", comment, comment.UserID)
+	_ = r.cacheDetail("byproblem", comment, comment.ProblemID)
+
+	// Invalidate list caches
+	r.invalidateCache("list")
+	
+	return nil
 }
 
-func (r *CommentRepository) Update(comment *entity.Comment) error {
-	return r.db.Save(comment).Error
-}
+func (r *commentRepository) Delete(id uint) error {
+	var comment entity.Comment
+	if err := r.db.First(&comment, id).Error; err != nil {
+		return err
+	}
 
-func (r *CommentRepository) Delete(id uint) error {
-	return r.db.Delete(&entity.Comment{}, id).Error
+	if err := r.db.Delete(&comment).Error; err != nil {
+		return err
+	}
+
+	// Invalidate all caches for this comment
+	r.invalidateAllCache()
+	
+	return nil
 }

@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"a2sv.org/hub/Domain/entity"
+	"a2sv.org/hub/Domain/repository"
 	"gorm.io/gorm"
 )
 
@@ -9,7 +10,7 @@ type ProblemRepository struct {
 	db *gorm.DB
 }
 
-func NewProblemRepository(db *gorm.DB) *ProblemRepository {
+func NewProblemRepository(db *gorm.DB) repository.ProblemRepository {
 	return &ProblemRepository{
 		db: db,
 	}
@@ -26,9 +27,17 @@ func (r *ProblemRepository) GetProblemByID(id uint) (*entity.Problem, error) {
 	}
 	return &problem, nil
 }
-
-func (r *ProblemRepository) GetProblemByName(name string) ([]*entity.Problem, error) {
+func (r *ProblemRepository) ListProblem() ([]*entity.Problem, error) {
 	var problems []*entity.Problem
+	result := r.db.Find(&problems)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return problems, nil
+}
+
+func (r *ProblemRepository) GetProblemByName(name string) (*entity.Problem, error) {
+	var problems *entity.Problem
 	result := r.db.Where("name = ?", name).Find(&problems)
 	if result.Error != nil {
 		return nil, result.Error

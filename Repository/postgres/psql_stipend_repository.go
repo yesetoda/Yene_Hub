@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"a2sv.org/hub/Domain/entity"
+	"a2sv.org/hub/Domain/repository"
 	"gorm.io/gorm"
 )
 
@@ -9,7 +10,7 @@ type StipendRepository struct {
 	db *gorm.DB
 }
 
-func NewStipendRepository(db *gorm.DB) *StipendRepository {
+func NewStipendRepository(db *gorm.DB) repository.StipendRepository {
 	return &StipendRepository{
 		db: db,
 	}
@@ -27,7 +28,7 @@ func (r *StipendRepository) GetStipendByID(id uint) (*entity.Stipend, error) {
 	}
 	return &stipend, nil
 }
-func (r *StipendRepository) ListStipends() ([]*entity.Stipend, error) {
+func (r *StipendRepository) ListStipend() ([]*entity.Stipend, error) {
 	var stipends []*entity.Stipend
 	result := r.db.Find(&stipends)
 	if result.Error != nil {

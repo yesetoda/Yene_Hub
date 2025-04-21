@@ -36,12 +36,10 @@ func InitGoogleOAuth(c *gin.Context) {
 }
 
 // HandleGoogleCallback handles the OAuth callback and only allows login for registered users.
-// HandleGoogleCallback handles the OAuth callback
 // @Summary Google OAuth callback
 // @Description Handle Google OAuth callback and return JWT token
 // @Tags Authentication
 // @Produce json
-// @Description [Login with Google](http://localhost:8080/api/auth/google)
 // @Param code query string true "Authorization code from Google"
 // @Param state query string false "OAuth state parameter"
 // @Param error query string false "OAuth error description"

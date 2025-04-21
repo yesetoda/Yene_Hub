@@ -42,7 +42,7 @@
         },
         "/api/auth/google/callback": {
             "get": {
-                "description": "Handle Google OAuth callback and return JWT token\n[Login with Google](http://localhost:8080/api/auth/google)",
+                "description": "Handle Google OAuth callback and return JWT token",
                 "produces": [
                     "application/json"
                 ],
@@ -146,6 +146,2752 @@
                         "description": "Internal server error",
                         "schema": {
                             "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/countries": {
+            "get": {
+                "description": "Get a list of all countries",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Countries"
+                ],
+                "summary": "List countries",
+                "responses": {
+                    "200": {
+                        "description": "List of countries",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Country"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new country entry",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Countries"
+                ],
+                "summary": "Create a new country",
+                "parameters": [
+                    {
+                        "description": "Country data",
+                        "name": "country",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.Country"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Country created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Country"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/countries/{id}": {
+            "get": {
+                "description": "Get a country by its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Countries"
+                ],
+                "summary": "Get country by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Country ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Country details",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Country"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid country ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Country not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a country by its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Countries"
+                ],
+                "summary": "Delete a country",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Country ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Country deleted successfully",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid country ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Country not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Update a country by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Countries"
+                ],
+                "summary": "Update a country",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Country ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Country data",
+                        "name": "country",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.Country"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Country updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Country"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/groups": {
+            "get": {
+                "description": "Get a list of all groups",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Groups"
+                ],
+                "summary": "List groups",
+                "responses": {
+                    "200": {
+                        "description": "List of groups",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Group"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new group entry",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Groups"
+                ],
+                "summary": "Create a new group",
+                "parameters": [
+                    {
+                        "description": "Group data",
+                        "name": "group",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.Group"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Group created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Group"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/groups/country/{country_id}": {
+            "get": {
+                "description": "Get a list of groups by country ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Groups"
+                ],
+                "summary": "List groups by country ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Country ID",
+                        "name": "country_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of groups",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Group"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/groups/{id}": {
+            "get": {
+                "description": "Get a group by its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Groups"
+                ],
+                "summary": "Get group by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Group ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Group details",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Group"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid group ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Group not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a group by its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Groups"
+                ],
+                "summary": "Delete a group",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Group ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Group deleted successfully",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid group ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Group not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Update a group by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Groups"
+                ],
+                "summary": "Update a group",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Group ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Group data",
+                        "name": "group",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.Group"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Group updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Group"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/problems": {
+            "get": {
+                "description": "Get a list of all problems",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Problems"
+                ],
+                "summary": "List problems",
+                "responses": {
+                    "200": {
+                        "description": "List of problems",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Problem"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new problem entry",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Problems"
+                ],
+                "summary": "Create a new problem",
+                "parameters": [
+                    {
+                        "description": "Problem data",
+                        "name": "problem",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.Problem"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Problem created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Problem"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/problems/name/{name}": {
+            "get": {
+                "description": "Get a problem by its name",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Problems"
+                ],
+                "summary": "Get problem by name",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Problem name",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Problem details",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Problem"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid problem name",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Problem not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/problems/{id}": {
+            "get": {
+                "description": "Get a problem by its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Problems"
+                ],
+                "summary": "Get problem by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Problem ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Problem details",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Problem"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid problem ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Problem not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a problem by its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Problems"
+                ],
+                "summary": "Delete a problem",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Problem ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Problem deleted successfully",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid problem ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Problem not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Update a problem by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Problems"
+                ],
+                "summary": "Update a problem",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Problem ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Problem data",
+                        "name": "problem",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.Problem"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Problem updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Problem"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/recent-actions": {
+            "get": {
+                "description": "Get a list of all recent user actions",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "RecentActions"
+                ],
+                "summary": "List recent actions",
+                "responses": {
+                    "200": {
+                        "description": "List of recent actions",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.RecentAction"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new recent user action",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "RecentActions"
+                ],
+                "summary": "Create recent action",
+                "parameters": [
+                    {
+                        "description": "Recent action details",
+                        "name": "recentAction",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.RecentAction"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Recent action created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/recent-actions/type/{action_type}": {
+            "get": {
+                "description": "Get a list of recent actions for a specific type",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "RecentActions"
+                ],
+                "summary": "Get recent actions by type",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Action Type",
+                        "name": "action_type",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of recent actions for the type",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.RecentAction"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/recent-actions/user/{user_id}": {
+            "get": {
+                "description": "Get a list of recent actions for a specific user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "RecentActions"
+                ],
+                "summary": "Get recent actions by user ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of recent actions for the user",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.RecentAction"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid user ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/recent-actions/{id}": {
+            "get": {
+                "description": "Get details of a recent action by its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "RecentActions"
+                ],
+                "summary": "Get recent action by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Recent Action ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Recent action details",
+                        "schema": {
+                            "$ref": "#/definitions/entity.RecentAction"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update a recent user action",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "RecentActions"
+                ],
+                "summary": "Update recent action",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Recent Action ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Recent action details",
+                        "name": "recentAction",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.RecentAction"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Recent action updated",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a recent user action",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "RecentActions"
+                ],
+                "summary": "Delete recent action",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Recent Action ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Recent action deleted",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/registration/bulk": {
+            "post": {
+                "description": "Register multiple users with the provided information",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Registration"
+                ],
+                "summary": "Register multiple users in bulk",
+                "parameters": [
+                    {
+                        "description": "Bulk registration data",
+                        "name": "bulk-registration",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.BulkRegistrationRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Bulk registration processed",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/registration/role/{role_id}": {
+            "post": {
+                "description": "Register multiple users with the provided information and a specific role ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Registration"
+                ],
+                "summary": "Register multiple users with a specific role",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Role ID",
+                        "name": "role_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Registration data",
+                        "name": "registration",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.RegistrationParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Bulk registration processed",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/roles": {
+            "get": {
+                "description": "Get a list of all roles",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "List roles",
+                "responses": {
+                    "200": {
+                        "description": "List of roles",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Role"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new role entry",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Create a new role",
+                "parameters": [
+                    {
+                        "description": "Role data",
+                        "name": "role",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.Role"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Role created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Role"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/roles/{id}": {
+            "get": {
+                "description": "Get a role by its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Get role by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Role ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Role details",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Role"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid role ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Role not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a role by its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Delete a role",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Role ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Role deleted successfully",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid role ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Role not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Update a role by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Update a role",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Role ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Role data",
+                        "name": "role",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.Role"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Role updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Role"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sessions": {
+            "get": {
+                "description": "Get a list of all sessions",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sessions"
+                ],
+                "summary": "List sessions",
+                "responses": {
+                    "200": {
+                        "description": "List of sessions",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Session"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new session for a user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sessions"
+                ],
+                "summary": "Create a new session",
+                "parameters": [
+                    {
+                        "description": "Session data",
+                        "name": "session",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.Session"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Session created successfully",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sessions/name/{name}": {
+            "get": {
+                "description": "Get a session by its name",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sessions"
+                ],
+                "summary": "Get session by name",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Session name",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Session details",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Session"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sessions/start-time/{start_time}": {
+            "get": {
+                "description": "Get a session by its start time",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sessions"
+                ],
+                "summary": "Get session by start time",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Session start time",
+                        "name": "start_time",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Session details",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Session"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sessions/{id}": {
+            "get": {
+                "description": "Get a session by its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sessions"
+                ],
+                "summary": "Get session by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Session ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Session details",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Session"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid session ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Session not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a session by its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sessions"
+                ],
+                "summary": "Delete a session",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Session ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Session deleted successfully",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid session ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Session not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Update a session by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sessions"
+                ],
+                "summary": "Update a session",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Session ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Session data",
+                        "name": "session",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.Session"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Session updated successfully",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Session not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/stipends": {
+            "get": {
+                "description": "Get a list of all stipends",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Stipends"
+                ],
+                "summary": "List stipends",
+                "responses": {
+                    "200": {
+                        "description": "List of stipends",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Stipend"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to fetch stippends",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new stipend entry",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Stipends"
+                ],
+                "summary": "Create a new stipend",
+                "parameters": [
+                    {
+                        "description": "Stipend data",
+                        "name": "stipend",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.Stipend"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Stipend created successfully",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/stipends/{stippend_id}": {
+            "get": {
+                "description": "Get a stipend by its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Stipends"
+                ],
+                "summary": "Get stipend by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Stipend ID",
+                        "name": "stippend_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Stipend details",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Stipend"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid stipend ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a stipend by its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Stipends"
+                ],
+                "summary": "Delete a stipend",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Stipend ID",
+                        "name": "stippend_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Stipend deleted successfully",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid stipend ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Update a stipend by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Stipends"
+                ],
+                "summary": "Update a stipend",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Stipend ID",
+                        "name": "stippend_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Stipend data",
+                        "name": "stipend",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.Stipend"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Stipend updated successfully",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/submissions": {
+            "get": {
+                "description": "Get a list of all submissions",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Submissions"
+                ],
+                "summary": "List submissions",
+                "responses": {
+                    "200": {
+                        "description": "List of submissions",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Submission"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new submission entry",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Submissions"
+                ],
+                "summary": "Create a new submission",
+                "parameters": [
+                    {
+                        "description": "Submission data",
+                        "name": "submission",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.Submission"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Submission created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Submission"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/submissions/problem/{problem_id}": {
+            "get": {
+                "description": "Get submissions for a specific problem",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Submissions"
+                ],
+                "summary": "Get submissions by problem ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Problem ID",
+                        "name": "problem_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Submissions for problem",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Submission"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid problem ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/submissions/user/{user_id}": {
+            "get": {
+                "description": "Get submissions for a specific user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Submissions"
+                ],
+                "summary": "Get submissions by user ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Submissions for user",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Submission"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid user ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/submissions/{id}": {
+            "get": {
+                "description": "Get a submission by its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Submissions"
+                ],
+                "summary": "Get submission by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Submission ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Submission details",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Submission"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid submission ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Submission not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/super_groups": {
+            "get": {
+                "description": "Get a list of all super groups",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SuperGroups"
+                ],
+                "summary": "List super groups",
+                "responses": {
+                    "200": {
+                        "description": "List of super groups",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.SuperGroup"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new super group entry",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SuperGroups"
+                ],
+                "summary": "Create a new super group",
+                "parameters": [
+                    {
+                        "description": "SuperGroup data",
+                        "name": "super_group",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.SuperGroup"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Super group created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.SuperGroup"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/super_groups/{id}": {
+            "get": {
+                "description": "Get a super group by its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SuperGroups"
+                ],
+                "summary": "Get super group by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "SuperGroup ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Super group details",
+                        "schema": {
+                            "$ref": "#/definitions/entity.SuperGroup"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid super group ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Super group not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a super group by its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SuperGroups"
+                ],
+                "summary": "Delete a super group",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "SuperGroup ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Super group deleted successfully",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid super group ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Super group not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Update a super group by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SuperGroups"
+                ],
+                "summary": "Update a super group",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "SuperGroup ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "SuperGroup data",
+                        "name": "super_group",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.SuperGroup"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Super group updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.SuperGroup"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/super_to_groups": {
+            "get": {
+                "description": "Get a list of all super to groups",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SuperToGroups"
+                ],
+                "summary": "List super to groups",
+                "responses": {
+                    "200": {
+                        "description": "List of super to groups",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.SuperToGroup"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new super to group entry",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SuperToGroups"
+                ],
+                "summary": "Create a new super to group",
+                "parameters": [
+                    {
+                        "description": "SuperToGroup data",
+                        "name": "super_to_group",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.SuperToGroup"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Super to group created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.SuperToGroup"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/super_to_groups/{id}": {
+            "get": {
+                "description": "Get a super to group by its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SuperToGroups"
+                ],
+                "summary": "Get super to group by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "SuperToGroup ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Super to group details",
+                        "schema": {
+                            "$ref": "#/definitions/entity.SuperToGroup"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid super to group ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Super to group not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a super to group by its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SuperToGroups"
+                ],
+                "summary": "Delete a super to group",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "SuperToGroup ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Super to group deleted successfully",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid super to group ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Super to group not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Update a super to group by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SuperToGroups"
+                ],
+                "summary": "Update a super to group",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "SuperToGroup ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "SuperToGroup data",
+                        "name": "super_to_group",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.SuperToGroup"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Super to group updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.SuperToGroup"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/tracks": {
+            "get": {
+                "description": "Get a list of all tracks",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tracks"
+                ],
+                "summary": "List tracks",
+                "responses": {
+                    "200": {
+                        "description": "List of tracks",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Track"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new track entry",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tracks"
+                ],
+                "summary": "Create a new track",
+                "parameters": [
+                    {
+                        "description": "Track data",
+                        "name": "track",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.Track"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Track created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Track"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/tracks/name/{name}": {
+            "get": {
+                "description": "Get a track by its name",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tracks"
+                ],
+                "summary": "Get track by name",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Track Name",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Track details",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Track"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid track name",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Track not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/tracks/{id}": {
+            "get": {
+                "description": "Get a track by its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tracks"
+                ],
+                "summary": "Get track by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Track ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Track details",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Track"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid track ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Track not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a track by its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tracks"
+                ],
+                "summary": "Delete a track",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Track ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Track deleted successfully",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid track ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Track not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Update a track by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tracks"
+                ],
+                "summary": "Update a track",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Track ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Track data",
+                        "name": "track",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.Track"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Track updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Track"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     }
                 }
@@ -454,6 +3200,477 @@
                         "description": "Internal server error",
                         "schema": {
                             "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/votes": {
+            "get": {
+                "description": "Get a list of votes",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Votes"
+                ],
+                "summary": "List votes",
+                "responses": {
+                    "200": {
+                        "description": "List of votes",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Vote"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new vote entry",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Votes"
+                ],
+                "summary": "Create a new vote",
+                "parameters": [
+                    {
+                        "description": "Vote data",
+                        "name": "vote",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.Vote"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Vote created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Vote"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/votes/comment/{comment_id}": {
+            "get": {
+                "description": "Get votes for a specific comment",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Votes"
+                ],
+                "summary": "Get votes by comment ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Comment ID",
+                        "name": "comment_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Votes for comment",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Vote"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid comment ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/votes/post/{post_id}": {
+            "get": {
+                "description": "Get votes for a specific post",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Votes"
+                ],
+                "summary": "Get votes by post ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Post ID",
+                        "name": "post_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Votes for post",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Vote"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid post ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/votes/problem/{problem_id}": {
+            "get": {
+                "description": "Get votes for a specific problem",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Votes"
+                ],
+                "summary": "Get votes by problem ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Problem ID",
+                        "name": "problem_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Votes for problem",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Vote"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid problem ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/votes/submission/{submission_id}": {
+            "get": {
+                "description": "Get votes for a specific submission",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Votes"
+                ],
+                "summary": "Get votes by submission ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Submission ID",
+                        "name": "submission_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Votes for submission",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Vote"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid submission ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/votes/track/{track_id}": {
+            "get": {
+                "description": "Get votes for a specific track",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Votes"
+                ],
+                "summary": "Get votes by track ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Track ID",
+                        "name": "track_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Votes for track",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Vote"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid track ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/votes/user/{user_id}": {
+            "get": {
+                "description": "Get votes for a specific user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Votes"
+                ],
+                "summary": "Get votes by user ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Votes for user",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Vote"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid user ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/votes/{id}": {
+            "get": {
+                "description": "Get a vote by its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Votes"
+                ],
+                "summary": "Get vote by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Vote ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Vote details",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Vote"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid vote ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Vote not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a vote by its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Votes"
+                ],
+                "summary": "Delete a vote",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Vote ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Vote deleted successfully",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid vote ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Vote not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Update a vote by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Votes"
+                ],
+                "summary": "Update a vote",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Vote ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Vote data",
+                        "name": "vote",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.Vote"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Vote updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Vote"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     }
                 }
@@ -1767,6 +4984,47 @@
                     "$ref": "#/definitions/entity.User"
                 },
                 "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handlers.BulkRegistrationRequest": {
+            "type": "object",
+            "required": [
+                "emails",
+                "group_id",
+                "role_id"
+            ],
+            "properties": {
+                "country_id": {
+                    "type": "integer"
+                },
+                "emails": {
+                    "type": "string"
+                },
+                "group_id": {
+                    "type": "integer"
+                },
+                "role_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handlers.RegistrationParam": {
+            "description": "Registration data for bulk user registration with a role",
+            "type": "object",
+            "required": [
+                "emails",
+                "group_id"
+            ],
+            "properties": {
+                "country_id": {
+                    "type": "integer"
+                },
+                "emails": {
+                    "type": "string"
+                },
+                "group_id": {
                     "type": "integer"
                 }
             }

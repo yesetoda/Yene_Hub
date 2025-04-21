@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"a2sv.org/hub/Domain/entity"
+	"a2sv.org/hub/Domain/repository"
 	"gorm.io/gorm"
 )
 
@@ -9,7 +10,7 @@ type RecentActionRepository struct {
 	db *gorm.DB
 }
 
-func NewRecentActionRepository(db *gorm.DB) *RecentActionRepository {
+func NewRecentActionRepository(db *gorm.DB) repository.RecentActionRepository {
 	return &RecentActionRepository{
 		db: db,
 	}
@@ -44,11 +45,17 @@ func (r *RecentActionRepository) GetRecentActionByType(actionType string) ([]*en
 	}
 	return RecentActions, nil
 }
-
+func (r *RecentActionRepository) ListRecentAction() ([]*entity.RecentAction, error) {
+	var RecentActions []*entity.RecentAction
+	result := r.db.Find(&RecentActions)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return RecentActions, nil
+}
 func (r *RecentActionRepository) UpdateRecentAction(recentAction *entity.RecentAction) error {
 	return r.db.Save(recentAction).Error
 }
-
 func (r *RecentActionRepository) DeleteRecentAction(id uint) error {
 	return r.db.Delete(&entity.RecentAction{}, id).Error
 }

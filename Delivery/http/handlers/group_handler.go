@@ -22,6 +22,16 @@ func NewGroupHandler(groupUseCase usecases.GroupUseCase) *GroupHandler {
 }
 
 // CreateGroup handles creating a new group
+// @Summary Create a new group
+// @Description Create a new group entry
+// @Tags Groups
+// @Accept json
+// @Produce json
+// @Param group body entity.Group true "Group data"
+// @Success 201 {object} entity.Group "Group created successfully"
+// @Failure 400 {object} map[string]string "Invalid request body"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /api/groups [post]
 func (h *GroupHandler) CreateGroup(c *gin.Context) {
 	var group entity.Group
 	if err := c.ShouldBindJSON(&group); err != nil {
@@ -42,6 +52,15 @@ func (h *GroupHandler) CreateGroup(c *gin.Context) {
 }
 
 // GetGroupByID handles getting a group by ID
+// @Summary Get group by ID
+// @Description Get a group by its ID
+// @Tags Groups
+// @Produce json
+// @Param id path int true "Group ID"
+// @Success 200 {object} entity.Group "Group details"
+// @Failure 400 {object} map[string]string "Invalid group ID"
+// @Failure 404 {object} map[string]string "Group not found"
+// @Router /api/groups/{id} [get]
 func (h *GroupHandler) GetGroupByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 32)
@@ -60,6 +79,17 @@ func (h *GroupHandler) GetGroupByID(c *gin.Context) {
 }
 
 // UpdateGroup handles updating a group
+// @Summary Update a group
+// @Description Update a group by its ID
+// @Tags Groups
+// @Accept json
+// @Produce json
+// @Param id path int true "Group ID"
+// @Param group body entity.Group true "Group data"
+// @Success 200 {object} entity.Group "Group updated successfully"
+// @Failure 400 {object} map[string]string "Invalid input"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /api/groups/{id} [patch]
 func (h *GroupHandler) UpdateGroup(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 32)
@@ -88,6 +118,15 @@ func (h *GroupHandler) UpdateGroup(c *gin.Context) {
 }
 
 // DeleteGroup handles deleting a group
+// @Summary Delete a group
+// @Description Delete a group by its ID
+// @Tags Groups
+// @Produce json
+// @Param id path int true "Group ID"
+// @Success 200 {object} map[string]string "Group deleted successfully"
+// @Failure 400 {object} map[string]string "Invalid group ID"
+// @Failure 404 {object} map[string]string "Group not found"
+// @Router /api/groups/{id} [delete]
 func (h *GroupHandler) DeleteGroup(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 32)
@@ -107,6 +146,12 @@ func (h *GroupHandler) DeleteGroup(c *gin.Context) {
 }
 
 // ListGroups handles listing all groups
+// @Summary List groups
+// @Description Get a list of all groups
+// @Tags Groups
+// @Produce json
+// @Success 200 {array} entity.Group "List of groups"
+// @Router /api/groups [get]
 func (h *GroupHandler) ListGroups(c *gin.Context) {
 	groups, err := h.groupUseCase.List()
 	if err != nil {
@@ -118,6 +163,13 @@ func (h *GroupHandler) ListGroups(c *gin.Context) {
 }
 
 // GetGroupsByCountryID handles listing groups by country ID
+// @Summary List groups by country ID
+// @Description Get a list of groups by country ID
+// @Tags Groups
+// @Produce json
+// @Param country_id path int true "Country ID"
+// @Success 200 {array} entity.Group "List of groups"
+// @Router /api/groups/country/{country_id} [get]
 func (h *GroupHandler) GetGroupsByCountryID(c *gin.Context) {
 	idStr := c.Param("country_id")
 	id, err := strconv.ParseUint(idStr, 10, 32)

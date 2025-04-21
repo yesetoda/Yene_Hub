@@ -22,7 +22,7 @@ type StipendUsecase struct{
 	StipendRepository repository.StipendRepository
 }
 
-func NewStipendUsecase(stipendRepository repository.StipendRepository) StipendUseCaseInterface{
+func NewStipendUsecase(stipendRepository repository.StipendRepository) *StipendUsecase{
 	return &StipendUsecase{
 		StipendRepository: stipendRepository,
 	}

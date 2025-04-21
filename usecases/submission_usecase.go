@@ -24,7 +24,7 @@ type SubmissionUsecase struct {
 	SubmissionRepository repository.SubmissionRepository
 }
 
-func NewSubmissionUsecase(submissionRepository repository.SubmissionRepository) SubmissionUseCaseInterface {
+func NewSubmissionUsecase(submissionRepository repository.SubmissionRepository) *SubmissionUsecase {
 	return &SubmissionUsecase{
 		SubmissionRepository: submissionRepository,
 	}

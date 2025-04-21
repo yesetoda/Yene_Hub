@@ -22,7 +22,7 @@ type SuperToGroupUsecase struct {
 	SuperToGroupRepository repository.SuperToGroupRepository
 }
 
-func NewSuperToGroupUsecase(superToGroupRepository repository.SuperToGroupRepository) SuperToGroupUseCaseInterface {
+func NewSuperToGroupUsecase(superToGroupRepository repository.SuperToGroupRepository) *SuperToGroupUsecase {
 	return &SuperToGroupUsecase{
 		SuperToGroupRepository: superToGroupRepository,
 	}

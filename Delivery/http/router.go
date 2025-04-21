@@ -34,6 +34,14 @@ func SetupRouter(
 	countryUseCase usecases.CountryUseCase,
 	bulkRegistrationUseCase usecases.BulkRegistrationUseCase,
 	superGroupUseCase usecases.SuperGroupUseCaseInterface,
+	recentActionUseCase usecases.RecentActionUsecase,
+	voteUsecase usecases.VoteUsecase,
+	trackUsecase usecases.TrackUsecase,
+	superToGroupUseCase usecases.SuperToGroupUsecase,
+	submissionUsecase usecases.SubmissionUsecase,
+	stippendUsecase usecases.StipendUsecase,
+	problemUsecase usecases.ProblemUseCaseInterface,
+	sessionUsecase usecases.SessionUsecase,
 
 ) *gin.Engine {
 	// Create a new gin router with default middleware
@@ -52,9 +60,15 @@ func SetupRouter(
 	countryHandler := handlers.NewCountryHandler(countryUseCase)
 	registrationHandler := handlers.NewRegistrationHandler(bulkRegistrationUseCase)
 	superGroupHandler := handlers.NewSuperGroupHandler(superGroupUseCase)
-
+	voteHandler := handlers.NewVoteHandler(voteUsecase)
+	trackHandler := handlers.NewTrackHandler(trackUsecase)
+	superToGroupHandler := handlers.NewSuperToGroupHandler(superToGroupUseCase)
+	submissionHandler := handlers.NewSubmissionHandeler(submissionUsecase)
+	stippendHandler := handlers.NewStippendHandler(stippendUsecase)
 	RoleMiddleware := middleware.NewRoleMiddleware(&userUseCase, &roleUseCase)
-
+	problemHandler := handlers.NewProblemHandler(problemUsecase)
+	recentActionHandler := handlers.NewRecentActionHandler(recentActionUseCase)
+	sessionHandler := handlers.NewSessionHandler(sessionUsecase)
 	// API routes group
 	api := router.Group("/api")
 	{
@@ -86,15 +100,33 @@ func SetupRouter(
 		}
 
 		// Role routes
-		roles := api.Group("/roles")
+		roles := api.Group("/roles") //correct
 		{
 			roles.POST("", roleHandler.CreateRole)
 			roles.GET("", roleHandler.ListRoles)
 			roles.GET("/:id", roleHandler.GetRoleByID)
-			roles.PUT("/:id", roleHandler.UpdateRole)
+			roles.PATCH("/:id", roleHandler.UpdateRole)
 			roles.DELETE("/:id", roleHandler.DeleteRole)
 		}
 
+		// Session routes
+		sessions := api.Group("/sessions")
+		{
+			sessions.POST("", sessionHandler.CreateSession)
+			sessions.GET("", sessionHandler.ListSessions)
+			sessions.GET("/:id", sessionHandler.GetSessionByID)
+			sessions.PATCH("/:id", sessionHandler.UpdateSession)
+			sessions.DELETE("/:id", sessionHandler.DeleteSession)
+		}
+		// Recent Action routes
+		recentActions := api.Group("/recent_actions")
+		{
+			recentActions.POST("", recentActionHandler.CreateRecentAction)
+			recentActions.GET("", recentActionHandler.ListRecentActions)
+			recentActions.GET("/:id", recentActionHandler.GetRecentActionByID)
+			recentActions.PATCH("/:id", recentActionHandler.UpdateRecentAction)
+			recentActions.DELETE("/:id", recentActionHandler.DeleteRecentAction)
+		}
 		// Group routes
 		groups := api.Group("/groups")
 		{
@@ -102,8 +134,17 @@ func SetupRouter(
 			groups.GET("", groupHandler.ListGroups)
 			groups.GET("/:id", groupHandler.GetGroupByID)
 			groups.GET("/country/:country_id", groupHandler.GetGroupsByCountryID)
-			groups.PUT("/:id", groupHandler.UpdateGroup)
+			groups.PATCH("/:id", groupHandler.UpdateGroup)
 			groups.DELETE("/:id", groupHandler.DeleteGroup)
+		}
+		problems := api.Group("/problems")
+		{
+			problems.POST("", problemHandler.CreateProblem)
+			problems.GET("", problemHandler.ListProblems)
+			problems.GET("/:id", problemHandler.GetProblemByID)
+			problems.GET("/name/:name", problemHandler.GetProblemByName)
+			problems.PATCH("/:id", problemHandler.UpdateProblem)
+			problems.DELETE("/:id", problemHandler.DeleteProblem)
 		}
 
 		// Country routes
@@ -112,20 +153,76 @@ func SetupRouter(
 			countries.POST("", countryHandler.CreateCountry)
 			countries.GET("", countryHandler.ListCountries)
 			countries.GET("/:id", countryHandler.GetCountryByID)
-			countries.PUT("/:id", countryHandler.UpdateCountry)
 			countries.DELETE("/:id", countryHandler.DeleteCountry)
+			// have some issue
+			countries.PATCH("/:id", countryHandler.UpdateCountry)
 		}
 
 		// Super Group routes
-		superGroups := api.Group("/super-groups")
+		superGroups := api.Group("/super_groups")
 		{
-			superGroups.POST("/create", superGroupHandler.CreateSuperGroup)
+			superGroups.POST("", superGroupHandler.CreateSuperGroup)
 			superGroups.GET("", superGroupHandler.ListSuperGroups)
 			superGroups.GET("/:id", superGroupHandler.GetSuperGroup)
-			superGroups.PUT("/:id", superGroupHandler.UpdateSuperGroup)
+			superGroups.PATCH("/:id", superGroupHandler.UpdateSuperGroup)
 			superGroups.DELETE("/:id", superGroupHandler.DeleteSuperGroup)
+		}
 
-			// Group management within super groups
+		// Vote routes
+		votes := api.Group("/votes")//there is error eof
+		{
+			votes.POST("", voteHandler.CreateVote)
+			votes.GET("", voteHandler.ListVote)
+			votes.GET("/:id", voteHandler.GetVoteByID)
+			votes.GET("/comment/:comment_id", voteHandler.GetVoteByCommentID)
+			votes.GET("/post/:post_id", voteHandler.GetVoteByPostID)
+			votes.GET("/user/:user_id", voteHandler.GetVoteByUserID)
+			votes.GET("/track/:track_id", voteHandler.GetVoteByTrackID)
+			votes.GET("/submission/:submission_id", voteHandler.GetVoteBySubmissionID)
+			votes.GET("/problem/:problem_id", voteHandler.GetVoteByProblemID)
+			votes.PATCH("/:id", voteHandler.UpdateVote)
+			votes.DELETE("/:id", voteHandler.DeleteVote)
+		}
+
+		// Track routes
+		tracks := api.Group("/tracks")
+		{
+			tracks.POST("", trackHandler.CreateTrack)
+			tracks.GET("", trackHandler.ListTrack)
+			tracks.GET("/:id", trackHandler.GetTrackByID)
+			tracks.GET("/name/:name", trackHandler.GetTrackByName)
+			tracks.PATCH("/:id", trackHandler.UpdateTrack)
+			tracks.DELETE("/:id", trackHandler.DeleteTrack)
+		}
+
+		// SuperToGroup routes
+		superToGroups := api.Group("/super_to_groups")
+		{
+			superToGroups.POST("", superToGroupHandler.CreateSuperToGroup)
+			superToGroups.GET("", superToGroupHandler.ListSuperToGroup)
+			superToGroups.GET("/:id", superToGroupHandler.GetSuperToGroupByID)
+			superToGroups.PATCH("/:id", superToGroupHandler.UpdateSuperToGroup)
+			superToGroups.DELETE("/:id", superToGroupHandler.DeleteSuperToGroup)
+		}
+
+		// Submission routes
+		submissions := api.Group("/submissions")
+		{
+			submissions.POST("", submissionHandler.CreateSubmission)
+			submissions.GET("", submissionHandler.ListSubmission)
+			submissions.GET("/:id", submissionHandler.GetSubmissionByID)
+			submissions.GET("/problem/:problem_id", submissionHandler.GetSubmissionByProblemID)
+			submissions.GET("/user/:user_id", submissionHandler.GetSubmissionByUserID)
+		}
+
+		// Stippend routes
+		stipends := api.Group("/stipends")
+		{
+			stipends.POST("", stippendHandler.CreateStipend)
+			stipends.GET("", stippendHandler.ListStippends)
+			stipends.GET("/:id", stippendHandler.GetStippendByID)
+			stipends.PATCH("/:id", stippendHandler.UpdateStipend)
+			stipends.DELETE("/:id", stippendHandler.DeleteStipend)
 		}
 	}
 	router.GET("/", func(c *gin.Context) {

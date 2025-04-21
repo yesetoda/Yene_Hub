@@ -162,7 +162,7 @@ func (u *UserUseCase) Login(email, password string) (*entity.User, string, error
 	if user == nil {
 		return nil, "", errors.New("user not found")
 	}
-	fmt.Println("user password", user.Password, "entered password", password)
+	// Removed logging of sensitive password details to prevent security vulnerabilities.
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
 		return nil, "", errors.New("invalid password")

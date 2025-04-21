@@ -881,6 +881,34 @@ definitions:
       user_id:
         type: integer
     type: object
+  handlers.BulkRegistrationRequest:
+    properties:
+      country_id:
+        type: integer
+      emails:
+        type: string
+      group_id:
+        type: integer
+      role_id:
+        type: integer
+    required:
+    - emails
+    - group_id
+    - role_id
+    type: object
+  handlers.RegistrationParam:
+    description: Registration data for bulk user registration with a role
+    properties:
+      country_id:
+        type: integer
+      emails:
+        type: string
+      group_id:
+        type: integer
+    required:
+    - emails
+    - group_id
+    type: object
   schemas.AuthTokenResponse:
     properties:
       token:
@@ -1132,9 +1160,7 @@ paths:
       - Authentication
   /api/auth/google/callback:
     get:
-      description: |-
-        Handle Google OAuth callback and return JWT token
-        [Login with Google](http://localhost:8080/api/auth/google)
+      description: Handle Google OAuth callback and return JWT token
       parameters:
       - description: Authorization code from Google
         in: query
@@ -1205,6 +1231,1831 @@ paths:
       summary: User login
       tags:
       - Auth
+  /api/countries:
+    get:
+      description: Get a list of all countries
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of countries
+          schema:
+            items:
+              $ref: '#/definitions/entity.Country'
+            type: array
+      summary: List countries
+      tags:
+      - Countries
+    post:
+      consumes:
+      - application/json
+      description: Create a new country entry
+      parameters:
+      - description: Country data
+        in: body
+        name: country
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Country'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Country created successfully
+          schema:
+            $ref: '#/definitions/entity.Country'
+        "400":
+          description: Invalid request body
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new country
+      tags:
+      - Countries
+  /api/countries/{id}:
+    delete:
+      description: Delete a country by its ID
+      parameters:
+      - description: Country ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Country deleted successfully
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid country ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Country not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a country
+      tags:
+      - Countries
+    get:
+      description: Get a country by its ID
+      parameters:
+      - description: Country ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Country details
+          schema:
+            $ref: '#/definitions/entity.Country'
+        "400":
+          description: Invalid country ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Country not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get country by ID
+      tags:
+      - Countries
+    patch:
+      consumes:
+      - application/json
+      description: Update a country by its ID
+      parameters:
+      - description: Country ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Country data
+        in: body
+        name: country
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Country'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Country updated successfully
+          schema:
+            $ref: '#/definitions/entity.Country'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update a country
+      tags:
+      - Countries
+  /api/groups:
+    get:
+      description: Get a list of all groups
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of groups
+          schema:
+            items:
+              $ref: '#/definitions/entity.Group'
+            type: array
+      summary: List groups
+      tags:
+      - Groups
+    post:
+      consumes:
+      - application/json
+      description: Create a new group entry
+      parameters:
+      - description: Group data
+        in: body
+        name: group
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Group'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Group created successfully
+          schema:
+            $ref: '#/definitions/entity.Group'
+        "400":
+          description: Invalid request body
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new group
+      tags:
+      - Groups
+  /api/groups/{id}:
+    delete:
+      description: Delete a group by its ID
+      parameters:
+      - description: Group ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Group deleted successfully
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid group ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Group not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a group
+      tags:
+      - Groups
+    get:
+      description: Get a group by its ID
+      parameters:
+      - description: Group ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Group details
+          schema:
+            $ref: '#/definitions/entity.Group'
+        "400":
+          description: Invalid group ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Group not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get group by ID
+      tags:
+      - Groups
+    patch:
+      consumes:
+      - application/json
+      description: Update a group by its ID
+      parameters:
+      - description: Group ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Group data
+        in: body
+        name: group
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Group'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Group updated successfully
+          schema:
+            $ref: '#/definitions/entity.Group'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update a group
+      tags:
+      - Groups
+  /api/groups/country/{country_id}:
+    get:
+      description: Get a list of groups by country ID
+      parameters:
+      - description: Country ID
+        in: path
+        name: country_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of groups
+          schema:
+            items:
+              $ref: '#/definitions/entity.Group'
+            type: array
+      summary: List groups by country ID
+      tags:
+      - Groups
+  /api/problems:
+    get:
+      description: Get a list of all problems
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of problems
+          schema:
+            items:
+              $ref: '#/definitions/entity.Problem'
+            type: array
+      summary: List problems
+      tags:
+      - Problems
+    post:
+      consumes:
+      - application/json
+      description: Create a new problem entry
+      parameters:
+      - description: Problem data
+        in: body
+        name: problem
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Problem'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Problem created successfully
+          schema:
+            $ref: '#/definitions/entity.Problem'
+        "400":
+          description: Invalid request body
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new problem
+      tags:
+      - Problems
+  /api/problems/{id}:
+    delete:
+      description: Delete a problem by its ID
+      parameters:
+      - description: Problem ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Problem deleted successfully
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid problem ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Problem not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a problem
+      tags:
+      - Problems
+    get:
+      description: Get a problem by its ID
+      parameters:
+      - description: Problem ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Problem details
+          schema:
+            $ref: '#/definitions/entity.Problem'
+        "400":
+          description: Invalid problem ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Problem not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get problem by ID
+      tags:
+      - Problems
+    patch:
+      consumes:
+      - application/json
+      description: Update a problem by its ID
+      parameters:
+      - description: Problem ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Problem data
+        in: body
+        name: problem
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Problem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Problem updated successfully
+          schema:
+            $ref: '#/definitions/entity.Problem'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update a problem
+      tags:
+      - Problems
+  /api/problems/name/{name}:
+    get:
+      description: Get a problem by its name
+      parameters:
+      - description: Problem name
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Problem details
+          schema:
+            $ref: '#/definitions/entity.Problem'
+        "400":
+          description: Invalid problem name
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Problem not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get problem by name
+      tags:
+      - Problems
+  /api/recent-actions:
+    get:
+      description: Get a list of all recent user actions
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of recent actions
+          schema:
+            items:
+              $ref: '#/definitions/entity.RecentAction'
+            type: array
+      summary: List recent actions
+      tags:
+      - RecentActions
+    post:
+      consumes:
+      - application/json
+      description: Create a new recent user action
+      parameters:
+      - description: Recent action details
+        in: body
+        name: recentAction
+        required: true
+        schema:
+          $ref: '#/definitions/entity.RecentAction'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Recent action created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid request body
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create recent action
+      tags:
+      - RecentActions
+  /api/recent-actions/{id}:
+    delete:
+      description: Delete a recent user action
+      parameters:
+      - description: Recent Action ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Recent action deleted
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete recent action
+      tags:
+      - RecentActions
+    get:
+      description: Get details of a recent action by its ID
+      parameters:
+      - description: Recent Action ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Recent action details
+          schema:
+            $ref: '#/definitions/entity.RecentAction'
+        "400":
+          description: Invalid ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get recent action by ID
+      tags:
+      - RecentActions
+    put:
+      consumes:
+      - application/json
+      description: Update a recent user action
+      parameters:
+      - description: Recent Action ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Recent action details
+        in: body
+        name: recentAction
+        required: true
+        schema:
+          $ref: '#/definitions/entity.RecentAction'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Recent action updated
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid request body
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update recent action
+      tags:
+      - RecentActions
+  /api/recent-actions/type/{action_type}:
+    get:
+      description: Get a list of recent actions for a specific type
+      parameters:
+      - description: Action Type
+        in: path
+        name: action_type
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of recent actions for the type
+          schema:
+            items:
+              $ref: '#/definitions/entity.RecentAction'
+            type: array
+      summary: Get recent actions by type
+      tags:
+      - RecentActions
+  /api/recent-actions/user/{user_id}:
+    get:
+      description: Get a list of recent actions for a specific user
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of recent actions for the user
+          schema:
+            items:
+              $ref: '#/definitions/entity.RecentAction'
+            type: array
+        "400":
+          description: Invalid user ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get recent actions by user ID
+      tags:
+      - RecentActions
+  /api/registration/bulk:
+    post:
+      consumes:
+      - application/json
+      description: Register multiple users with the provided information
+      parameters:
+      - description: Bulk registration data
+        in: body
+        name: bulk-registration
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.BulkRegistrationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Bulk registration processed
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Register multiple users in bulk
+      tags:
+      - Registration
+  /api/registration/role/{role_id}:
+    post:
+      consumes:
+      - application/json
+      description: Register multiple users with the provided information and a specific
+        role ID
+      parameters:
+      - description: Role ID
+        in: path
+        name: role_id
+        required: true
+        type: integer
+      - description: Registration data
+        in: body
+        name: registration
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.RegistrationParam'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Bulk registration processed
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Register multiple users with a specific role
+      tags:
+      - Registration
+  /api/roles:
+    get:
+      description: Get a list of all roles
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of roles
+          schema:
+            items:
+              $ref: '#/definitions/entity.Role'
+            type: array
+      summary: List roles
+      tags:
+      - Roles
+    post:
+      consumes:
+      - application/json
+      description: Create a new role entry
+      parameters:
+      - description: Role data
+        in: body
+        name: role
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Role'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Role created successfully
+          schema:
+            $ref: '#/definitions/entity.Role'
+        "400":
+          description: Invalid request body
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new role
+      tags:
+      - Roles
+  /api/roles/{id}:
+    delete:
+      description: Delete a role by its ID
+      parameters:
+      - description: Role ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Role deleted successfully
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid role ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Role not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a role
+      tags:
+      - Roles
+    get:
+      description: Get a role by its ID
+      parameters:
+      - description: Role ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Role details
+          schema:
+            $ref: '#/definitions/entity.Role'
+        "400":
+          description: Invalid role ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Role not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get role by ID
+      tags:
+      - Roles
+    patch:
+      consumes:
+      - application/json
+      description: Update a role by its ID
+      parameters:
+      - description: Role ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Role data
+        in: body
+        name: role
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Role'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Role updated successfully
+          schema:
+            $ref: '#/definitions/entity.Role'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update a role
+      tags:
+      - Roles
+  /api/sessions:
+    get:
+      description: Get a list of all sessions
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of sessions
+          schema:
+            items:
+              $ref: '#/definitions/entity.Session'
+            type: array
+      summary: List sessions
+      tags:
+      - Sessions
+    post:
+      consumes:
+      - application/json
+      description: Create a new session for a user
+      parameters:
+      - description: Session data
+        in: body
+        name: session
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Session'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Session created successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request body
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create a new session
+      tags:
+      - Sessions
+  /api/sessions/{id}:
+    delete:
+      description: Delete a session by its ID
+      parameters:
+      - description: Session ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Session deleted successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid session ID
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Session not found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete a session
+      tags:
+      - Sessions
+    get:
+      description: Get a session by its ID
+      parameters:
+      - description: Session ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Session details
+          schema:
+            $ref: '#/definitions/entity.Session'
+        "400":
+          description: Invalid session ID
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Session not found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get session by ID
+      tags:
+      - Sessions
+    patch:
+      consumes:
+      - application/json
+      description: Update a session by its ID
+      parameters:
+      - description: Session ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Session data
+        in: body
+        name: session
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Session'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Session updated successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request body
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Session not found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update a session
+      tags:
+      - Sessions
+  /api/sessions/name/{name}:
+    get:
+      description: Get a session by its name
+      parameters:
+      - description: Session name
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Session details
+          schema:
+            items:
+              $ref: '#/definitions/entity.Session'
+            type: array
+      summary: Get session by name
+      tags:
+      - Sessions
+  /api/sessions/start-time/{start_time}:
+    get:
+      description: Get a session by its start time
+      parameters:
+      - description: Session start time
+        in: path
+        name: start_time
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Session details
+          schema:
+            items:
+              $ref: '#/definitions/entity.Session'
+            type: array
+      summary: Get session by start time
+      tags:
+      - Sessions
+  /api/stipends:
+    get:
+      description: Get a list of all stipends
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of stipends
+          schema:
+            items:
+              $ref: '#/definitions/entity.Stipend'
+            type: array
+        "400":
+          description: Failed to fetch stippends
+          schema:
+            additionalProperties: true
+            type: object
+      summary: List stipends
+      tags:
+      - Stipends
+    post:
+      consumes:
+      - application/json
+      description: Create a new stipend entry
+      parameters:
+      - description: Stipend data
+        in: body
+        name: stipend
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Stipend'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Stipend created successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request body
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create a new stipend
+      tags:
+      - Stipends
+  /api/stipends/{stippend_id}:
+    delete:
+      description: Delete a stipend by its ID
+      parameters:
+      - description: Stipend ID
+        in: path
+        name: stippend_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Stipend deleted successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid stipend ID
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete a stipend
+      tags:
+      - Stipends
+    get:
+      description: Get a stipend by its ID
+      parameters:
+      - description: Stipend ID
+        in: path
+        name: stippend_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Stipend details
+          schema:
+            $ref: '#/definitions/entity.Stipend'
+        "400":
+          description: Invalid stipend ID
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get stipend by ID
+      tags:
+      - Stipends
+    patch:
+      consumes:
+      - application/json
+      description: Update a stipend by its ID
+      parameters:
+      - description: Stipend ID
+        in: path
+        name: stippend_id
+        required: true
+        type: integer
+      - description: Stipend data
+        in: body
+        name: stipend
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Stipend'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Stipend updated successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update a stipend
+      tags:
+      - Stipends
+  /api/submissions:
+    get:
+      description: Get a list of all submissions
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of submissions
+          schema:
+            items:
+              $ref: '#/definitions/entity.Submission'
+            type: array
+      summary: List submissions
+      tags:
+      - Submissions
+    post:
+      consumes:
+      - application/json
+      description: Create a new submission entry
+      parameters:
+      - description: Submission data
+        in: body
+        name: submission
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Submission'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Submission created successfully
+          schema:
+            $ref: '#/definitions/entity.Submission'
+        "400":
+          description: Invalid request body
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new submission
+      tags:
+      - Submissions
+  /api/submissions/{id}:
+    get:
+      description: Get a submission by its ID
+      parameters:
+      - description: Submission ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Submission details
+          schema:
+            $ref: '#/definitions/entity.Submission'
+        "400":
+          description: Invalid submission ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Submission not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get submission by ID
+      tags:
+      - Submissions
+  /api/submissions/problem/{problem_id}:
+    get:
+      description: Get submissions for a specific problem
+      parameters:
+      - description: Problem ID
+        in: path
+        name: problem_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Submissions for problem
+          schema:
+            items:
+              $ref: '#/definitions/entity.Submission'
+            type: array
+        "400":
+          description: Invalid problem ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get submissions by problem ID
+      tags:
+      - Submissions
+  /api/submissions/user/{user_id}:
+    get:
+      description: Get submissions for a specific user
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Submissions for user
+          schema:
+            items:
+              $ref: '#/definitions/entity.Submission'
+            type: array
+        "400":
+          description: Invalid user ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get submissions by user ID
+      tags:
+      - Submissions
+  /api/super_groups:
+    get:
+      description: Get a list of all super groups
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of super groups
+          schema:
+            items:
+              $ref: '#/definitions/entity.SuperGroup'
+            type: array
+      summary: List super groups
+      tags:
+      - SuperGroups
+    post:
+      consumes:
+      - application/json
+      description: Create a new super group entry
+      parameters:
+      - description: SuperGroup data
+        in: body
+        name: super_group
+        required: true
+        schema:
+          $ref: '#/definitions/entity.SuperGroup'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Super group created successfully
+          schema:
+            $ref: '#/definitions/entity.SuperGroup'
+        "400":
+          description: Invalid request body
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new super group
+      tags:
+      - SuperGroups
+  /api/super_groups/{id}:
+    delete:
+      description: Delete a super group by its ID
+      parameters:
+      - description: SuperGroup ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Super group deleted successfully
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid super group ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Super group not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a super group
+      tags:
+      - SuperGroups
+    get:
+      description: Get a super group by its ID
+      parameters:
+      - description: SuperGroup ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Super group details
+          schema:
+            $ref: '#/definitions/entity.SuperGroup'
+        "400":
+          description: Invalid super group ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Super group not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get super group by ID
+      tags:
+      - SuperGroups
+    patch:
+      consumes:
+      - application/json
+      description: Update a super group by its ID
+      parameters:
+      - description: SuperGroup ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: SuperGroup data
+        in: body
+        name: super_group
+        required: true
+        schema:
+          $ref: '#/definitions/entity.SuperGroup'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Super group updated successfully
+          schema:
+            $ref: '#/definitions/entity.SuperGroup'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update a super group
+      tags:
+      - SuperGroups
+  /api/super_to_groups:
+    get:
+      description: Get a list of all super to groups
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of super to groups
+          schema:
+            items:
+              $ref: '#/definitions/entity.SuperToGroup'
+            type: array
+      summary: List super to groups
+      tags:
+      - SuperToGroups
+    post:
+      consumes:
+      - application/json
+      description: Create a new super to group entry
+      parameters:
+      - description: SuperToGroup data
+        in: body
+        name: super_to_group
+        required: true
+        schema:
+          $ref: '#/definitions/entity.SuperToGroup'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Super to group created successfully
+          schema:
+            $ref: '#/definitions/entity.SuperToGroup'
+        "400":
+          description: Invalid request body
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new super to group
+      tags:
+      - SuperToGroups
+  /api/super_to_groups/{id}:
+    delete:
+      description: Delete a super to group by its ID
+      parameters:
+      - description: SuperToGroup ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Super to group deleted successfully
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid super to group ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Super to group not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a super to group
+      tags:
+      - SuperToGroups
+    get:
+      description: Get a super to group by its ID
+      parameters:
+      - description: SuperToGroup ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Super to group details
+          schema:
+            $ref: '#/definitions/entity.SuperToGroup'
+        "400":
+          description: Invalid super to group ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Super to group not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get super to group by ID
+      tags:
+      - SuperToGroups
+    patch:
+      consumes:
+      - application/json
+      description: Update a super to group by its ID
+      parameters:
+      - description: SuperToGroup ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: SuperToGroup data
+        in: body
+        name: super_to_group
+        required: true
+        schema:
+          $ref: '#/definitions/entity.SuperToGroup'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Super to group updated successfully
+          schema:
+            $ref: '#/definitions/entity.SuperToGroup'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update a super to group
+      tags:
+      - SuperToGroups
+  /api/tracks:
+    get:
+      description: Get a list of all tracks
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of tracks
+          schema:
+            items:
+              $ref: '#/definitions/entity.Track'
+            type: array
+      summary: List tracks
+      tags:
+      - Tracks
+    post:
+      consumes:
+      - application/json
+      description: Create a new track entry
+      parameters:
+      - description: Track data
+        in: body
+        name: track
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Track'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Track created successfully
+          schema:
+            $ref: '#/definitions/entity.Track'
+        "400":
+          description: Invalid request body
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new track
+      tags:
+      - Tracks
+  /api/tracks/{id}:
+    delete:
+      description: Delete a track by its ID
+      parameters:
+      - description: Track ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Track deleted successfully
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid track ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Track not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a track
+      tags:
+      - Tracks
+    get:
+      description: Get a track by its ID
+      parameters:
+      - description: Track ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Track details
+          schema:
+            $ref: '#/definitions/entity.Track'
+        "400":
+          description: Invalid track ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Track not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get track by ID
+      tags:
+      - Tracks
+    patch:
+      consumes:
+      - application/json
+      description: Update a track by its ID
+      parameters:
+      - description: Track ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Track data
+        in: body
+        name: track
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Track'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Track updated successfully
+          schema:
+            $ref: '#/definitions/entity.Track'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update a track
+      tags:
+      - Tracks
+  /api/tracks/name/{name}:
+    get:
+      description: Get a track by its name
+      parameters:
+      - description: Track Name
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Track details
+          schema:
+            $ref: '#/definitions/entity.Track'
+        "400":
+          description: Invalid track name
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Track not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get track by name
+      tags:
+      - Tracks
   /api/users:
     get:
       description: Get paginated list of users with optional filters
@@ -1406,6 +3257,317 @@ paths:
       summary: Update user details
       tags:
       - Users
+  /api/votes:
+    get:
+      description: Get a list of votes
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of votes
+          schema:
+            items:
+              $ref: '#/definitions/entity.Vote'
+            type: array
+      summary: List votes
+      tags:
+      - Votes
+    post:
+      consumes:
+      - application/json
+      description: Create a new vote entry
+      parameters:
+      - description: Vote data
+        in: body
+        name: vote
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Vote'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Vote created successfully
+          schema:
+            $ref: '#/definitions/entity.Vote'
+        "400":
+          description: Invalid request body
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new vote
+      tags:
+      - Votes
+  /api/votes/{id}:
+    delete:
+      description: Delete a vote by its ID
+      parameters:
+      - description: Vote ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Vote deleted successfully
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid vote ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Vote not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a vote
+      tags:
+      - Votes
+    get:
+      description: Get a vote by its ID
+      parameters:
+      - description: Vote ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Vote details
+          schema:
+            $ref: '#/definitions/entity.Vote'
+        "400":
+          description: Invalid vote ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Vote not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get vote by ID
+      tags:
+      - Votes
+    patch:
+      consumes:
+      - application/json
+      description: Update a vote by its ID
+      parameters:
+      - description: Vote ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Vote data
+        in: body
+        name: vote
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Vote'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Vote updated successfully
+          schema:
+            $ref: '#/definitions/entity.Vote'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update a vote
+      tags:
+      - Votes
+  /api/votes/comment/{comment_id}:
+    get:
+      description: Get votes for a specific comment
+      parameters:
+      - description: Comment ID
+        in: path
+        name: comment_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Votes for comment
+          schema:
+            items:
+              $ref: '#/definitions/entity.Vote'
+            type: array
+        "400":
+          description: Invalid comment ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get votes by comment ID
+      tags:
+      - Votes
+  /api/votes/post/{post_id}:
+    get:
+      description: Get votes for a specific post
+      parameters:
+      - description: Post ID
+        in: path
+        name: post_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Votes for post
+          schema:
+            items:
+              $ref: '#/definitions/entity.Vote'
+            type: array
+        "400":
+          description: Invalid post ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get votes by post ID
+      tags:
+      - Votes
+  /api/votes/problem/{problem_id}:
+    get:
+      description: Get votes for a specific problem
+      parameters:
+      - description: Problem ID
+        in: path
+        name: problem_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Votes for problem
+          schema:
+            items:
+              $ref: '#/definitions/entity.Vote'
+            type: array
+        "400":
+          description: Invalid problem ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get votes by problem ID
+      tags:
+      - Votes
+  /api/votes/submission/{submission_id}:
+    get:
+      description: Get votes for a specific submission
+      parameters:
+      - description: Submission ID
+        in: path
+        name: submission_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Votes for submission
+          schema:
+            items:
+              $ref: '#/definitions/entity.Vote'
+            type: array
+        "400":
+          description: Invalid submission ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get votes by submission ID
+      tags:
+      - Votes
+  /api/votes/track/{track_id}:
+    get:
+      description: Get votes for a specific track
+      parameters:
+      - description: Track ID
+        in: path
+        name: track_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Votes for track
+          schema:
+            items:
+              $ref: '#/definitions/entity.Vote'
+            type: array
+        "400":
+          description: Invalid track ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get votes by track ID
+      tags:
+      - Votes
+  /api/votes/user/{user_id}:
+    get:
+      description: Get votes for a specific user
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Votes for user
+          schema:
+            items:
+              $ref: '#/definitions/entity.Vote'
+            type: array
+        "400":
+          description: Invalid user ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get votes by user ID
+      tags:
+      - Votes
 securityDefinitions:
   BearerAuth:
     description: Type "Bearer" followed by a space and JWT token.

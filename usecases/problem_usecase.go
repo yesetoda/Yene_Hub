@@ -22,12 +22,11 @@ type ProblemUseCaseInterface interface {
 	DeleteProblem(id uint) error
 }
 
-
-type ProblemUsecase struct{
+type ProblemUsecase struct {
 	ProblemRepository repository.ProblemRepository
 }
 
-func NewProblemUsecase(problemRepository repository.ProblemRepository) ProblemUseCaseInterface {
+func NewProblemUsecase(problemRepository repository.ProblemRepository) *ProblemUsecase {
 	return &ProblemUsecase{
 		ProblemRepository: problemRepository,
 	}
@@ -107,6 +106,3 @@ func (p *ProblemUsecase) DeleteProblem(id uint) error {
 	}
 	return nil
 }
-
-
-

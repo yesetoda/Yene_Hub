@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"a2sv.org/hub/Domain/entity"
+	"a2sv.org/hub/Domain/repository"
 	"gorm.io/gorm"
 )
 
@@ -9,13 +10,22 @@ type SubmissionRepository struct {
 	db *gorm.DB
 }
 
-func NewSubmissionRepository(db *gorm.DB) *SubmissionRepository {
+func NewSubmissionRepository(db *gorm.DB) repository.SubmissionRepository {
 	return &SubmissionRepository{
 		db: db,
 	}
 }
 func (r *SubmissionRepository) CreateSubmission(submission *entity.Submission) error {
 	return r.db.Create(submission).Error
+}
+
+func (r *SubmissionRepository) ListSubmission() ([]*entity.Submission, error) {
+	var submissions []*entity.Submission
+	result := r.db.Find(&submissions)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return submissions, nil
 }
 
 func (r *SubmissionRepository) GetSubmissionByID(id uint) (*entity.Submission, error) {

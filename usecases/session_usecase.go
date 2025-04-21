@@ -14,7 +14,6 @@ type SessionUseCaseInterface interface {
 	GetSessionByName(name string) ([]*entity.Session, error)
 	GetSessionByID(id uint) (*entity.Session, error)
 	GetSessionByStartTime(startTime string) ([]*entity.Session, error)
-	
 
 	UpdateSession(Session *entity.Session) error
 
@@ -25,12 +24,11 @@ type SessionUsecase struct {
 	SessionRepository repository.SessionRepository
 }
 
-func NewSessionUsecase(sessionRepository repository.SessionRepository) SessionUseCaseInterface {
+func NewSessionUsecase(sessionRepository repository.SessionRepository) *SessionUsecase {
 	return &SessionUsecase{
 		SessionRepository: sessionRepository,
 	}
 }
-
 
 func (s *SessionUsecase) CreateSession(session *entity.Session) error {
 	err := s.SessionRepository.CreateSession(session)
@@ -39,7 +37,6 @@ func (s *SessionUsecase) CreateSession(session *entity.Session) error {
 	}
 	return nil
 }
-
 
 func (s *SessionUsecase) ListSession() ([]*entity.Session, error) {
 	sessions, err := s.SessionRepository.ListSession()
@@ -79,6 +76,6 @@ func (s *SessionUsecase) UpdateSession(session *entity.Session) error {
 	return nil
 }
 
-func (s *SessionUsecase) DeleteSession(id uint) error{
+func (s *SessionUsecase) DeleteSession(id uint) error {
 	return s.SessionRepository.DeleteSession(id)
 }
