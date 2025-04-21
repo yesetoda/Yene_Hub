@@ -2,6 +2,7 @@ package http
 
 import (
 	"os"
+	"time"
 
 	"a2sv.org/hub/Delivery/http/handlers"
 	"a2sv.org/hub/Delivery/http/middleware"
@@ -50,7 +51,17 @@ func SetupRouter(
 	// @name Authorization
 	// @description Type "Bearer" followed by a space and JWT token.
 	router := gin.Default()
-	router.Use(cors.Default())
+	
+	// Configure CORS to allow all origins and necessary headers
+	config := cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}
+	router.Use(cors.New(config))
+	
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	router.Use(middleware.UpstashRateLimiter(10, 60, os.Getenv("REDIS_URL"), os.Getenv("REDIS_TOKEN")))
 
