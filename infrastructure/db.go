@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"a2sv.org/hub/Domain/entity"
 	"gorm.io/driver/postgres"
@@ -23,17 +24,33 @@ func NewDBConnection() (*gorm.DB, error) {
 	gormLogger := logger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags),
 		logger.Config{
-			LogLevel: logger.Info,
+			LogLevel:                  logger.Error, // Only log errors
+			IgnoreRecordNotFoundError: true,        // Ignore record not found errors
+			Colorful:                  false,        // Disable colors for better performance
+			SlowThreshold:            time.Second,  // Only log queries that take more than 1 second
 		},
 	)
 
-	// Open database connection
+	// Open database connection with optimized configuration
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: gormLogger,
+		PrepareStmt: true,                // Enable prepared statement cache
+		SkipDefaultTransaction: true,     // Skip default transaction for better performance
 	})
 	if err != nil {
 		return nil, err
 	}
+
+	// Configure connection pool
+	sqlDB, err := db.DB()
+	if err != nil {
+		return nil, err
+	}
+	
+	// Set connection pool settings
+	sqlDB.SetMaxIdleConns(10)           // Maximum number of idle connections
+	sqlDB.SetMaxOpenConns(100)          // Maximum number of open connections
+	sqlDB.SetConnMaxLifetime(time.Hour) // Maximum lifetime of a connection
 
 	// Auto migrate database models
 	err = db.AutoMigrate(
