@@ -14,7 +14,7 @@
         },
         "version": "1.0"
     },
-    "host": "https://yene-hub-ls0y.onrender.com",
+    "host": "yene-hub-ls0y.onrender.com",
     "basePath": "/",
     "paths": {
         "/api/auth/google": {
