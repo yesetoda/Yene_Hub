@@ -20,7 +20,8 @@ import (
 // @description API for managing A2SV Hub resources including users, groups, and learning activities
 // @contact.name A2SV Support
 // @contact.email support@a2sv.org
-// @host localhost:8080
+// @host yene-hub-ls0y.onrender.com
+// @schemes https
 // @BasePath /
 // @securityDefinitions.apikey BearerAuth
 // @in header
