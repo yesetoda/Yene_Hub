@@ -25,8 +25,8 @@ func NewSuperGroupHandler(superGroupUseCase usecases.SuperGroupUseCaseInterface)
 // @Tags SuperGroups
 // @Accept json
 // @Produce json
-// @Param super_group body entity.SuperGroup true "SuperGroup data"
-// @Success 201 {object} entity.SuperGroup "Super group created successfully"
+// @Param super_group body schemas.CreateSuperGroupRequest true "SuperGroup data"
+// @Success 201 {object} schemas.SuperGroupResponse "Super group created successfully"
 // @Failure 400 {object} map[string]string "Invalid request body"
 // @Failure 500 {object} map[string]string "Internal server error"
 // @Router /api/super_groups [post]
@@ -56,7 +56,7 @@ func (h *SuperGroupHandler) CreateSuperGroup(c *gin.Context) {
 // @Tags SuperGroups
 // @Produce json
 // @Param id path int true "SuperGroup ID"
-// @Success 200 {object} entity.SuperGroup "Super group details"
+// @Success 200 {object} schemas.SuperGroupResponse "Super group details"
 // @Failure 400 {object} map[string]string "Invalid super group ID"
 // @Failure 404 {object} map[string]string "Super group not found"
 // @Router /api/super_groups/{id} [get]
@@ -86,8 +86,8 @@ func (h *SuperGroupHandler) GetSuperGroup(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path int true "SuperGroup ID"
-// @Param super_group body entity.SuperGroup true "SuperGroup data"
-// @Success 200 {object} entity.SuperGroup "Super group updated successfully"
+// @Param super_group body schemas.UpdateSuperGroupRequest true "SuperGroup data"
+// @Success 200 {object} schemas.SuperGroupResponse "Super group updated successfully"
 // @Failure 400 {object} map[string]string "Invalid input"
 // @Failure 500 {object} map[string]string "Internal server error"
 // @Router /api/super_groups/{id} [patch]
@@ -123,7 +123,7 @@ func (h *SuperGroupHandler) UpdateSuperGroup(c *gin.Context) {
 // @Tags SuperGroups
 // @Produce json
 // @Param id path int true "SuperGroup ID"
-// @Success 200 {object} map[string]string "Super group deleted successfully"
+// @Success 200 {object} schemas.SuperGroupResponse "Super group deleted successfully"
 // @Failure 400 {object} map[string]string "Invalid super group ID"
 // @Failure 404 {object} map[string]string "Super group not found"
 // @Router /api/super_groups/{id} [delete]
@@ -149,7 +149,7 @@ func (h *SuperGroupHandler) DeleteSuperGroup(c *gin.Context) {
 // @Description Get a list of all super groups
 // @Tags SuperGroups
 // @Produce json
-// @Success 200 {array} entity.SuperGroup "List of super groups"
+// @Success 200 {array} []*schemas.SuperGroupResponse "List of super groups"
 // @Router /api/super_groups [get]
 func (h *SuperGroupHandler) ListSuperGroups(c *gin.Context) {
 	superGroups, err := h.superGroupUseCase.List()

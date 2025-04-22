@@ -3,6 +3,7 @@ package handlers
 import (
 	"strconv"
 
+	"a2sv.org/hub/Delivery/http/schemas"
 	"a2sv.org/hub/Domain/entity"
 	"a2sv.org/hub/usecases"
 	"github.com/gin-gonic/gin"
@@ -24,8 +25,8 @@ func NewProblemHandler(problemUsecase usecases.ProblemUseCaseInterface) *Problem
 // @Tags Problems
 // @Accept json
 // @Produce json
-// @Param problem body entity.Problem true "Problem data"
-// @Success 201 {object} entity.Problem "Problem created successfully"
+// @Param problem body schemas.CreateProblemRequest true "Problem data"
+// @Success 201 {object} schemas.ProblemResponse "Problem created successfully"
 // @Failure 400 {object} map[string]string "Invalid request body"
 // @Failure 500 {object} map[string]string "Internal server error"
 // @Router /api/problems [post]
@@ -49,7 +50,7 @@ func (h *ProblemHandler) CreateProblem(c *gin.Context) {
 // @Description Get a list of all problems
 // @Tags Problems
 // @Produce json
-// @Success 200 {array} entity.Problem "List of problems"
+// @Success 200 {array} schemas.ProblemResponse "List of problems"
 // @Router /api/problems [get]
 func (h *ProblemHandler) ListProblems(c *gin.Context) {
 	problems, err := h.ProblemUsecase.ListProblem()
@@ -66,7 +67,7 @@ func (h *ProblemHandler) ListProblems(c *gin.Context) {
 // @Tags Problems
 // @Produce json
 // @Param name path string true "Problem name"
-// @Success 200 {object} entity.Problem "Problem details"
+// @Success 200 {object} schemas.ProblemResponse "Problem details"
 // @Failure 400 {object} map[string]string "Invalid problem name"
 // @Failure 404 {object} map[string]string "Problem not found"
 // @Router /api/problems/name/{name} [get]
@@ -86,7 +87,7 @@ func (h *ProblemHandler) GetProblemByName(c *gin.Context) {
 // @Tags Problems
 // @Produce json
 // @Param id path int true "Problem ID"
-// @Success 200 {object} entity.Problem "Problem details"
+// @Success 200 {object} schemas.ProblemResponse "Problem details"
 // @Failure 400 {object} map[string]string "Invalid problem ID"
 // @Failure 404 {object} map[string]string "Problem not found"
 // @Router /api/problems/{id} [get]
@@ -111,8 +112,8 @@ func (h *ProblemHandler) GetProblemByID(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path int true "Problem ID"
-// @Param problem body entity.Problem true "Problem data"
-// @Success 200 {object} entity.Problem "Problem updated successfully"
+// @Param problem body schemas.UpdateProblemRequest true "Problem data"
+// @Success 200 {object} schemas.ProblemResponse "Problem updated successfully"
 // @Failure 400 {object} map[string]string "Invalid input"
 // @Failure 500 {object} map[string]string "Internal server error"
 // @Router /api/problems/{id} [patch]
@@ -122,7 +123,7 @@ func (h *ProblemHandler) UpdateProblem(c *gin.Context) {
 		c.JSON(400, gin.H{"error": "Invalid problem ID"})
 		return
 	}
-	problem := &entity.Problem{}
+	problem := &schemas.UpdateProblemRequest{}
 	err = c.BindJSON(problem)
 	if err != nil {
 		c.JSON(400, gin.H{"error": "Invalid input"})

@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"a2sv.org/hub/Delivery/http/schemas"
 	"a2sv.org/hub/Domain/entity"
 	"a2sv.org/hub/Domain/repository"
 	"gorm.io/gorm"
@@ -16,7 +17,7 @@ func NewRecentActionRepository(db *gorm.DB) repository.RecentActionRepository {
 	}
 }
 
-func (r *RecentActionRepository) CreateRecentAction(RecentAction *entity.RecentAction) error {
+func (r *RecentActionRepository) CreateRecentAction(RecentAction *schemas.CreateRecentActionRequest) error {
 	return r.db.Create(RecentAction).Error
 }
 func (r *RecentActionRepository) GetRecentActionByID(id uint) (*entity.RecentAction, error) {
@@ -53,7 +54,7 @@ func (r *RecentActionRepository) ListRecentAction() ([]*entity.RecentAction, err
 	}
 	return RecentActions, nil
 }
-func (r *RecentActionRepository) UpdateRecentAction(recentAction *entity.RecentAction) error {
+func (r *RecentActionRepository) UpdateRecentAction(recentAction *schemas.UpdateRecentActionRequest) error {
 	return r.db.Save(recentAction).Error
 }
 func (r *RecentActionRepository) DeleteRecentAction(id uint) error {

@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"a2sv.org/hub/Delivery/http/schemas"
 	"a2sv.org/hub/Domain/entity"
 	"a2sv.org/hub/Domain/repository"
 	"gorm.io/gorm"
@@ -70,7 +71,7 @@ func (r *ProblemRepository) GetProblemByPlatform(platform string) ([]*entity.Pro
 	return problems, nil
 }
 
-func (r *ProblemRepository) UpdateProblem(problem *entity.Problem) error {
+func (r *ProblemRepository) UpdateProblem(problem *schemas.UpdateProblemRequest) error {
 	return r.db.Save(problem).Error
 }
 

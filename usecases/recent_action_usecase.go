@@ -1,13 +1,14 @@
 package usecases
 
 import (
+	"a2sv.org/hub/Delivery/http/schemas"
 	"a2sv.org/hub/Domain/entity"
 	"a2sv.org/hub/Domain/repository"
 )
 
 // RecentActionRepository defines methods for RecentAction data opeRecentActiontions
 type RecentActionUseCaseInterface interface {
-	CreateRecentAction(RecentAction *entity.RecentAction) error
+	CreateRecentAction(RecentAction *schemas.CreateRecentActionRequest) error
 
 	ListRecentAction() ([]*entity.RecentAction, error)
 
@@ -15,7 +16,7 @@ type RecentActionUseCaseInterface interface {
 	GetRecentActionByID(id uint) (*entity.RecentAction, error)
 	GetRecentActionByType(actionType string) ([]*entity.RecentAction, error)
 
-	UpdateRecentAction(RecentAction *entity.RecentAction) error
+	UpdateRecentAction(RecentAction *schemas.UpdateRecentActionRequest) error
 
 	DeleteRecentAction(id uint) error
 }
@@ -29,13 +30,14 @@ func NewRecentActionUsecase(recentActionRepository repository.RecentActionReposi
 	}
 }
 
-func (r *RecentActionUsecase) CreateRecentAction(recentAction *entity.RecentAction) error {
+func (r *RecentActionUsecase) CreateRecentAction(recentAction *schemas.CreateRecentActionRequest) error {
 	err := r.RecentActionRepository.CreateRecentAction(recentAction)
 	if err != nil {
 		return err
 	}
 	return nil
 }
+
 
 func (r *RecentActionUsecase) ListRecentAction() ([]*entity.RecentAction, error) {
 	recentActions, err := r.RecentActionRepository.ListRecentAction()
@@ -69,13 +71,14 @@ func (r *RecentActionUsecase) GetRecentActionByType(actionType string) ([]*entit
 	return recentActions, nil
 }
 
-func (r *RecentActionUsecase) UpdateRecentAction(recentAction *entity.RecentAction) error {
+func (r *RecentActionUsecase) UpdateRecentAction(recentAction *schemas.UpdateRecentActionRequest) error {
 	err := r.RecentActionRepository.UpdateRecentAction(recentAction)
 	if err != nil {
 		return err
 	}
 	return nil
 }
+
 
 func (r *RecentActionUsecase) DeleteRecentAction(id uint) error {
 	err := r.RecentActionRepository.DeleteRecentAction(id)

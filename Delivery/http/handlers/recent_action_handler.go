@@ -3,7 +3,7 @@ package handlers
 import (
 	"strconv"
 
-	"a2sv.org/hub/Domain/entity"
+	"a2sv.org/hub/Delivery/http/schemas"
 	"a2sv.org/hub/usecases"
 	"github.com/gin-gonic/gin"
 )
@@ -24,13 +24,13 @@ func NewRecentActionHandler(recentActionUsecase usecases.RecentActionUsecase) *R
 // @Tags RecentActions
 // @Accept json
 // @Produce json
-// @Param recentAction body entity.RecentAction true "Recent action details"
-// @Success 201 {object} map[string]string "Recent action created"
+// @Param recentAction body schemas.CreateRecentActionRequest true "Recent action details"
+// @Success 201 {object} schemas.RecentActionResponse "Recent action created"
 // @Failure 400 {object} map[string]string "Invalid request body"
-// @Router /api/recent-actions [post]
+// @Router /api/recent_actions [post]
 func (h *RecentActionHandler) CreateRecentAction(c *gin.Context) {
 	// Get the request body
-	var recentAction entity.RecentAction
+	var recentAction schemas.CreateRecentActionRequest
 	if err := c.ShouldBindJSON(&recentAction); err != nil {
 		c.JSON(400, gin.H{"error": "Invalid request body"})
 		return
@@ -49,8 +49,8 @@ func (h *RecentActionHandler) CreateRecentAction(c *gin.Context) {
 // @Description Get a list of all recent user actions
 // @Tags RecentActions
 // @Produce json
-// @Success 200 {array} entity.RecentAction "List of recent actions"
-// @Router /api/recent-actions [get]
+// @Success 200 {array} []*schemas.RecentActionResponse "List of recent actions"
+// @Router /api/recent_actions [get]
 func (h *RecentActionHandler) ListRecentActions(c *gin.Context) {
 	// Call the use case to get the list of recent actions
 	recentActions, err := h.RecentActionUsecase.ListRecentAction()
@@ -68,9 +68,9 @@ func (h *RecentActionHandler) ListRecentActions(c *gin.Context) {
 // @Tags RecentActions
 // @Produce json
 // @Param user_id path int true "User ID"
-// @Success 200 {array} entity.RecentAction "List of recent actions for the user"
+// @Success 200 {array} []*schemas.RecentActionResponse "List of recent actions for the user"
 // @Failure 400 {object} map[string]string "Invalid user ID"
-// @Router /api/recent-actions/user/{user_id} [get]
+// @Router /api/recent_actions/user/{user_id} [get]
 func (h *RecentActionHandler) GetRecentActionByUserID(c *gin.Context) {
 	// Get the user ID from the URL parameter
 	uid := c.Param("user_id")
@@ -100,10 +100,10 @@ func (h *RecentActionHandler) GetRecentActionByUserID(c *gin.Context) {
 // @Tags RecentActions
 // @Produce json
 // @Param id path int true "Recent Action ID"
-// @Success 200 {object} entity.RecentAction "Recent action details"
+// @Success 200 {object} schemas.RecentActionResponse "Recent action details"
 // @Failure 400 {object} map[string]string "Invalid ID"
 // @Failure 404 {object} map[string]string "Not found"
-// @Router /api/recent-actions/{id} [get]
+// @Router /api/recent_actions/{id} [get]
 func (h *RecentActionHandler) GetRecentActionByID(c *gin.Context) {
 	// Get the recent action ID from the URL parameter
 	id := c.Param("id")
@@ -133,8 +133,8 @@ func (h *RecentActionHandler) GetRecentActionByID(c *gin.Context) {
 // @Tags RecentActions
 // @Produce json
 // @Param action_type path string true "Action Type"
-// @Success 200 {array} entity.RecentAction "List of recent actions for the type"
-// @Router /api/recent-actions/type/{action_type} [get]
+// @Success 200 {array} []*schemas.RecentActionResponse "List of recent actions for the type"
+// @Router /api/recent_actions/type/{action_type} [get]
 func (h *RecentActionHandler) GetRecentActionByType(c *gin.Context) {
 	// Get the action type from the URL parameter
 	actionType := c.Param("action_type")
@@ -159,10 +159,10 @@ func (h *RecentActionHandler) GetRecentActionByType(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path int true "Recent Action ID"
-// @Param recentAction body entity.RecentAction true "Recent action details"
-// @Success 200 {object} map[string]string "Recent action updated"
+// @Param recentAction body schemas.UpdateRecentActionRequest true "Recent action details"
+// @Success 200 {object} schemas.RecentActionResponse "Recent action updated"
 // @Failure 400 {object} map[string]string "Invalid request body"
-// @Router /api/recent-actions/{id} [put]
+// @Router /api/recent_actions/{id} [put]
 func (h *RecentActionHandler) UpdateRecentAction(c *gin.Context) {
 	// Get the recent action ID from the URL parameter
 	id := c.Param("id")
@@ -177,7 +177,7 @@ func (h *RecentActionHandler) UpdateRecentAction(c *gin.Context) {
 		return
 	}
 	// Get the request body
-	var recentAction entity.RecentAction
+	var recentAction schemas.UpdateRecentActionRequest
 	if err := c.ShouldBindJSON(&recentAction); err != nil {
 		c.JSON(400, gin.H{"error": "Invalid request body"})
 		return
@@ -198,9 +198,9 @@ func (h *RecentActionHandler) UpdateRecentAction(c *gin.Context) {
 // @Tags RecentActions
 // @Produce json
 // @Param id path int true "Recent Action ID"
-// @Success 200 {object} map[string]string "Recent action deleted"
+// @Success 200 {object} schemas.RecentActionResponse "Recent action deleted"
 // @Failure 400 {object} map[string]string "Invalid ID"
-// @Router /api/recent-actions/{id} [delete]
+// @Router /api/recent_actions/{id} [delete]
 func (h *RecentActionHandler) DeleteRecentAction(c *gin.Context) {
 	// Get the recent action ID from the URL parameter
 	id := c.Param("id")
@@ -220,5 +220,5 @@ func (h *RecentActionHandler) DeleteRecentAction(c *gin.Context) {
 		return
 	}
 	// Return a success response
-	c.JSON(200, gin.H{"message": "Recent action deleted successfully"})	
+	c.JSON(200, gin.H{"message": "Recent action deleted successfully"})
 }

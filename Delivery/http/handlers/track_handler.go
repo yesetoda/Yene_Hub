@@ -25,8 +25,8 @@ func NewTrackHandler(trackUsecase usecases.TrackUsecase) *TrackHandler {
 // @Tags Tracks
 // @Accept json
 // @Produce json
-// @Param track body entity.Track true "Track data"
-// @Success 201 {object} entity.Track "Track created successfully"
+// @Param track body schemas.CreateTrackRequest true "Track data"
+// @Success 201 {object} schemas.TrackResponse "Track created successfully"
 // @Failure 400 {object} map[string]string "Invalid request body"
 // @Failure 500 {object} map[string]string "Internal server error"
 // @Router /api/tracks [post]
@@ -51,7 +51,7 @@ func (h *TrackHandler) CreateTrack(c *gin.Context) {
 // @Description Get a list of all tracks
 // @Tags Tracks
 // @Produce json
-// @Success 200 {array} entity.Track "List of tracks"
+// @Success 200 {array} []*schemas.TrackResponse "List of tracks"
 // @Router /api/tracks [get]
 func (h *TrackHandler) ListTrack(c *gin.Context) {
 	// Get the list of tracks using the use case
@@ -123,8 +123,8 @@ func (h *TrackHandler) GetTrackByName(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path int true "Track ID"
-// @Param track body entity.Track true "Track data"
-// @Success 200 {object} entity.Track "Track updated successfully"
+// @Param track body schemas.UpdateTrackRequest true "Track data"
+// @Success 200 {object} schemas.TrackResponse "Track updated successfully"
 // @Failure 400 {object} map[string]string "Invalid input"
 // @Failure 500 {object} map[string]string "Internal server error"
 // @Router /api/tracks/{id} [patch]
@@ -160,7 +160,7 @@ func (h *TrackHandler) UpdateTrack(c *gin.Context) {
 // @Tags Tracks
 // @Produce json
 // @Param id path int true "Track ID"
-// @Success 200 {object} map[string]string "Track deleted successfully"
+// @Success 200 {object} schemas.TrackResponse "Track deleted successfully"
 // @Failure 400 {object} map[string]string "Invalid track ID"
 // @Failure 404 {object} map[string]string "Track not found"
 // @Router /api/tracks/{id} [delete]

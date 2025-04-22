@@ -3,75 +3,113 @@ package usecases
 import (
 	"time"
 
+	"a2sv.org/hub/Delivery/http/schemas"
 	"a2sv.org/hub/Domain/entity"
 	"a2sv.org/hub/Domain/repository"
 )
 
 // RoleUseCase defines methods for role business logic
+// Now uses schemas for input/output
+// PaginationMeta is returned for list endpoints
+// Conversion utilities are used internally
 type RoleUseCaseInterface interface {
-	Create(role *entity.Role) (*entity.Role, error)
-	GetByID(id uint) (*entity.Role, error)
-	GetByType(roleType string) ([]*entity.Role, error)
-	Update(role *entity.Role) (*entity.Role, error)
+	Create(input *schemas.CreateRoleRequest) (*schemas.RoleResponse, error)
+	GetByID(id uint) (*schemas.RoleResponse, error)
+	GetByType(roleType string) ([]*schemas.RoleResponse, error)
+	Update(id uint, input *schemas.UpdateRoleRequest) (*schemas.RoleResponse, error)
 	Delete(id uint) error
-	List() ([]*entity.Role, error)
+	List() ([]*schemas.RoleResponse, *schemas.PaginationMeta, error)
 }
 
-// RoleUseCase implements RoleUseCase
 type RoleUseCase struct {
-	RoleRepository repository.RoleRepository
+	roleRepo repository.RoleRepository
 }
 
-// NewRoleUseCase creates a new RoleUseCase instance
-func NewRoleUseCase(RoleRepository repository.RoleRepository) *RoleUseCase {
+func NewRoleUseCase(roleRepo repository.RoleRepository) *RoleUseCase {
 	return &RoleUseCase{
-		RoleRepository: RoleRepository,
+		roleRepo: roleRepo,
 	}
 }
 
-// Create creates a new role
-func (u *RoleUseCase) Create(role *entity.Role) (*entity.Role, error) {
-	// Set timestamps
-	role.CreatedAt = time.Now()
-	role.UpdatedAt = time.Now()
-
-	// Create role
-	err := u.RoleRepository.CreateRole(role)
-	if err != nil {
-		return &entity.Role{}, err
+func (u *RoleUseCase) Create(input *schemas.CreateRoleRequest) (*schemas.RoleResponse, error) {
+	role := &entity.Role{
+		Type:      input.Type,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
-	return role, nil
-}
-
-// GetByID retrieves a role by ID
-func (u *RoleUseCase) GetByID(id uint) (*entity.Role, error) {
-	return u.RoleRepository.GetRoleByID(id)
-}
-
-// GetByType retrieves a role by type
-func (u *RoleUseCase) GetByType(roleType string) ([]*entity.Role, error) {
-	return u.RoleRepository.GetRoleByType(roleType)
-}
-
-// Update updates a role
-func (u *RoleUseCase) Update(role *entity.Role) (*entity.Role, error) {
-	existingRole, err := u.RoleRepository.GetRoleByID(role.ID)
+	err := u.roleRepo.CreateRole(role)
 	if err != nil {
 		return nil, err
 	}
-
-	role.CreatedAt = existingRole.CreatedAt
-	role.UpdatedAt = time.Now()
-
-	return role,u.RoleRepository.UpdateRole(role)
+	return entityToRoleResponse(role), nil
 }
 
-// Delete deletes a role
+func (u *RoleUseCase) GetByID(id uint) (*schemas.RoleResponse, error) {
+	role, err := u.roleRepo.GetRoleByID(id)
+	if err != nil {
+		return nil, err
+	}
+	return entityToRoleResponse(role), nil
+}
+
+func (u *RoleUseCase) GetByType(roleType string) ([]*schemas.RoleResponse, error) {
+	roles, err := u.roleRepo.GetRoleByType(roleType)
+	if err != nil {
+		return nil, err
+	}
+	resp := make([]*schemas.RoleResponse, 0, len(roles))
+	for _, r := range roles {
+		resp = append(resp, entityToRoleResponse(r))
+	}
+	return resp, nil
+}
+
+func (u *RoleUseCase) Update(id uint, input *schemas.UpdateRoleRequest) (*schemas.RoleResponse, error) {
+	existing, err := u.roleRepo.GetRoleByID(id)
+	if err != nil {
+		return nil, err
+	}
+	if input.Type != nil {
+		existing.Type = *input.Type
+	}
+	existing.UpdatedAt = time.Now()
+	err = u.roleRepo.UpdateRole(existing)
+	if err != nil {
+		return nil, err
+	}
+	return entityToRoleResponse(existing), nil
+}
+
 func (u *RoleUseCase) Delete(id uint) error {
-	return u.RoleRepository.DeleteRole(id)
+	return u.roleRepo.DeleteRole(id)
 }
 
-// List retrieves all roles
-func (u *RoleUseCase) List() ([]*entity.Role, error) {
-	return u.RoleRepository.ListRole()
+func (u *RoleUseCase) List() ([]*schemas.RoleResponse, *schemas.PaginationMeta, error) {
+	roles, err := u.roleRepo.ListRole()
+	if err != nil {
+		return nil, nil, err
+	}
+	resp := make([]*schemas.RoleResponse, 0, len(roles))
+	for _, r := range roles {
+		resp = append(resp, entityToRoleResponse(r))
+	}
+	meta := &schemas.PaginationMeta{
+		Total:      len(resp),
+		Page:       1,
+		PageSize:   len(resp),
+		TotalPages: 1,
+	}
+	return resp, meta, nil
+}
+
+func entityToRoleResponse(r *entity.Role) *schemas.RoleResponse {
+	if r == nil {
+		return nil
+	}
+	return &schemas.RoleResponse{
+		ID:        r.ID,
+		Type:      r.Type,
+		CreatedAt: r.CreatedAt,
+		UpdatedAt: r.UpdatedAt,
+	}
 }

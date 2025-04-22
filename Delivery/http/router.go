@@ -42,7 +42,7 @@ func SetupRouter(
 	superToGroupUseCase usecases.SuperToGroupUsecase,
 	submissionUsecase usecases.SubmissionUsecase,
 	stippendUsecase usecases.StipendUsecase,
-	problemUsecase usecases.ProblemUseCaseInterface,
+	problemUsecase usecases.ProblemUsecase,
 	sessionUsecase usecases.SessionUsecase,
 
 ) *gin.Engine {
@@ -52,7 +52,7 @@ func SetupRouter(
 	// @name Authorization
 	// @description Type "Bearer" followed by a space and JWT token.
 	router := gin.Default()
-	
+
 	// Configure CORS to allow all origins and necessary headers
 	config := cors.Config{
 		AllowOrigins:     []string{"*"},
@@ -62,7 +62,7 @@ func SetupRouter(
 		MaxAge:           12 * time.Hour,
 	}
 	router.Use(cors.New(config))
-	
+
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	router.Use(middleware.UpstashRateLimiter(10, 60, os.Getenv("REDIS_URL"), os.Getenv("REDIS_TOKEN")))
 
@@ -78,7 +78,7 @@ func SetupRouter(
 	submissionHandler := handlers.NewSubmissionHandeler(submissionUsecase)
 	stippendHandler := handlers.NewStippendHandler(stippendUsecase)
 	RoleMiddleware := middleware.NewRoleMiddleware(&userUseCase, &roleUseCase)
-	problemHandler := handlers.NewProblemHandler(problemUsecase)
+	problemHandler := handlers.NewProblemHandler(&problemUsecase)
 	recentActionHandler := handlers.NewRecentActionHandler(recentActionUseCase)
 	sessionHandler := handlers.NewSessionHandler(sessionUsecase)
 	// API routes group
@@ -181,7 +181,7 @@ func SetupRouter(
 		}
 
 		// Vote routes
-		votes := api.Group("/votes")//there is error eof
+		votes := api.Group("/votes") //there is error eof
 		{
 			votes.POST("", voteHandler.CreateVote)
 			votes.GET("", voteHandler.ListVote)

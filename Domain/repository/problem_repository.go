@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"a2sv.org/hub/Delivery/http/schemas"
 	"a2sv.org/hub/Domain/entity"
 )
 
@@ -16,7 +17,7 @@ type ProblemRepository interface {
 	GetProblemByPlatform(platform string) ([]*entity.Problem, error)
 	GetProblemByID(id uint) (*entity.Problem, error)
 
-	UpdateProblem(Problem *entity.Problem) error
+	UpdateProblem(Problem *schemas.UpdateProblemRequest) error
 
 	DeleteProblem(id uint) error
 }

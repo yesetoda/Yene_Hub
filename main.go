@@ -86,7 +86,7 @@ func main() {
 		*superToGroupUseCase,
 		*submissionUseCase,
 		*stippendUseCase,
-		problemUseCase,
+		*problemUseCase,
 		*sessionUsecase,
 	)
 	// Print all registered routes for debugging

@@ -1,6 +1,7 @@
 package usecases
 
 import (
+	"a2sv.org/hub/Delivery/http/schemas"
 	"a2sv.org/hub/Domain/entity"
 	"a2sv.org/hub/Domain/repository"
 )
@@ -17,7 +18,7 @@ type ProblemUseCaseInterface interface {
 	GetProblemByPlatform(platform string) ([]*entity.Problem, error)
 	GetProblemByID(id uint) (*entity.Problem, error)
 
-	UpdateProblem(Problem *entity.Problem) error
+	UpdateProblem(Problem *schemas.UpdateProblemRequest) error
 
 	DeleteProblem(id uint) error
 }
@@ -91,13 +92,14 @@ func (p *ProblemUsecase) GetProblemByID(id uint) (*entity.Problem, error) {
 	return problem, nil
 }
 
-func (p *ProblemUsecase) UpdateProblem(problem *entity.Problem) error {
+func (p *ProblemUsecase) UpdateProblem(problem *schemas.UpdateProblemRequest) error {
 	err := p.ProblemRepository.UpdateProblem(problem)
 	if err != nil {
 		return err
 	}
 	return nil
 }
+
 
 func (p *ProblemUsecase) DeleteProblem(id uint) error {
 	err := p.ProblemRepository.DeleteProblem(id)

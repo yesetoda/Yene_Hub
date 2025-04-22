@@ -23,8 +23,8 @@ func NewStippendHandler(stippendUsecase usecases.StipendUsecase) *StippendHandle
 // @Tags Stipends
 // @Accept json
 // @Produce json
-// @Param stipend body entity.Stipend true "Stipend data"
-// @Success 201 {object} map[string]interface{} "Stipend created successfully"
+// @Param stipend body schemas.CreateStipendRequest true "Stipend data"
+// @Success 201 {object} schemas.StipendResponse "Stipend created successfully"
 // @Failure 400 {object} map[string]interface{} "Invalid request body"
 // @Router /api/stipends [post]
 func (h *StippendHandler) CreateStipend(c *gin.Context) {
@@ -48,7 +48,7 @@ func (h *StippendHandler) CreateStipend(c *gin.Context) {
 // @Description Get a list of all stipends
 // @Tags Stipends
 // @Produce json
-// @Success 200 {array} entity.Stipend "List of stipends"
+// @Success 200 {array} []*schemas.StipendResponse "List of stipends"
 // @Failure 400 {object} map[string]interface{} "Failed to fetch stippends"
 // @Router /api/stipends [get]
 func (h *StippendHandler) ListStippends(c *gin.Context) {
@@ -68,7 +68,7 @@ func (h *StippendHandler) ListStippends(c *gin.Context) {
 // @Tags Stipends
 // @Produce json
 // @Param stippend_id path int true "Stipend ID"
-// @Success 200 {object} entity.Stipend "Stipend details"
+// @Success 200 {object} schemas.StipendResponse "Stipend details"
 // @Failure 400 {object} map[string]interface{} "Invalid stipend ID"
 // @Router /api/stipends/{stippend_id} [get]
 func (h *StippendHandler) GetStippendByID(c *gin.Context) {
@@ -101,8 +101,8 @@ func (h *StippendHandler) GetStippendByID(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param stippend_id path int true "Stipend ID"
-// @Param stipend body entity.Stipend true "Stipend data"
-// @Success 200 {object} map[string]interface{} "Stipend updated successfully"
+// @Param stipend body schemas.UpdateStipendRequest true "Stipend data"
+// @Success 200 {object} schemas.StipendResponse "Stipend updated successfully"
 // @Failure 400 {object} map[string]interface{} "Invalid input"
 // @Router /api/stipends/{stippend_id} [patch]
 func (h *StippendHandler) UpdateStipend(c *gin.Context) {
@@ -125,7 +125,7 @@ func (h *StippendHandler) UpdateStipend(c *gin.Context) {
 // @Tags Stipends
 // @Produce json
 // @Param stippend_id path int true "Stipend ID"
-// @Success 200 {object} map[string]interface{} "Stipend deleted successfully"
+// @Success 200 {object} schemas.StipendResponse "Stipend deleted successfully"
 // @Failure 400 {object} map[string]interface{} "Invalid stipend ID"
 // @Router /api/stipends/{stippend_id} [delete]
 func (h *StippendHandler) DeleteStipend(c *gin.Context) {

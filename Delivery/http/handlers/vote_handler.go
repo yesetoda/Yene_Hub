@@ -25,13 +25,12 @@ func NewVoteHandler(voteUsecase usecases.VoteUsecase) *VoteHandler {
 // @Tags Votes
 // @Accept json
 // @Produce json
-// @Param vote body entity.Vote true "Vote data"
-// @Success 201 {object} entity.Vote "Vote created successfully"
+// @Param vote body schemas.CreateVoteRequest true "Vote data"
+// @Success 201 {object} schemas.VoteResponse "Vote created successfully"
 // @Failure 400 {object} map[string]string "Invalid request body"
 // @Failure 500 {object} map[string]string "Internal server error"
 // @Router /api/votes [post]
 func (h *VoteHandler) CreateVote(c *gin.Context) {
-	// Get the vote data from the request body
 	var vote entity.Vote
 	if err := c.ShouldBindJSON(&vote); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -56,10 +55,6 @@ func (h *VoteHandler) CreateVote(c *gin.Context) {
 func (h *VoteHandler) ListVote(c *gin.Context) {
 	// Get the vote data from the request body
 	var vote entity.Vote
-	if err := c.ShouldBindJSON(&vote); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
 	// Create the vote using the use case
 	if err := h.VoteUsecase.CreateVote(&vote); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -273,8 +268,8 @@ func (h *VoteHandler) GetVoteByProblemID(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path int true "Vote ID"
-// @Param vote body entity.Vote true "Vote data"
-// @Success 200 {object} entity.Vote "Vote updated successfully"
+// @Param vote body schemas.UpdateVoteRequest true "Vote data"
+// @Success 200 {object} schemas.VoteResponse "Vote updated successfully"
 // @Failure 400 {object} map[string]string "Invalid input"
 // @Failure 500 {object} map[string]string "Internal server error"
 // @Router /api/votes/{id} [patch]

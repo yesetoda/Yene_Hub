@@ -24,8 +24,8 @@ func NewSessionHandler(sessionUsecase usecases.SessionUsecase) *SessionHandler {
 // @Tags Sessions
 // @Accept json
 // @Produce json
-// @Param session body entity.Session true "Session data"
-// @Success 201 {object} map[string]interface{} "Session created successfully"
+// @Param session body schemas.CreateSessionRequest true "Session data"
+// @Success 201 {object} schemas.SessionResponse "Session created successfully"
 // @Failure 400 {object} map[string]interface{} "Invalid request body"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
 // @Router /api/sessions [post]
@@ -49,7 +49,7 @@ func (h *SessionHandler) CreateSession(c *gin.Context) {
 // @Description Get a list of all sessions
 // @Tags Sessions
 // @Produce json
-// @Success 200 {array} entity.Session "List of sessions"
+// @Success 200 {array} []*schemas.SessionResponse "List of sessions"
 // @Router /api/sessions [get]
 func (h *SessionHandler) ListSessions(c *gin.Context) {
 	// List all sessions
@@ -68,7 +68,7 @@ func (h *SessionHandler) ListSessions(c *gin.Context) {
 // @Tags Sessions
 // @Produce json
 // @Param id path int true "Session ID"
-// @Success 200 {object} entity.Session "Session details"
+// @Success 200 {object} schemas.SessionResponse "Session details"
 // @Failure 400 {object} map[string]interface{} "Invalid session ID"
 // @Failure 404 {object} map[string]interface{} "Session not found"
 // @Router /api/sessions/{id} [get]
@@ -99,7 +99,7 @@ func (h *SessionHandler) GetSessionByID(c *gin.Context) {
 // @Tags Sessions
 // @Produce json
 // @Param name path string true "Session name"
-// @Success 200 {array} entity.Session "Session details"
+// @Success 200 {array} []*schemas.SessionResponse "Session details"
 // @Router /api/sessions/name/{name} [get]
 func (h *SessionHandler) GetSessionByName(c *gin.Context) {
 	// Get a session by name
@@ -123,7 +123,7 @@ func (h *SessionHandler) GetSessionByName(c *gin.Context) {
 // @Tags Sessions
 // @Produce json
 // @Param start_time path string true "Session start time"
-// @Success 200 {array} entity.Session "Session details"
+// @Success 200 {array} []*schemas.SessionResponse "Session details"
 // @Router /api/sessions/start-time/{start_time} [get]
 func (h *SessionHandler) GetSessionByStartTime(c *gin.Context) {
 	// Get a session by start time
@@ -148,8 +148,8 @@ func (h *SessionHandler) GetSessionByStartTime(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path int true "Session ID"
-// @Param session body entity.Session true "Session data"
-// @Success 200 {object} map[string]interface{} "Session updated successfully"
+// @Param session body schemas.UpdateSessionRequest true "Session data"
+// @Success 200 {object} schemas.SessionResponse "Session updated successfully"
 // @Failure 400 {object} map[string]interface{} "Invalid request body"
 // @Failure 404 {object} map[string]interface{} "Session not found"
 // @Router /api/sessions/{id} [patch]
@@ -174,7 +174,7 @@ func (h *SessionHandler) UpdateSession(c *gin.Context) {
 // @Tags Sessions
 // @Produce json
 // @Param id path int true "Session ID"
-// @Success 200 {object} map[string]interface{} "Session deleted successfully"
+// @Success 200 {object} schemas.SessionResponse "Session deleted successfully"
 // @Failure 400 {object} map[string]interface{} "Invalid session ID"
 // @Failure 404 {object} map[string]interface{} "Session not found"
 // @Router /api/sessions/{id} [delete]

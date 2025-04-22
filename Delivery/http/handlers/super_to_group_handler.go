@@ -26,8 +26,8 @@ func NewSuperToGroupHandler(superToGroupUseCase usecases.SuperToGroupUsecase) *S
 // @Tags SuperToGroups
 // @Accept json
 // @Produce json
-// @Param super_to_group body entity.SuperToGroup true "SuperToGroup data"
-// @Success 201 {object} entity.SuperToGroup "Super to group created successfully"
+// @Param super_to_group body schemas.CreateSuperToGroupRequest true "SuperToGroup data"
+// @Success 201 {object} schemas.SuperToGroupResponse "Super to group created successfully"
 // @Failure 400 {object} map[string]string "Invalid request body"
 // @Failure 500 {object} map[string]string "Internal server error"
 // @Router /api/super_to_groups [post]
@@ -56,7 +56,7 @@ func (h *SuperToGroupHandler) CreateSuperToGroup(c *gin.Context) {
 // @Description Get a list of all super to groups
 // @Tags SuperToGroups
 // @Produce json
-// @Success 200 {array} entity.SuperToGroup "List of super to groups"
+// @Success 200 {array} []*schemas.SuperToGroupResponse "List of super to groups"
 // @Router /api/super_to_groups [get]
 func (h *SuperToGroupHandler) ListSuperToGroup(c *gin.Context) {
 	superToGroups, err := h.SuperToGroupUseCase.ListSuperToGroup()
@@ -77,7 +77,7 @@ func (h *SuperToGroupHandler) ListSuperToGroup(c *gin.Context) {
 // @Tags SuperToGroups
 // @Produce json
 // @Param id path int true "SuperToGroup ID"
-// @Success 200 {object} entity.SuperToGroup "Super to group details"
+// @Success 200 {object} schemas.SuperToGroupResponse "Super to group details"
 // @Failure 400 {object} map[string]string "Invalid super to group ID"
 // @Failure 404 {object} map[string]string "Super to group not found"
 // @Router /api/super_to_groups/{id} [get]
@@ -106,8 +106,8 @@ func (h *SuperToGroupHandler) GetSuperToGroupByID(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path int true "SuperToGroup ID"
-// @Param super_to_group body entity.SuperToGroup true "SuperToGroup data"
-// @Success 200 {object} entity.SuperToGroup "Super to group updated successfully"
+// @Param super_to_group body schemas.UpdateSuperToGroupRequest true "SuperToGroup data"
+// @Success 200 {object} schemas.SuperToGroupResponse "Super to group updated successfully"
 // @Failure 400 {object} map[string]string "Invalid input"
 // @Failure 500 {object} map[string]string "Internal server error"
 // @Router /api/super_to_groups/{id} [patch]
@@ -141,7 +141,7 @@ func (h *SuperToGroupHandler) UpdateSuperToGroup(c *gin.Context) {
 // @Tags SuperToGroups
 // @Produce json
 // @Param id path int true "SuperToGroup ID"
-// @Success 200 {object} map[string]string "Super to group deleted successfully"
+// @Success 200 {object} schemas.SuperToGroupResponse "Super to group deleted successfully"
 // @Failure 400 {object} map[string]string "Invalid super to group ID"
 // @Failure 404 {object} map[string]string "Super to group not found"
 // @Router /api/super_to_groups/{id} [delete]

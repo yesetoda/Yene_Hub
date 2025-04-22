@@ -14,7 +14,7 @@ type AuthController struct {
 	RoleUsecases usecases.RoleUseCaseInterface
 }
 
-func NewRoleMiddleware(userUsecase usecases.UserUseCaseInterface,roleUsecase usecases.RoleUseCaseInterface) AuthController {
+func NewRoleMiddleware(userUsecase usecases.UserUseCaseInterface, roleUsecase usecases.RoleUseCaseInterface) AuthController {
 	return AuthController{
 		UserUsecases: userUsecase,
 		RoleUsecases: roleUsecase,
@@ -82,14 +82,14 @@ func (ac *AuthController) RoleMiddleware(role string) gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "User record is missing"})
 			return
 		}
-		userRole,err := ac.RoleUsecases.GetByID(User.RoleID)
+		userRole, err := ac.RoleUsecases.GetByID(User.RoleID)
 		fmt.Println("userRole", userRole, err)
 		fmt.Println("userRole", userRole.Type, role)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "Role not found"})
 			return
 		}
-		
+
 		if userRole.Type != role {
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "insufficient permissions"})
 			return

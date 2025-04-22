@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"a2sv.org/hub/Delivery/http/schemas"
 	"a2sv.org/hub/Domain/entity"
 	"a2sv.org/hub/Domain/repository"
 	"gorm.io/gorm"
@@ -31,8 +32,16 @@ func (r *userRepository) CreateUser(user *entity.User) error {
 
 	// Invalidate list caches
 	r.invalidateCache("list", "byname", "bycountryid", "bygroupid")
-	
+
 	return nil
+}
+func (r *userRepository) ListUsers(query *schemas.UserListQuery) ([]*entity.User, int, error) {
+	var users []*entity.User
+	err := r.getCachedList("list", &users, func() error {
+		return r.db.Order("created_at desc").Find(&users).Error
+	}, query)
+
+	return users, 0, err
 }
 
 // GetUserByID retrieves a user by ID using the cache
@@ -41,7 +50,7 @@ func (r *userRepository) GetUserByID(id uint) (*entity.User, error) {
 	err := r.getCachedDetail("byid", &user, func() error {
 		return r.db.First(&user, id).Error
 	}, id)
-	
+
 	return &user, err
 }
 
@@ -51,7 +60,7 @@ func (r *userRepository) GetUserByName(name string) ([]*entity.User, error) {
 	err := r.getCachedList("byname", &users, func() error {
 		return r.db.Where("name LIKE ?", "%"+name+"%").Find(&users).Error
 	}, name)
-	
+
 	return users, err
 }
 
@@ -61,7 +70,7 @@ func (r *userRepository) GetUserByUniversity(university string) ([]*entity.User,
 	err := r.getCachedList("byuniversity", &users, func() error {
 		return r.db.Where("university = ?", university).Find(&users).Error
 	}, university)
-	
+
 	return users, err
 }
 
@@ -71,7 +80,7 @@ func (r *userRepository) GetUserByCountryID(countryID uint) ([]*entity.User, err
 	err := r.getCachedList("bycountryid", &users, func() error {
 		return r.db.Where("country_id = ?", countryID).Find(&users).Error
 	}, countryID)
-	
+
 	return users, err
 }
 
@@ -81,7 +90,7 @@ func (r *userRepository) GetUserByGroupID(groupID uint) ([]*entity.User, error) 
 	err := r.getCachedList("bygroupid", &users, func() error {
 		return r.db.Where("group_id = ?", groupID).Find(&users).Error
 	}, groupID)
-	
+
 	return users, err
 }
 
@@ -91,7 +100,7 @@ func (r *userRepository) GetUserByEmail(email string) (*entity.User, error) {
 	err := r.getCachedDetail("byemail", &user, func() error {
 		return r.db.Where("email = ?", email).First(&user).Error
 	}, email)
-	
+
 	return &user, err
 }
 
@@ -99,11 +108,11 @@ func (r *userRepository) GetUserByEmail(email string) (*entity.User, error) {
 func (r *userRepository) ListUser(page, pageSize int) ([]*entity.User, error) {
 	var users []*entity.User
 	offset := (page - 1) * pageSize
-	
+
 	err := r.getCachedList("list", &users, func() error {
 		return r.db.Offset(offset).Limit(pageSize).Find(&users).Error
 	}, page, pageSize)
-	
+
 	return users, err
 }
 
@@ -120,7 +129,7 @@ func (r *userRepository) UpdateUser(user *entity.User) error {
 
 	// Invalidate list caches
 	r.invalidateCache("list", "byname", "bycountryid", "bygroupid")
-	
+
 	return nil
 }
 
@@ -137,6 +146,6 @@ func (r *userRepository) DeleteUser(id uint) error {
 
 	// Invalidate all caches for this user
 	r.invalidateAllCache()
-	
+
 	return nil
 }

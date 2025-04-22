@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"a2sv.org/hub/Domain/entity"
+	"a2sv.org/hub/Delivery/http/schemas"
 	"a2sv.org/hub/usecases"
 	"github.com/gin-gonic/gin"
 )
@@ -14,11 +14,8 @@ type GroupHandler struct {
 	groupUseCase usecases.GroupUseCase
 }
 
-// NewGroupHandler creates a new GroupHandler instance
 func NewGroupHandler(groupUseCase usecases.GroupUseCase) *GroupHandler {
-	return &GroupHandler{
-		groupUseCase: groupUseCase,
-	}
+	return &GroupHandler{groupUseCase: groupUseCase}
 }
 
 // CreateGroup handles creating a new group
@@ -27,28 +24,31 @@ func NewGroupHandler(groupUseCase usecases.GroupUseCase) *GroupHandler {
 // @Tags Groups
 // @Accept json
 // @Produce json
-// @Param group body entity.Group true "Group data"
-// @Success 201 {object} entity.Group "Group created successfully"
-// @Failure 400 {object} map[string]string "Invalid request body"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Param group body schemas.CreateGroupRequest true "Group data"
+// @Success 201 {object} schemas.GroupResponse "Group created successfully"
+// @Failure 400 {object} schemas.ErrorResponse "Invalid request body"
+// @Failure 500 {object} schemas.ErrorResponse "Internal server error"
 // @Router /api/groups [post]
 func (h *GroupHandler) CreateGroup(c *gin.Context) {
-	var group entity.Group
-	if err := c.ShouldBindJSON(&group); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+	var input schemas.CreateGroupRequest
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{
+			Code: http.StatusBadRequest,
+			Message: "Invalid request body",
+			Details: err.Error(),
+		})
 		return
 	}
-
-	createdGroup, err := h.groupUseCase.Create(&group)
+	createdGroup, err := h.groupUseCase.Create(&input)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{
+			Code: http.StatusInternalServerError,
+			Message: "Could not create group",
+			Details: err.Error(),
+		})
 		return
 	}
-
-	c.JSON(http.StatusCreated, gin.H{
-		"message": "Group created successfully",
-		"group":   createdGroup,
-	})
+	c.JSON(http.StatusCreated, createdGroup)
 }
 
 // GetGroupByID handles getting a group by ID
@@ -57,64 +57,76 @@ func (h *GroupHandler) CreateGroup(c *gin.Context) {
 // @Tags Groups
 // @Produce json
 // @Param id path int true "Group ID"
-// @Success 200 {object} entity.Group "Group details"
-// @Failure 400 {object} map[string]string "Invalid group ID"
-// @Failure 404 {object} map[string]string "Group not found"
+// @Success 200 {object} schemas.GroupResponse "Group details"
+// @Failure 400 {object} schemas.ErrorResponse "Invalid group ID"
+// @Failure 404 {object} schemas.ErrorResponse "Group not found"
 // @Router /api/groups/{id} [get]
 func (h *GroupHandler) GetGroupByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 32)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid group ID"})
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{
+			Code: http.StatusBadRequest,
+			Message: "Invalid group ID",
+			Details: err.Error(),
+		})
 		return
 	}
-
 	group, err := h.groupUseCase.GetByID(uint(id))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Group not found"})
+		c.JSON(http.StatusNotFound, schemas.ErrorResponse{
+			Code: http.StatusNotFound,
+			Message: "Group not found",
+			Details: err.Error(),
+		})
 		return
 	}
-
 	c.JSON(http.StatusOK, group)
 }
 
 // UpdateGroup handles updating a group
-// @Summary Update a group
+// @Summary Update group
 // @Description Update a group by its ID
 // @Tags Groups
 // @Accept json
 // @Produce json
 // @Param id path int true "Group ID"
-// @Param group body entity.Group true "Group data"
-// @Success 200 {object} entity.Group "Group updated successfully"
-// @Failure 400 {object} map[string]string "Invalid input"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Param group body schemas.UpdateGroupRequest true "Group data"
+// @Success 200 {object} schemas.GroupResponse "Group updated successfully"
+// @Failure 400 {object} schemas.ErrorResponse "Invalid request body or group ID"
+// @Failure 404 {object} schemas.ErrorResponse "Group not found"
+// @Failure 500 {object} schemas.ErrorResponse "Internal server error"
 // @Router /api/groups/{id} [patch]
 func (h *GroupHandler) UpdateGroup(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 32)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid group ID"})
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{
+			Code: http.StatusBadRequest,
+			Message: "Invalid group ID",
+			Details: err.Error(),
+		})
 		return
 	}
-
-	var group entity.Group
-	if err := c.ShouldBindJSON(&group); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+	var input schemas.UpdateGroupRequest
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{
+			Code: http.StatusBadRequest,
+			Message: "Invalid request body",
+			Details: err.Error(),
+		})
 		return
 	}
-
-	group.ID = uint(id)
-	updatedGroup, err := h.groupUseCase.Update(&group)
+	updatedGroup, err := h.groupUseCase.Update(uint(id), &input)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusNotFound, schemas.ErrorResponse{
+			Code: http.StatusNotFound,
+			Message: "Group not found",
+			Details: err.Error(),
+		})
 		return
 	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Group updated successfully",
-		"group":   updatedGroup,
-	})
+	c.JSON(http.StatusOK, updatedGroup)
 }
 
 // DeleteGroup handles deleting a group
@@ -123,26 +135,31 @@ func (h *GroupHandler) UpdateGroup(c *gin.Context) {
 // @Tags Groups
 // @Produce json
 // @Param id path int true "Group ID"
-// @Success 200 {object} map[string]string "Group deleted successfully"
-// @Failure 400 {object} map[string]string "Invalid group ID"
-// @Failure 404 {object} map[string]string "Group not found"
+// @Success 200 {object} schemas.SuccessResponse "Group deleted successfully"
+// @Failure 400 {object} schemas.ErrorResponse "Invalid group ID"
+// @Failure 404 {object} schemas.ErrorResponse "Group not found"
 // @Router /api/groups/{id} [delete]
 func (h *GroupHandler) DeleteGroup(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 32)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid group ID"})
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{
+			Code: http.StatusBadRequest,
+			Message: "Invalid group ID",
+			Details: err.Error(),
+		})
 		return
 	}
-
-	if err := h.groupUseCase.Delete(uint(id)); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	err = h.groupUseCase.Delete(uint(id))
+	if err != nil {
+		c.JSON(http.StatusNotFound, schemas.ErrorResponse{
+			Code: http.StatusNotFound,
+			Message: "Group not found",
+			Details: err.Error(),
+		})
 		return
 	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Group deleted successfully",
-	})
+	c.JSON(http.StatusOK, schemas.SuccessResponse{Message: "Group deleted successfully"})
 }
 
 // ListGroups handles listing all groups
@@ -150,16 +167,19 @@ func (h *GroupHandler) DeleteGroup(c *gin.Context) {
 // @Description Get a list of all groups
 // @Tags Groups
 // @Produce json
-// @Success 200 {array} entity.Group "List of groups"
+// @Success 200 {object} schemas.GroupListResponse "List of groups"
 // @Router /api/groups [get]
 func (h *GroupHandler) ListGroups(c *gin.Context) {
-	groups, err := h.groupUseCase.List()
+	groups, meta, err := h.groupUseCase.List()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{
+			Code: http.StatusInternalServerError,
+			Message: "Failed to list groups",
+			Details: err.Error(),
+		})
 		return
 	}
-
-	c.JSON(http.StatusOK, groups)
+	c.JSON(http.StatusOK, schemas.GroupListResponse{Data: groups, Meta: *meta})
 }
 
 // GetGroupsByCountryID handles listing groups by country ID
@@ -168,21 +188,27 @@ func (h *GroupHandler) ListGroups(c *gin.Context) {
 // @Tags Groups
 // @Produce json
 // @Param country_id path int true "Country ID"
-// @Success 200 {array} entity.Group "List of groups"
+// @Success 200 {object} schemas.GroupListResponse "List of groups"
 // @Router /api/groups/country/{country_id} [get]
 func (h *GroupHandler) GetGroupsByCountryID(c *gin.Context) {
 	idStr := c.Param("country_id")
 	id, err := strconv.ParseUint(idStr, 10, 32)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid country ID"})
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{
+			Code: http.StatusBadRequest,
+			Message: "Invalid country ID",
+			Details: err.Error(),
+		})
 		return
 	}
-
-	groups, err := h.groupUseCase.GetGroupsByCountryID(uint(id))
+	groups, meta, err := h.groupUseCase.GetByCountryID(uint(id))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{
+			Code: http.StatusInternalServerError,
+			Message: "Failed to list groups",
+			Details: err.Error(),
+		})
 		return
 	}
-
-	c.JSON(http.StatusOK, groups)
+	c.JSON(http.StatusOK, schemas.GroupListResponse{Data: groups, Meta: *meta})
 }
