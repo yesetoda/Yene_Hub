@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"net/http"
 	"strconv"
 
 	"a2sv.org/hub/Delivery/http/schemas"
@@ -26,23 +27,23 @@ func NewProblemHandler(problemUsecase usecases.ProblemUseCaseInterface) *Problem
 // @Accept json
 // @Produce json
 // @Param problem body schemas.CreateProblemRequest true "Problem data"
-// @Success 201 {object} schemas.ProblemResponse "Problem created successfully"
-// @Failure 400 {object} map[string]string "Invalid request body"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Success 201 {object} schemas.SuccessResponse "Problem created successfully"
+// @Failure 400 {object} schemas.ErrorResponse "Invalid request body"
+// @Failure 500 {object} schemas.ErrorResponse "Internal server error"
 // @Router /api/problems [post]
 func (h *ProblemHandler) CreateProblem(c *gin.Context) {
 	problem := &entity.Problem{}
 	err := c.BindJSON(problem)
 	if err != nil {
-		c.JSON(400, gin.H{"error": "Invalid request body"})
+		c.JSON(400, schemas.ErrorResponse{Code: http.StatusBadRequest, Message: "Invalid request body"})
 		return
 	}
 	err = h.ProblemUsecase.CreateProblem(problem)
 	if err != nil {
-		c.JSON(500, gin.H{"error": "Internal server error"})
+		c.JSON(500, schemas.ErrorResponse{Code: http.StatusInternalServerError, Message: "Internal server error"})
 		return
 	}
-	c.JSON(201, problem)
+	c.JSON(201, schemas.SuccessResponse{Data: problem})
 }
 
 // ListProblems handles listing all problems
@@ -50,15 +51,16 @@ func (h *ProblemHandler) CreateProblem(c *gin.Context) {
 // @Description Get a list of all problems
 // @Tags Problems
 // @Produce json
-// @Success 200 {array} schemas.ProblemResponse "List of problems"
+// @Success 200 {object} schemas.SuccessResponse "List of problems"
+// @Failure 500 {object} schemas.ErrorResponse "Internal server error"
 // @Router /api/problems [get]
 func (h *ProblemHandler) ListProblems(c *gin.Context) {
 	problems, err := h.ProblemUsecase.ListProblem()
 	if err != nil {
-		c.JSON(500, gin.H{"error": "Internal server error"})
+		c.JSON(500, schemas.ErrorResponse{Code: http.StatusInternalServerError, Message: "Internal server error"})
 		return
 	}
-	c.JSON(200, problems)
+	c.JSON(200, schemas.SuccessResponse{Data: problems})
 }
 
 // GetProblemByName handles getting a problem by name
@@ -67,18 +69,18 @@ func (h *ProblemHandler) ListProblems(c *gin.Context) {
 // @Tags Problems
 // @Produce json
 // @Param name path string true "Problem name"
-// @Success 200 {object} schemas.ProblemResponse "Problem details"
-// @Failure 400 {object} map[string]string "Invalid problem name"
-// @Failure 404 {object} map[string]string "Problem not found"
+// @Success 200 {object} schemas.SuccessResponse "Problem details"
+// @Failure 400 {object} schemas.ErrorResponse "Invalid problem name"
+// @Failure 404 {object} schemas.ErrorResponse "Problem not found"
 // @Router /api/problems/name/{name} [get]
 func (h *ProblemHandler) GetProblemByName(c *gin.Context) {
 	name := c.Param("name")
 	problem, err := h.ProblemUsecase.GetProblemByName(name)
 	if err != nil {
-		c.JSON(404, gin.H{"error": "Problem not found"})
+		c.JSON(404, schemas.ErrorResponse{Code: http.StatusNotFound, Message: "Problem not found"})
 		return
 	}
-	c.JSON(200, problem)
+	c.JSON(200, schemas.SuccessResponse{Data: problem})
 }
 
 // GetProblemByID handles getting a problem by ID
@@ -87,22 +89,22 @@ func (h *ProblemHandler) GetProblemByName(c *gin.Context) {
 // @Tags Problems
 // @Produce json
 // @Param id path int true "Problem ID"
-// @Success 200 {object} schemas.ProblemResponse "Problem details"
-// @Failure 400 {object} map[string]string "Invalid problem ID"
-// @Failure 404 {object} map[string]string "Problem not found"
+// @Success 200 {object} schemas.SuccessResponse "Problem details"
+// @Failure 400 {object} schemas.ErrorResponse "Invalid problem ID"
+// @Failure 404 {object} schemas.ErrorResponse "Problem not found"
 // @Router /api/problems/{id} [get]
 func (h *ProblemHandler) GetProblemByID(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(400, gin.H{"error": "Invalid problem ID"})
+		c.JSON(400, schemas.ErrorResponse{Code: http.StatusBadRequest, Message: "Invalid problem ID"})
 		return
 	}
 	problem, err := h.ProblemUsecase.GetProblemByID(uint(id))
 	if err != nil {
-		c.JSON(404, gin.H{"error": "Problem not found"})
+		c.JSON(404, schemas.ErrorResponse{Code: http.StatusNotFound, Message: "Problem not found"})
 		return
 	}
-	c.JSON(200, problem)
+	c.JSON(200, schemas.SuccessResponse{Data: problem})
 }
 
 // UpdateProblem handles updating a problem
@@ -113,29 +115,30 @@ func (h *ProblemHandler) GetProblemByID(c *gin.Context) {
 // @Produce json
 // @Param id path int true "Problem ID"
 // @Param problem body schemas.UpdateProblemRequest true "Problem data"
-// @Success 200 {object} schemas.ProblemResponse "Problem updated successfully"
-// @Failure 400 {object} map[string]string "Invalid input"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Success 200 {object} schemas.SuccessResponse "Problem updated successfully"
+// @Failure 400 {object} schemas.ErrorResponse "Invalid request body or problem ID"
+// @Failure 404 {object} schemas.ErrorResponse "Problem not found"
+// @Failure 500 {object} schemas.ErrorResponse "Internal server error"
 // @Router /api/problems/{id} [patch]
 func (h *ProblemHandler) UpdateProblem(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(400, gin.H{"error": "Invalid problem ID"})
+		c.JSON(400, schemas.ErrorResponse{Code: http.StatusBadRequest, Message: "Invalid problem ID"})
 		return
 	}
 	problem := &schemas.UpdateProblemRequest{}
 	err = c.BindJSON(problem)
 	if err != nil {
-		c.JSON(400, gin.H{"error": "Invalid input"})
+		c.JSON(400, schemas.ErrorResponse{Code: http.StatusBadRequest, Message: "Invalid request body"})
 		return
 	}
 	problem.ID = uint(id)
 	err = h.ProblemUsecase.UpdateProblem(problem)
 	if err != nil {
-		c.JSON(500, gin.H{"error": "Internal server error"})
+		c.JSON(500, schemas.ErrorResponse{Code: http.StatusInternalServerError, Message: "Internal server error"})
 		return
 	}
-	c.JSON(200, problem)
+	c.JSON(200, schemas.SuccessResponse{Data: problem})
 }
 
 // DeleteProblem handles deleting a problem
@@ -144,22 +147,23 @@ func (h *ProblemHandler) UpdateProblem(c *gin.Context) {
 // @Tags Problems
 // @Produce json
 // @Param id path int true "Problem ID"
-// @Success 200 {object} map[string]string "Problem deleted successfully"
-// @Failure 400 {object} map[string]string "Invalid problem ID"
-// @Failure 404 {object} map[string]string "Problem not found"
+// @Success 200 {object} schemas.SuccessResponse "Problem deleted successfully"
+// @Failure 400 {object} schemas.ErrorResponse "Invalid problem ID"
+// @Failure 404 {object} schemas.ErrorResponse "Problem not found"
+// @Failure 500 {object} schemas.ErrorResponse "Internal server error"
 // @Router /api/problems/{id} [delete]
 func (h *ProblemHandler) DeleteProblem(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(400, gin.H{"error": "Invalid problem ID"})
+		c.JSON(400, schemas.ErrorResponse{Code: http.StatusBadRequest, Message: "Invalid problem ID"})
 		return
 	}
 	err = h.ProblemUsecase.DeleteProblem(uint(id))
 	if err != nil {
-		c.JSON(404, gin.H{"error": "Problem not found"})
+		c.JSON(404, schemas.ErrorResponse{Code: http.StatusNotFound, Message: "Problem not found"})
 		return
 	}
-	c.JSON(200, gin.H{"message": "Problem deleted successfully"})
+	c.JSON(200, schemas.SuccessResponse{Data: gin.H{"message": "Problem deleted successfully"}})
 }
 
 func (h *ProblemHandler) GetProblemByDifficulty(difficulty string) ([]*entity.Problem, error) {

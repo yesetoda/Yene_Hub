@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"net/http"
 	"strconv"
 
 	"a2sv.org/hub/Delivery/http/schemas"
@@ -29,17 +28,17 @@ func NewRoleHandler(roleUseCase usecases.RoleUseCase) *RoleHandler {
 // @Produce json
 // @Param Authorization header string true "Bearer token"
 // @Param request body schemas.CreateRoleRequest true "Role creation data"
-// @Success 201 {object} schemas.RoleResponse "Role created successfully"
+// @Success 201 {object} schemas.SuccessResponse "Role created successfully"
 // @Failure 400 {object} schemas.ErrorResponse "Invalid request format"
 // @Failure 401 {object} schemas.ErrorResponse "Unauthorized - Invalid or missing token"
 // @Failure 403 {object} schemas.ErrorResponse "Forbidden - Insufficient permissions"
 // @Failure 500 {object} schemas.ErrorResponse "Internal server error"
-// @Router /roles [post]
+// @Router /api/roles [post]
 func (h *RoleHandler) CreateRole(c *gin.Context) {
 	var input schemas.CreateRoleRequest
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{
-			Code:    http.StatusBadRequest,
+		c.JSON(400, schemas.ErrorResponse{
+			Code:    400,
 			Message: "Invalid request format",
 			Details: err.Error(),
 		})
@@ -52,20 +51,17 @@ func (h *RoleHandler) CreateRole(c *gin.Context) {
 
 	createdRole, err := h.roleUseCase.Create(role)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{
-			Code:    http.StatusInternalServerError,
+		c.JSON(500, schemas.ErrorResponse{
+			Code:    500,
 			Message: "Failed to create role",
 			Details: err.Error(),
 		})
 		return
 	}
 
-	c.JSON(http.StatusCreated, &schemas.RoleResponse{
-		ID:          createdRole.ID,
-		Type:        createdRole.Type,
-		Description: "",
-		CreatedAt:   createdRole.CreatedAt,
-		UpdatedAt:   createdRole.UpdatedAt,
+	c.JSON(201, schemas.SuccessResponse{
+		Message: "Role created successfully",
+		Data:    createdRole,
 	})
 }
 
@@ -77,18 +73,18 @@ func (h *RoleHandler) CreateRole(c *gin.Context) {
 // @Produce json
 // @Param Authorization header string true "Bearer token"
 // @Param id path int true "Role ID" minimum(1)
-// @Success 200 {object} schemas.RoleResponse "Role details retrieved successfully"
+// @Success 200 {object} schemas.SuccessResponse "Role details retrieved successfully"
 // @Failure 400 {object} schemas.ErrorResponse "Invalid role ID format"
 // @Failure 401 {object} schemas.ErrorResponse "Unauthorized - Invalid or missing token"
 // @Failure 403 {object} schemas.ErrorResponse "Forbidden - Insufficient permissions"
 // @Failure 404 {object} schemas.ErrorResponse "Role not found"
 // @Failure 500 {object} schemas.ErrorResponse "Internal server error"
-// @Router /roles/{id} [get]
+// @Router /api/roles/{id} [get]
 func (h *RoleHandler) GetRoleByID(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{
-			Code:    http.StatusBadRequest,
+		c.JSON(400, schemas.ErrorResponse{
+			Code:    400,
 			Message: "Invalid role ID",
 			Details: "Role ID must be a positive integer",
 		})
@@ -97,15 +93,18 @@ func (h *RoleHandler) GetRoleByID(c *gin.Context) {
 
 	role, err := h.roleUseCase.GetByID(uint(id))
 	if err != nil {
-		c.JSON(http.StatusNotFound, schemas.ErrorResponse{
-			Code:    http.StatusNotFound,
+		c.JSON(404, schemas.ErrorResponse{
+			Code:    404,
 			Message: "Role not found",
 			Details: err.Error(),
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, role)
+	c.JSON(200, schemas.SuccessResponse{
+		Message: "Role details retrieved successfully",
+		Data:    role,
+	})
 }
 
 // UpdateRole handles updating a role's information
@@ -117,18 +116,18 @@ func (h *RoleHandler) GetRoleByID(c *gin.Context) {
 // @Param Authorization header string true "Bearer token"
 // @Param id path int true "Role ID" minimum(1)
 // @Param request body schemas.UpdateRoleRequest true "Role update data"
-// @Success 200 {object} schemas.RoleResponse "Role updated successfully"
+// @Success 200 {object} schemas.SuccessResponse "Role updated successfully"
 // @Failure 400 {object} schemas.ErrorResponse "Invalid request format or role ID"
 // @Failure 401 {object} schemas.ErrorResponse "Unauthorized - Invalid or missing token"
 // @Failure 403 {object} schemas.ErrorResponse "Forbidden - Insufficient permissions"
 // @Failure 404 {object} schemas.ErrorResponse "Role not found"
 // @Failure 500 {object} schemas.ErrorResponse "Internal server error"
-// @Router /roles/{id} [patch]
+// @Router /api/roles/{id} [patch]
 func (h *RoleHandler) UpdateRole(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{
-			Code:    http.StatusBadRequest,
+		c.JSON(400, schemas.ErrorResponse{
+			Code:    400,
 			Message: "Invalid role ID",
 			Details: "Role ID must be a positive integer",
 		})
@@ -137,8 +136,8 @@ func (h *RoleHandler) UpdateRole(c *gin.Context) {
 
 	var input schemas.UpdateRoleRequest
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{
-			Code:    http.StatusBadRequest,
+		c.JSON(400, schemas.ErrorResponse{
+			Code:    400,
 			Message: "Invalid request format",
 			Details: err.Error(),
 		})
@@ -153,27 +152,24 @@ func (h *RoleHandler) UpdateRole(c *gin.Context) {
 	updatedRole, err := h.roleUseCase.Update(uint(id), role)
 	if err != nil {
 		if err.Error() == "record not found" {
-			c.JSON(http.StatusNotFound, schemas.ErrorResponse{
-				Code:    http.StatusNotFound,
+			c.JSON(404, schemas.ErrorResponse{
+				Code:    404,
 				Message: "Role not found",
 				Details: err.Error(),
 			})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{
-			Code:    http.StatusInternalServerError,
+		c.JSON(500, schemas.ErrorResponse{
+			Code:    500,
 			Message: "Failed to update role",
 			Details: err.Error(),
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, &schemas.RoleResponse{
-		ID:          updatedRole.ID,
-		Type:        updatedRole.Type,
-		Description: "",
-		CreatedAt:   updatedRole.CreatedAt,
-		UpdatedAt:   updatedRole.UpdatedAt,
+	c.JSON(200, schemas.SuccessResponse{
+		Message: "Role updated successfully",
+		Data:    updatedRole,
 	})
 }
 
@@ -191,12 +187,12 @@ func (h *RoleHandler) UpdateRole(c *gin.Context) {
 // @Failure 403 {object} schemas.ErrorResponse "Forbidden - Insufficient permissions"
 // @Failure 404 {object} schemas.ErrorResponse "Role not found"
 // @Failure 500 {object} schemas.ErrorResponse "Internal server error"
-// @Router /roles/{id} [delete]
+// @Router /api/roles/{id} [delete]
 func (h *RoleHandler) DeleteRole(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{
-			Code:    http.StatusBadRequest,
+		c.JSON(400, schemas.ErrorResponse{
+			Code:    400,
 			Message: "Invalid role ID",
 			Details: "Role ID must be a positive integer",
 		})
@@ -205,22 +201,22 @@ func (h *RoleHandler) DeleteRole(c *gin.Context) {
 
 	if err := h.roleUseCase.Delete(uint(id)); err != nil {
 		if err.Error() == "record not found" {
-			c.JSON(http.StatusNotFound, schemas.ErrorResponse{
-				Code:    http.StatusNotFound,
+			c.JSON(404, schemas.ErrorResponse{
+				Code:    404,
 				Message: "Role not found",
 				Details: err.Error(),
 			})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{
-			Code:    http.StatusInternalServerError,
+		c.JSON(500, schemas.ErrorResponse{
+			Code:    500,
 			Message: "Failed to delete role",
 			Details: err.Error(),
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, schemas.SuccessResponse{
+	c.JSON(200, schemas.SuccessResponse{
 		Message: "Role deleted successfully",
 	})
 }
@@ -234,17 +230,17 @@ func (h *RoleHandler) DeleteRole(c *gin.Context) {
 // @Param Authorization header string true "Bearer token"
 // @Param page query int false "Page number" minimum(0) default(0)
 // @Param page_size query int false "Number of items per page" minimum(1) maximum(100) default(10)
-// @Success 200 {object} schemas.RoleListResponse "List of roles retrieved successfully"
+// @Success 200 {object} schemas.SuccessResponse "List of roles retrieved successfully"
 // @Failure 400 {object} schemas.ErrorResponse "Invalid query parameters"
 // @Failure 401 {object} schemas.ErrorResponse "Unauthorized - Invalid or missing token"
 // @Failure 403 {object} schemas.ErrorResponse "Forbidden - Insufficient permissions"
 // @Failure 500 {object} schemas.ErrorResponse "Internal server error"
-// @Router /roles [get]
+// @Router /api/roles [get]
 func (h *RoleHandler) ListRoles(c *gin.Context) {
 	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
 	if err != nil || page < 1 {
-		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{
-			Code:    http.StatusBadRequest,
+		c.JSON(400, schemas.ErrorResponse{
+			Code:    400,
 			Message: "Invalid page number",
 			Details: "Page number must be a positive integer",
 		})
@@ -253,8 +249,8 @@ func (h *RoleHandler) ListRoles(c *gin.Context) {
 
 	pageSize, err := strconv.Atoi(c.DefaultQuery("page_size", "10"))
 	if err != nil || pageSize < 1 || pageSize > 100 {
-		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{
-			Code:    http.StatusBadRequest,
+		c.JSON(400, schemas.ErrorResponse{
+			Code:    400,
 			Message: "Invalid page size",
 			Details: "Page size must be between 1 and 100",
 		})
@@ -263,8 +259,8 @@ func (h *RoleHandler) ListRoles(c *gin.Context) {
 
 	roles, _, err := h.roleUseCase.List()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{
-			Code:    http.StatusInternalServerError,
+		c.JSON(500, schemas.ErrorResponse{
+			Code:    500,
 			Message: "Failed to list roles",
 			Details: err.Error(),
 		})
@@ -283,12 +279,7 @@ func (h *RoleHandler) ListRoles(c *gin.Context) {
 		}
 	}
 
-	c.JSON(http.StatusOK, schemas.RoleListResponse{
-		Data: roleResponses,
-		Meta: schemas.PaginationMeta{
-			Page:     page,
-			PageSize: pageSize,
-			Total:    len(roles),
-		},
+	c.JSON(200, schemas.SuccessResponse{
+		Message: "List of roles retrieved successfully",
 	})
 }

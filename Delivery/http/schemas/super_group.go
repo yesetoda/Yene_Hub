@@ -51,8 +51,9 @@ type SuperGroupListResponse struct {
 
 // SuperToGroupRequest represents the request body for adding groups to a super group
 // swagger:model
+// Note: The example tag should be a comma-separated list for array fields, not a JSON array string.
 type SuperToGroupRequest struct {
-	GroupIDs []uint `json:"group_ids" binding:"required" example:"[1,2,3]"`
+	GroupIDs []uint `json:"group_ids" binding:"required" example:"1,2,3"`
 }
 
 // SuperToGroupResponse represents the response for groups in a super group

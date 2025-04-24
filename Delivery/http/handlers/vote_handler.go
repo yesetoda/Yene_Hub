@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"a2sv.org/hub/Delivery/http/schemas"
 	"a2sv.org/hub/Domain/entity"
 	"a2sv.org/hub/usecases"
 	"github.com/gin-gonic/gin"
@@ -26,23 +27,23 @@ func NewVoteHandler(voteUsecase usecases.VoteUsecase) *VoteHandler {
 // @Accept json
 // @Produce json
 // @Param vote body schemas.CreateVoteRequest true "Vote data"
-// @Success 201 {object} schemas.VoteResponse "Vote created successfully"
-// @Failure 400 {object} map[string]string "Invalid request body"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Success 201 {object} schemas.SuccessResponse "Vote created successfully"
+// @Failure 400 {object} schemas.ErrorResponse "Invalid request body"
+// @Failure 500 {object} schemas.ErrorResponse "Internal server error"
 // @Router /api/votes [post]
 func (h *VoteHandler) CreateVote(c *gin.Context) {
 	var vote entity.Vote
 	if err := c.ShouldBindJSON(&vote); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Code: http.StatusBadRequest, Message: "Invalid request body", Details: err.Error()})
 		return
 	}
 	// Create the vote using the use case
 	if err := h.VoteUsecase.CreateVote(&vote); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Code: http.StatusInternalServerError, Message: "Failed to create vote", Details: err.Error()})
 		return
 	}
 	// Return the created vote
-	c.JSON(http.StatusOK, gin.H{"vote": vote})
+	c.JSON(http.StatusCreated, schemas.SuccessResponse{Message: "Vote created successfully", Data: vote})
 }
 
 // ListVote handles listing votes
@@ -50,18 +51,17 @@ func (h *VoteHandler) CreateVote(c *gin.Context) {
 // @Description Get a list of votes
 // @Tags Votes
 // @Produce json
-// @Success 200 {array} entity.Vote "List of votes"
+// @Success 200 {object} schemas.SuccessResponse "List of votes"
 // @Router /api/votes [get]
 func (h *VoteHandler) ListVote(c *gin.Context) {
-	// Get the vote data from the request body
-	var vote entity.Vote
 	// Create the vote using the use case
-	if err := h.VoteUsecase.CreateVote(&vote); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	votes, err := h.VoteUsecase.ListVote(); 
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Code: http.StatusInternalServerError, Message: "Failed to create vote", Details: err.Error()})
 		return
 	}
 	// Return the created vote
-	c.JSON(http.StatusOK, gin.H{"vote": vote})
+	c.JSON(http.StatusOK, schemas.SuccessResponse{Message: "List of votes", Data: votes})
 }
 
 // GetVoteByID handles getting a vote by ID
@@ -70,9 +70,9 @@ func (h *VoteHandler) ListVote(c *gin.Context) {
 // @Tags Votes
 // @Produce json
 // @Param id path int true "Vote ID"
-// @Success 200 {object} entity.Vote "Vote details"
-// @Failure 400 {object} map[string]string "Invalid vote ID"
-// @Failure 404 {object} map[string]string "Vote not found"
+// @Success 200 {object} schemas.SuccessResponse "Vote details"
+// @Failure 400 {object} schemas.ErrorResponse "Invalid vote ID"
+// @Failure 404 {object} schemas.ErrorResponse "Vote not found"
 // @Router /api/votes/{id} [get]
 func (h *VoteHandler) GetVoteByID(c *gin.Context) {
 	// Get the vote ID from the URL parameter
@@ -80,17 +80,17 @@ func (h *VoteHandler) GetVoteByID(c *gin.Context) {
 	// Convert the ID to uint
 	voteID, err := strconv.ParseUint(id, 10, 32)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Code: http.StatusBadRequest, Message: "Invalid ID", Details: err.Error()})
 		return
 	}
 	// Get the vote using the use case
 	vote, err := h.VoteUsecase.GetVoteByID(uint(voteID))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Code: http.StatusInternalServerError, Message: "Failed to fetch vote", Details: err.Error()})
 		return
 	}
 	// Return the vote
-	c.JSON(http.StatusOK, gin.H{"vote": vote})
+	c.JSON(http.StatusOK, schemas.SuccessResponse{Message: "Vote details", Data: vote})
 }
 
 // GetVoteByCommentID handles getting votes by comment ID
@@ -99,8 +99,8 @@ func (h *VoteHandler) GetVoteByID(c *gin.Context) {
 // @Tags Votes
 // @Produce json
 // @Param comment_id path int true "Comment ID"
-// @Success 200 {array} entity.Vote "Votes for comment"
-// @Failure 400 {object} map[string]string "Invalid comment ID"
+// @Success 200 {object} schemas.SuccessResponse "Votes for comment"
+// @Failure 400 {object} schemas.ErrorResponse "Invalid comment ID"
 // @Router /api/votes/comment/{comment_id} [get]
 func (h *VoteHandler) GetVoteByCommentID(c *gin.Context) {
 	// Get the comment ID from the URL parameter
@@ -108,17 +108,17 @@ func (h *VoteHandler) GetVoteByCommentID(c *gin.Context) {
 	// Convert the ID to uint
 	commentID, err := strconv.ParseUint(id, 10, 32)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Code: http.StatusBadRequest, Message: "Invalid ID", Details: err.Error()})
 		return
 	}
 	// Get the vote using the use case
 	vote, err := h.VoteUsecase.GetVoteByCommentID(uint(commentID))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Code: http.StatusInternalServerError, Message: "Failed to fetch votes", Details: err.Error()})
 		return
 	}
 	// Return the vote
-	c.JSON(http.StatusOK, gin.H{"vote": vote})
+	c.JSON(http.StatusOK, schemas.SuccessResponse{Message: "Votes for comment", Data: vote})
 }
 
 // GetVoteByPostID handles getting votes by post ID
@@ -127,8 +127,8 @@ func (h *VoteHandler) GetVoteByCommentID(c *gin.Context) {
 // @Tags Votes
 // @Produce json
 // @Param post_id path int true "Post ID"
-// @Success 200 {array} entity.Vote "Votes for post"
-// @Failure 400 {object} map[string]string "Invalid post ID"
+// @Success 200 {object} schemas.SuccessResponse "Votes for post"
+// @Failure 400 {object} schemas.ErrorResponse "Invalid post ID"
 // @Router /api/votes/post/{post_id} [get]
 func (h *VoteHandler) GetVoteByPostID(c *gin.Context) {
 	// Get the Post ID from the URL parameter
@@ -136,17 +136,17 @@ func (h *VoteHandler) GetVoteByPostID(c *gin.Context) {
 	// Convert the ID to uint
 	PostID, err := strconv.ParseUint(id, 10, 32)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Code: http.StatusBadRequest, Message: "Invalid ID", Details: err.Error()})
 		return
 	}
 	// Get the vote using the use case
 	vote, err := h.VoteUsecase.GetVoteByPostID(uint(PostID))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Code: http.StatusInternalServerError, Message: "Failed to fetch votes", Details: err.Error()})
 		return
 	}
 	// Return the vote
-	c.JSON(http.StatusOK, gin.H{"vote": vote})
+	c.JSON(http.StatusOK, schemas.SuccessResponse{Message: "Votes for post", Data: vote})
 }
 
 // GetVoteByUserID handles getting votes by user ID
@@ -155,8 +155,8 @@ func (h *VoteHandler) GetVoteByPostID(c *gin.Context) {
 // @Tags Votes
 // @Produce json
 // @Param user_id path int true "User ID"
-// @Success 200 {array} entity.Vote "Votes for user"
-// @Failure 400 {object} map[string]string "Invalid user ID"
+// @Success 200 {object} schemas.SuccessResponse "Votes for user"
+// @Failure 400 {object} schemas.ErrorResponse "Invalid user ID"
 // @Router /api/votes/user/{user_id} [get]
 func (h *VoteHandler) GetVoteByUserID(c *gin.Context) {
 	// Get the User ID from the URL parameter
@@ -164,17 +164,17 @@ func (h *VoteHandler) GetVoteByUserID(c *gin.Context) {
 	// Convert the ID to uint
 	UserID, err := strconv.ParseUint(id, 10, 32)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Code: http.StatusBadRequest, Message: "Invalid ID", Details: err.Error()})
 		return
 	}
 	// Get the vote using the use case
 	vote, err := h.VoteUsecase.GetVoteByUserID(uint(UserID))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Code: http.StatusInternalServerError, Message: "Failed to fetch votes", Details: err.Error()})
 		return
 	}
 	// Return the vote
-	c.JSON(http.StatusOK, gin.H{"vote": vote})
+	c.JSON(http.StatusOK, schemas.SuccessResponse{Message: "Votes for user", Data: vote})
 }
 
 // GetVoteByTrackID handles getting votes by track ID
@@ -183,8 +183,8 @@ func (h *VoteHandler) GetVoteByUserID(c *gin.Context) {
 // @Tags Votes
 // @Produce json
 // @Param track_id path int true "Track ID"
-// @Success 200 {array} entity.Vote "Votes for track"
-// @Failure 400 {object} map[string]string "Invalid track ID"
+// @Success 200 {object} schemas.SuccessResponse "Votes for track"
+// @Failure 400 {object} schemas.ErrorResponse "Invalid track ID"
 // @Router /api/votes/track/{track_id} [get]
 func (h *VoteHandler) GetVoteByTrackID(c *gin.Context) {
 	// Get the Track ID from the URL parameter
@@ -192,17 +192,17 @@ func (h *VoteHandler) GetVoteByTrackID(c *gin.Context) {
 	// Convert the ID to uint
 	TrackID, err := strconv.ParseUint(id, 10, 32)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Code: http.StatusBadRequest, Message: "Invalid track ID", Details: err.Error()})
 		return
 	}
 	// Get the vote using the use case
 	vote, err := h.VoteUsecase.GetVoteByTrackID(uint(TrackID))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Code: http.StatusInternalServerError, Message: "Failed to fetch votes", Details: err.Error()})
 		return
 	}
 	// Return the vote
-	c.JSON(http.StatusOK, gin.H{"vote": vote})
+	c.JSON(http.StatusOK, schemas.SuccessResponse{Message: "Votes for track", Data: vote})
 }
 
 // GetVoteBySubmissionID handles getting votes by submission ID
@@ -211,8 +211,8 @@ func (h *VoteHandler) GetVoteByTrackID(c *gin.Context) {
 // @Tags Votes
 // @Produce json
 // @Param submission_id path int true "Submission ID"
-// @Success 200 {array} entity.Vote "Votes for submission"
-// @Failure 400 {object} map[string]string "Invalid submission ID"
+// @Success 200 {object} schemas.SuccessResponse "Votes for submission"
+// @Failure 400 {object} schemas.ErrorResponse "Invalid submission ID"
 // @Router /api/votes/submission/{submission_id} [get]
 func (h *VoteHandler) GetVoteBySubmissionID(c *gin.Context) {
 	// Get the Submission ID from the URL parameter
@@ -220,17 +220,17 @@ func (h *VoteHandler) GetVoteBySubmissionID(c *gin.Context) {
 	// Convert the ID to uint
 	SubmissionID, err := strconv.ParseUint(id, 10, 32)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Code: http.StatusBadRequest, Message: "Invalid submission ID", Details: err.Error()})
 		return
 	}
 	// Get the vote using the use case
 	vote, err := h.VoteUsecase.GetVoteBySubmissionID(uint(SubmissionID))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Code: http.StatusInternalServerError, Message: "Failed to fetch votes", Details: err.Error()})
 		return
 	}
 	// Return the vote
-	c.JSON(http.StatusOK, gin.H{"vote": vote})
+	c.JSON(http.StatusOK, schemas.SuccessResponse{Message: "Votes for submission", Data: vote})
 }
 
 // GetVoteByProblemID handles getting votes by problem ID
@@ -239,8 +239,8 @@ func (h *VoteHandler) GetVoteBySubmissionID(c *gin.Context) {
 // @Tags Votes
 // @Produce json
 // @Param problem_id path int true "Problem ID"
-// @Success 200 {array} entity.Vote "Votes for problem"
-// @Failure 400 {object} map[string]string "Invalid problem ID"
+// @Success 200 {object} schemas.SuccessResponse "Votes for problem"
+// @Failure 400 {object} schemas.ErrorResponse "Invalid problem ID"
 // @Router /api/votes/problem/{problem_id} [get]
 func (h *VoteHandler) GetVoteByProblemID(c *gin.Context) {
 	// Get the Problem ID from the URL parameter
@@ -248,17 +248,17 @@ func (h *VoteHandler) GetVoteByProblemID(c *gin.Context) {
 	// Convert the ID to uint
 	ProblemID, err := strconv.ParseUint(id, 10, 32)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Code: http.StatusBadRequest, Message: "Invalid problem ID", Details: err.Error()})
 		return
 	}
 	// Get the vote using the use case
 	vote, err := h.VoteUsecase.GetVoteByProblemID(uint(ProblemID))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Code: http.StatusInternalServerError, Message: "Failed to fetch votes", Details: err.Error()})
 		return
 	}
 	// Return the vote
-	c.JSON(http.StatusOK, gin.H{"vote": vote})
+	c.JSON(http.StatusOK, schemas.SuccessResponse{Message: "Votes for problem", Data: vote})
 }
 
 // UpdateVote handles updating a vote
@@ -269,9 +269,9 @@ func (h *VoteHandler) GetVoteByProblemID(c *gin.Context) {
 // @Produce json
 // @Param id path int true "Vote ID"
 // @Param vote body schemas.UpdateVoteRequest true "Vote data"
-// @Success 200 {object} schemas.VoteResponse "Vote updated successfully"
-// @Failure 400 {object} map[string]string "Invalid input"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Success 200 {object} schemas.SuccessResponse "Vote updated successfully"
+// @Failure 400 {object} schemas.ErrorResponse "Invalid input"
+// @Failure 500 {object} schemas.ErrorResponse "Internal server error"
 // @Router /api/votes/{id} [patch]
 func (h *VoteHandler) UpdateVote(c *gin.Context) {
 	// Get the vote ID from the URL parameter
@@ -279,23 +279,23 @@ func (h *VoteHandler) UpdateVote(c *gin.Context) {
 	// Convert the ID to uint
 	voteID, err := strconv.ParseUint(id, 10, 32)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Code: http.StatusBadRequest, Message: "Invalid ID", Details: err.Error()})
 		return
 	}
 	// Get the vote data from the request body
 	var vote entity.Vote
 	if err := c.ShouldBindJSON(&vote); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Code: http.StatusBadRequest, Message: "Invalid input", Details: err.Error()})
 		return
 	}
 	vote.ID = uint(voteID)
 	// Update the vote using the use case
 	if err := h.VoteUsecase.UpdateVote(&vote); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Code: http.StatusInternalServerError, Message: "Failed to update vote", Details: err.Error()})
 		return
 	}
 	// Return the updated vote
-	c.JSON(http.StatusOK, gin.H{"vote": vote})
+	c.JSON(http.StatusOK, schemas.SuccessResponse{Message: "Vote updated successfully", Data: vote})
 }
 
 // DeleteVote handles deleting a vote
@@ -304,9 +304,9 @@ func (h *VoteHandler) UpdateVote(c *gin.Context) {
 // @Tags Votes
 // @Produce json
 // @Param id path int true "Vote ID"
-// @Success 200 {object} map[string]string "Vote deleted successfully"
-// @Failure 400 {object} map[string]string "Invalid vote ID"
-// @Failure 404 {object} map[string]string "Vote not found"
+// @Success 200 {object} schemas.SuccessResponse "Vote deleted successfully"
+// @Failure 400 {object} schemas.ErrorResponse "Invalid vote ID"
+// @Failure 404 {object} schemas.ErrorResponse "Vote not found"
 // @Router /api/votes/{id} [delete]
 func (h *VoteHandler) DeleteVote(c *gin.Context) {
 	// Get the vote ID from the URL parameter
@@ -314,16 +314,16 @@ func (h *VoteHandler) DeleteVote(c *gin.Context) {
 	// Convert the ID to uint
 	voteID, err := strconv.ParseUint(id, 10, 32)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Code: http.StatusBadRequest, Message: "Invalid ID", Details: err.Error()})
 		return
 	}
 	// Delete the vote using the use case
 	if err := h.VoteUsecase.DeleteVote(uint(voteID)); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Code: http.StatusInternalServerError, Message: "Failed to delete vote", Details: err.Error()})
 		return
 	}
 	// Return a success message
-	c.JSON(http.StatusOK, gin.H{"message": "Vote deleted successfully"})
+	c.JSON(http.StatusOK, schemas.SuccessResponse{Message: "Vote deleted successfully"})
 }
 
 // ForceSwaggoParse is a dummy function to ensure Swaggo parses this file.

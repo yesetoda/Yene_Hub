@@ -47,9 +47,9 @@ type RegistrationParam struct {
 // @Accept json
 // @Produce json
 // @Param bulk-registration body BulkRegistrationRequest true "Bulk registration data"
-// @Success 200 {object} map[string]interface{} "Bulk registration processed"
-// @Failure 400 {object} map[string]interface{} "Invalid input"
-// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Success 200 {object} schemas.SuccessResponse "Bulk registration processed"
+// @Failure 400 {object} schemas.ErrorResponse "Invalid input"
+// @Failure 500 {object} schemas.ErrorResponse "Internal server error"
 // @Router /api/registration/bulk [post]
 func (h *RegistrationHandler) RegisterBulkUsers(c *gin.Context) {
 	var request BulkRegistrationRequest
@@ -111,9 +111,9 @@ func (h *RegistrationHandler) RegisterBulkUsers(c *gin.Context) {
 // @Produce json
 // @Param role_id path uint true "Role ID"
 // @Param registration body RegistrationParam true "Registration data"
-// @Success 200 {object} map[string]interface{} "Bulk registration processed"
-// @Failure 400 {object} map[string]interface{} "Invalid input"
-// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Success 200 {object} schemas.SuccessResponse "Bulk registration processed"
+// @Failure 400 {object} schemas.ErrorResponse "Invalid input"
+// @Failure 500 {object} schemas.ErrorResponse "Internal server error"
 // @Router /api/registration/role/{role_id} [post]
 func (h *RegistrationHandler) RegisterUsersWithRole(c *gin.Context) {
 	// Get role ID from URL parameter

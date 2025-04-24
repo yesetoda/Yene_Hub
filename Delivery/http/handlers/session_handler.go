@@ -3,6 +3,7 @@ package handlers
 import (
 	"strconv"
 
+	"a2sv.org/hub/Delivery/http/schemas"
 	"a2sv.org/hub/Domain/entity"
 	"a2sv.org/hub/usecases"
 	"github.com/gin-gonic/gin"
@@ -25,23 +26,21 @@ func NewSessionHandler(sessionUsecase usecases.SessionUsecase) *SessionHandler {
 // @Accept json
 // @Produce json
 // @Param session body schemas.CreateSessionRequest true "Session data"
-// @Success 201 {object} schemas.SessionResponse "Session created successfully"
-// @Failure 400 {object} map[string]interface{} "Invalid request body"
-// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Success 201 {object} schemas.SuccessResponse "Session created successfully"
+// @Failure 400 {object} schemas.ErrorResponse "Invalid request body"
+// @Failure 500 {object} schemas.ErrorResponse "Internal server error"
 // @Router /api/sessions [post]
 func (h *SessionHandler) CreateSession(c *gin.Context) {
-	// Create a new session
 	var session entity.Session
 	if err := c.ShouldBindJSON(&session); err != nil {
-		c.JSON(400, gin.H{"error": "Invalid request body"})
+		c.JSON(400, schemas.ErrorResponse{Code: 400, Message: "Invalid request body", Details: err.Error()})
 		return
 	}
 	if err := h.SessionUsecase.CreateSession(&session); err != nil {
-		c.JSON(400, gin.H{"error": "Failed to create session"})
+		c.JSON(500, schemas.ErrorResponse{Code: 500, Message: "Failed to create session", Details: err.Error()})
 		return
 	}
-	// Return a success response
-	c.JSON(201, gin.H{"message": "Session created successfully"})
+	c.JSON(201, schemas.SuccessResponse{Message: "Session created successfully", Data: session})
 }
 
 // ListSessions handles listing all sessions
@@ -49,17 +48,16 @@ func (h *SessionHandler) CreateSession(c *gin.Context) {
 // @Description Get a list of all sessions
 // @Tags Sessions
 // @Produce json
-// @Success 200 {array} []*schemas.SessionResponse "List of sessions"
+// @Success 200 {object} schemas.SuccessResponse "List of sessions"
+// @Failure 500 {object} schemas.ErrorResponse "Internal server error"
 // @Router /api/sessions [get]
 func (h *SessionHandler) ListSessions(c *gin.Context) {
-	// List all sessions
 	sessions, err := h.SessionUsecase.ListSession()
 	if err != nil {
-		c.JSON(400, gin.H{"error": "Failed to fetch sessions"})
+		c.JSON(500, schemas.ErrorResponse{Code: 500, Message: "Failed to fetch sessions", Details: err.Error()})
 		return
 	}
-	// Return the list of sessions
-	c.JSON(200, sessions)
+	c.JSON(200, schemas.SuccessResponse{Message: "List of sessions", Data: sessions})
 }
 
 // GetSessionByID handles getting a session by ID
@@ -68,29 +66,27 @@ func (h *SessionHandler) ListSessions(c *gin.Context) {
 // @Tags Sessions
 // @Produce json
 // @Param id path int true "Session ID"
-// @Success 200 {object} schemas.SessionResponse "Session details"
-// @Failure 400 {object} map[string]interface{} "Invalid session ID"
-// @Failure 404 {object} map[string]interface{} "Session not found"
+// @Success 200 {object} schemas.SuccessResponse "Session details"
+// @Failure 400 {object} schemas.ErrorResponse "Invalid session ID"
+// @Failure 404 {object} schemas.ErrorResponse "Session not found"
 // @Router /api/sessions/{id} [get]
 func (h *SessionHandler) GetSessionByID(c *gin.Context) {
-	// Get a session by ID
 	id := c.Param("id")
 	if id == "" {
-		c.JSON(400, gin.H{"error": "Session ID is required"})
+		c.JSON(400, schemas.ErrorResponse{Code: 400, Message: "Session ID is required"})
 		return
 	}
-	sid, err := strconv.Atoi(id)
+	sessionID, err := strconv.Atoi(id)
 	if err != nil {
-		c.JSON(400, gin.H{"error": "Invalid session ID"})
+		c.JSON(400, schemas.ErrorResponse{Code: 400, Message: "Invalid session ID", Details: err.Error()})
 		return
 	}
-	session, err := h.SessionUsecase.GetSessionByID(uint(sid))
+	session, err := h.SessionUsecase.GetSessionByID(uint(sessionID))
 	if err != nil {
-		c.JSON(400, gin.H{"error": "Failed to fetch session"})
+		c.JSON(404, schemas.ErrorResponse{Code: 404, Message: "Session not found", Details: err.Error()})
 		return
 	}
-	// Return the session
-	c.JSON(200, session)
+	c.JSON(200, schemas.SuccessResponse{Message: "Session details", Data: session})
 }
 
 // GetSessionByName handles getting a session by name
@@ -99,22 +95,22 @@ func (h *SessionHandler) GetSessionByID(c *gin.Context) {
 // @Tags Sessions
 // @Produce json
 // @Param name path string true "Session name"
-// @Success 200 {array} []*schemas.SessionResponse "Session details"
+// @Success 200 {object} schemas.SuccessResponse "Session details"
+// @Failure 400 {object} schemas.ErrorResponse "Invalid session name"
+// @Failure 404 {object} schemas.ErrorResponse "Session not found"
 // @Router /api/sessions/name/{name} [get]
 func (h *SessionHandler) GetSessionByName(c *gin.Context) {
-	// Get a session by name
 	name := c.Param("name")
 	if name == "" {
-		c.JSON(400, gin.H{"error": "Session name is required"})
+		c.JSON(400, schemas.ErrorResponse{Code: 400, Message: "Session name is required"})
 		return
 	}
 	sessions, err := h.SessionUsecase.GetSessionByName(name)
 	if err != nil {
-		c.JSON(400, gin.H{"error": "Failed to fetch session"})
+		c.JSON(404, schemas.ErrorResponse{Code: 404, Message: "Session not found", Details: err.Error()})
 		return
 	}
-	// Return the session
-	c.JSON(200, sessions)
+	c.JSON(200, schemas.SuccessResponse{Message: "Session details", Data: sessions})
 }
 
 // GetSessionByStartTime handles getting a session by start time
@@ -123,22 +119,22 @@ func (h *SessionHandler) GetSessionByName(c *gin.Context) {
 // @Tags Sessions
 // @Produce json
 // @Param start_time path string true "Session start time"
-// @Success 200 {array} []*schemas.SessionResponse "Session details"
+// @Success 200 {object} schemas.SuccessResponse "Session details"
+// @Failure 400 {object} schemas.ErrorResponse "Invalid session start time"
+// @Failure 404 {object} schemas.ErrorResponse "Session not found"
 // @Router /api/sessions/start-time/{start_time} [get]
 func (h *SessionHandler) GetSessionByStartTime(c *gin.Context) {
-	// Get a session by start time
 	startTime := c.Param("start_time")
 	if startTime == "" {
-		c.JSON(400, gin.H{"error": "Session start time is required"})
+		c.JSON(400, schemas.ErrorResponse{Code: 400, Message: "Session start time is required"})
 		return
 	}
 	sessions, err := h.SessionUsecase.GetSessionByStartTime(startTime)
 	if err != nil {
-		c.JSON(400, gin.H{"error": "Failed to fetch session"})
+		c.JSON(404, schemas.ErrorResponse{Code: 404, Message: "Session not found", Details: err.Error()})
 		return
 	}
-	// Return the session
-	c.JSON(200, sessions)
+	c.JSON(200, schemas.SuccessResponse{Message: "Session details", Data: sessions})
 }
 
 // UpdateSession handles updating a session
@@ -149,23 +145,32 @@ func (h *SessionHandler) GetSessionByStartTime(c *gin.Context) {
 // @Produce json
 // @Param id path int true "Session ID"
 // @Param session body schemas.UpdateSessionRequest true "Session data"
-// @Success 200 {object} schemas.SessionResponse "Session updated successfully"
-// @Failure 400 {object} map[string]interface{} "Invalid request body"
-// @Failure 404 {object} map[string]interface{} "Session not found"
+// @Success 200 {object} schemas.SuccessResponse "Session updated successfully"
+// @Failure 400 {object} schemas.ErrorResponse "Invalid request body"
+// @Failure 404 {object} schemas.ErrorResponse "Session not found"
 // @Router /api/sessions/{id} [patch]
 func (h *SessionHandler) UpdateSession(c *gin.Context) {
-	// Update a session
+	id := c.Param("id")
+	if id == "" {
+		c.JSON(400, schemas.ErrorResponse{Code: 400, Message: "Session ID is required"})
+		return
+	}
+	sessionID, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(400, schemas.ErrorResponse{Code: 400, Message: "Invalid session ID", Details: err.Error()})
+		return
+	}
 	var session entity.Session
 	if err := c.ShouldBindJSON(&session); err != nil {
-		c.JSON(400, gin.H{"error": "Invalid request body"})
+		c.JSON(400, schemas.ErrorResponse{Code: 400, Message: "Invalid request body", Details: err.Error()})
 		return
 	}
+	session.ID = uint(sessionID)
 	if err := h.SessionUsecase.UpdateSession(&session); err != nil {
-		c.JSON(400, gin.H{"error": "Failed to update session"})
+		c.JSON(404, schemas.ErrorResponse{Code: 404, Message: "Session not found", Details: err.Error()})
 		return
 	}
-	// Return a success response
-	c.JSON(200, gin.H{"message": "Session updated successfully"})
+	c.JSON(200, schemas.SuccessResponse{Message: "Session updated successfully", Data: session})
 }
 
 // DeleteSession handles deleting a session
@@ -174,29 +179,27 @@ func (h *SessionHandler) UpdateSession(c *gin.Context) {
 // @Tags Sessions
 // @Produce json
 // @Param id path int true "Session ID"
-// @Success 200 {object} schemas.SessionResponse "Session deleted successfully"
-// @Failure 400 {object} map[string]interface{} "Invalid session ID"
-// @Failure 404 {object} map[string]interface{} "Session not found"
+// @Success 200 {object} schemas.SuccessResponse "Session deleted successfully"
+// @Failure 400 {object} schemas.ErrorResponse "Invalid session ID"
+// @Failure 404 {object} schemas.ErrorResponse "Session not found"
 // @Router /api/sessions/{id} [delete]
 func (h *SessionHandler) DeleteSession(c *gin.Context) {
-	// Delete a session
 	id := c.Param("id")
 	if id == "" {
-		c.JSON(400, gin.H{"error": "Session ID is required"})
+		c.JSON(400, schemas.ErrorResponse{Code: 400, Message: "Session ID is required"})
 		return
 	}
-	sid, err := strconv.Atoi(id)
+	sessionID, err := strconv.Atoi(id)
 	if err != nil {
-		c.JSON(400, gin.H{"error": "Invalid session ID"})
+		c.JSON(400, schemas.ErrorResponse{Code: 400, Message: "Invalid session ID", Details: err.Error()})
 		return
 	}
-	if err := h.SessionUsecase.DeleteSession(uint(sid)); err != nil {
-		c.JSON(400, gin.H{"error": "Failed to delete session"})
+	if err := h.SessionUsecase.DeleteSession(uint(sessionID)); err != nil {
+		c.JSON(404, schemas.ErrorResponse{Code: 404, Message: "Session not found", Details: err.Error()})
 		return
 	}
-	// Return a success response
-	c.JSON(200, gin.H{"message": "Session deleted successfully"})
+	c.JSON(200, schemas.SuccessResponse{Message: "Session deleted successfully"})
 }
 
-// ForceSwaggoParse is a dummy function to ensure Swaggo parses this file.
+// ForceSwaggoParseSessionHandler is a dummy function to ensure Swaggo parses this file.
 func ForceSwaggoParseSessionHandler() {}

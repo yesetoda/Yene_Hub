@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 
 	"a2sv.org/hub/Delivery/http/schemas"
 	"a2sv.org/hub/Domain/entity"
@@ -24,9 +25,9 @@ var UserRepo interface {
 // @Tags auth
 // @Accept json
 // @Produce json
-// @Success 302 {string} string "Redirect to Google OAuth"
+// @Success 302 {object} schemas.SuccessResponse "Redirect to Google OAuth"
 // @Failure 500 {object} schemas.ErrorResponse "Failed to initiate OAuth flow"
-// @Router /auth/google [get]
+// @Router /api/auth/google [get]
 func InitGoogleOAuth(c *gin.Context) {
 	url := fmt.Sprintf(
 		"https://accounts.google.com/o/oauth2/auth?client_id=%s&redirect_uri=%s&response_type=code&scope=email profile",
@@ -45,12 +46,12 @@ func InitGoogleOAuth(c *gin.Context) {
 // @Param code query string true "OAuth2 authorization code from Google"
 // @Param state query string false "OAuth state for CSRF protection"
 // @Param error query string false "Error message from OAuth provider"
-// @Success 200 {object} schemas.AuthTokenResponse "JWT token for authenticated user"
+// @Success 200 {object} schemas.SuccessResponse "Authentication successful"
 // @Failure 400 {object} schemas.ErrorResponse "Missing or invalid authorization code"
 // @Failure 401 {object} schemas.ErrorResponse "User not registered or email not verified"
 // @Failure 403 {object} schemas.ErrorResponse "Invalid OAuth state"
 // @Failure 500 {object} schemas.ErrorResponse "Internal server error"
-// @Router /auth/google/callback [get]
+// @Router /api/auth/google/callback [get]
 func HandleGoogleCallback(c *gin.Context) {
 	code := c.Query("code")
 	if code == "" {
@@ -105,7 +106,7 @@ func HandleGoogleCallback(c *gin.Context) {
 	}
 
 	// Generate JWT token for the user
-	jwtToken, err := token_services.GenerateToken(user, user.Email, fmt.Sprintf("%d", user.RoleID))
+	jwtToken, err := token_services.CreateJWTToken(user, os.Getenv("JWT_SECRET"), 24*30*time.Hour)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{
 			Code:    http.StatusInternalServerError,
@@ -115,7 +116,8 @@ func HandleGoogleCallback(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, schemas.AuthTokenResponse{
-		Token: jwtToken,
+	c.JSON(http.StatusOK, schemas.SuccessResponse{
+		Message: "Login successful",
+		Data:    jwtToken,
 	})
 }

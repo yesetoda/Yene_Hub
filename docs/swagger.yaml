@@ -1,886 +1,5 @@
 basePath: /
 definitions:
-  entity.APIToken:
-    properties:
-      created_at:
-        type: string
-      expires_at:
-        type: string
-      id:
-        type: integer
-      name:
-        type: string
-      token:
-        type: string
-      type:
-        type: string
-      user:
-        $ref: '#/definitions/entity.User'
-      user_id:
-        type: integer
-    type: object
-  entity.Attendance:
-    properties:
-      at:
-        description: Time when attendance was taken
-        type: string
-      created_at:
-        type: string
-      head:
-        $ref: '#/definitions/entity.User'
-      head_id:
-        description: The head who recorded this attendance
-        type: integer
-      id:
-        type: integer
-      session:
-        $ref: '#/definitions/entity.Session'
-      session_id:
-        type: integer
-      status:
-        description: e.g., 0=absent, 1=present, 2=excused
-        type: integer
-      type:
-        description: Type of attendance record
-        type: integer
-      updated_at:
-        type: string
-      user:
-        $ref: '#/definitions/entity.User'
-      user_id:
-        type: integer
-    type: object
-  entity.Comment:
-    properties:
-      created_at:
-        type: string
-      id:
-        type: integer
-      post:
-        $ref: '#/definitions/entity.Post'
-      post_id:
-        type: integer
-      problem:
-        $ref: '#/definitions/entity.Problem'
-      problem_id:
-        type: integer
-      replies:
-        description: Relations
-        items:
-          $ref: '#/definitions/entity.Comment'
-        type: array
-      reply:
-        $ref: '#/definitions/entity.Comment'
-      reply_id:
-        type: integer
-      submission:
-        $ref: '#/definitions/entity.Submission'
-      submission_id:
-        type: integer
-      text:
-        type: string
-      track:
-        $ref: '#/definitions/entity.Track'
-      track_id:
-        type: integer
-      updated_at:
-        type: string
-      user:
-        $ref: '#/definitions/entity.User'
-      user_id:
-        type: integer
-      votes:
-        items:
-          $ref: '#/definitions/entity.Vote'
-        type: array
-    type: object
-  entity.Contest:
-    properties:
-      created_at:
-        type: string
-      id:
-        type: integer
-      link:
-        type: string
-      link2:
-        type: string
-      link3:
-        type: string
-      name:
-        type: string
-      problem_count:
-        type: integer
-      problems:
-        description: Relations
-        items:
-          $ref: '#/definitions/entity.Problem'
-        type: array
-      super_group:
-        $ref: '#/definitions/entity.SuperGroup'
-      super_group_id:
-        type: integer
-      type:
-        type: string
-      unrated:
-        type: boolean
-      updated_at:
-        type: string
-      votes:
-        description: |-
-          Ratings       []Rating       `json:"ratings,omitempty" gorm:"foreignKey:ContestID"`
-          DivisionUsers []DivisionUser `json:"division_users,omitempty" gorm:"foreignKey:ContestID"`
-        items:
-          $ref: '#/definitions/entity.Vote'
-        type: array
-    type: object
-  entity.Country:
-    properties:
-      created_at:
-        type: string
-      groups:
-        items:
-          $ref: '#/definitions/entity.Group'
-        type: array
-      id:
-        type: integer
-      name:
-        type: string
-      short_code:
-        type: string
-      updated_at:
-        type: string
-      users:
-        description: Relations
-        items:
-          $ref: '#/definitions/entity.User'
-        type: array
-    type: object
-  entity.DailyProblem:
-    properties:
-      created_at:
-        type: string
-      for_date:
-        type: string
-      id:
-        type: integer
-      problem:
-        $ref: '#/definitions/entity.Problem'
-      problem_id:
-        type: integer
-      super_group:
-        $ref: '#/definitions/entity.SuperGroup'
-      super_group_id:
-        type: integer
-      updated_at:
-        type: string
-    type: object
-  entity.Exercise:
-    properties:
-      created_at:
-        type: string
-      group:
-        $ref: '#/definitions/entity.Group'
-      group_id:
-        type: integer
-      id:
-        type: integer
-      problem:
-        $ref: '#/definitions/entity.Problem'
-      problem_id:
-        type: integer
-      track:
-        $ref: '#/definitions/entity.Track'
-      track_id:
-        type: integer
-      updated_at:
-        type: string
-    type: object
-  entity.Fund:
-    properties:
-      amount:
-        type: number
-      created_at:
-        type: string
-      currency:
-        type: string
-      description:
-        type: string
-      id:
-        type: integer
-      name:
-        type: string
-      sessions:
-        description: Relations
-        items:
-          $ref: '#/definitions/entity.Session'
-        type: array
-      stipends:
-        items:
-          $ref: '#/definitions/entity.Stipend'
-        type: array
-      updated_at:
-        type: string
-    type: object
-  entity.GoogleOAuth:
-    properties:
-      calendar_id:
-        type: string
-      created_at:
-        type: string
-      encrypted_token_string:
-        type: string
-      group:
-        $ref: '#/definitions/entity.Group'
-      group_id:
-        type: integer
-      id:
-        type: integer
-      updated_at:
-        type: string
-      user:
-        $ref: '#/definitions/entity.User'
-      user_id:
-        type: integer
-    type: object
-  entity.Group:
-    properties:
-      country:
-        $ref: '#/definitions/entity.Country'
-      country_id:
-        type: integer
-      created_at:
-        type: string
-      description:
-        type: string
-      exercises:
-        items:
-          $ref: '#/definitions/entity.Exercise'
-        type: array
-      google_oauths:
-        items:
-          $ref: '#/definitions/entity.GoogleOAuth'
-        type: array
-      group_sessions:
-        items:
-          $ref: '#/definitions/entity.GroupSession'
-        type: array
-      hoa_id:
-        description: Head of Academy ID
-        type: integer
-      hoas:
-        items:
-          $ref: '#/definitions/entity.HOA'
-        type: array
-      id:
-        type: integer
-      invites:
-        items:
-          $ref: '#/definitions/entity.Invite'
-        type: array
-      name:
-        type: string
-      short_name:
-        type: string
-      super_to_groups:
-        items:
-          $ref: '#/definitions/entity.SuperToGroup'
-        type: array
-      updated_at:
-        type: string
-      users:
-        description: Relations
-        items:
-          $ref: '#/definitions/entity.User'
-        type: array
-    type: object
-  entity.GroupSession:
-    properties:
-      created_at:
-        type: string
-      group:
-        $ref: '#/definitions/entity.Group'
-      group_id:
-        type: integer
-      id:
-        type: integer
-      session:
-        $ref: '#/definitions/entity.Session'
-      session_id:
-        type: integer
-      updated_at:
-        type: string
-    type: object
-  entity.HOA:
-    properties:
-      created_at:
-        type: string
-      group:
-        $ref: '#/definitions/entity.Group'
-      group_id:
-        type: integer
-      id:
-        type: integer
-      updated_at:
-        type: string
-      user:
-        $ref: '#/definitions/entity.User'
-      user_id:
-        type: integer
-    type: object
-  entity.Invite:
-    properties:
-      created_at:
-        type: string
-      group:
-        $ref: '#/definitions/entity.Group'
-      group_id:
-        type: integer
-      id:
-        type: integer
-      key:
-        description: Unique invite key
-        type: string
-      role:
-        $ref: '#/definitions/entity.Role'
-      role_id:
-        type: integer
-      updated_at:
-        type: string
-      used:
-        description: Whether the invite has been used
-        type: boolean
-      user:
-        $ref: '#/definitions/entity.User'
-      user_id:
-        description: User who created the invite
-        type: integer
-    type: object
-  entity.Post:
-    properties:
-      body:
-        type: string
-      comments:
-        description: Relations
-        items:
-          $ref: '#/definitions/entity.Comment'
-        type: array
-      created_at:
-        type: string
-      id:
-        type: integer
-      post_to_tags:
-        items:
-          $ref: '#/definitions/entity.PostToTag'
-        type: array
-      title:
-        type: string
-      updated_at:
-        type: string
-      user:
-        $ref: '#/definitions/entity.User'
-      user_id:
-        type: integer
-      votes:
-        items:
-          $ref: '#/definitions/entity.Vote'
-        type: array
-    type: object
-  entity.PostTag:
-    properties:
-      created_at:
-        type: string
-      id:
-        type: integer
-      name:
-        type: string
-      post_to_tags:
-        description: Relations
-        items:
-          $ref: '#/definitions/entity.PostToTag'
-        type: array
-      updated_at:
-        type: string
-    type: object
-  entity.PostToTag:
-    properties:
-      created_at:
-        type: string
-      id:
-        type: integer
-      post:
-        $ref: '#/definitions/entity.Post'
-      post_id:
-        type: integer
-      post_tag:
-        $ref: '#/definitions/entity.PostTag'
-      post_tag_id:
-        type: integer
-      updated_at:
-        type: string
-    type: object
-  entity.Problem:
-    properties:
-      comments:
-        items:
-          $ref: '#/definitions/entity.Comment'
-        type: array
-      contest:
-        $ref: '#/definitions/entity.Contest'
-      contest_id:
-        type: integer
-      created_at:
-        type: string
-      daily_problems:
-        items:
-          $ref: '#/definitions/entity.DailyProblem'
-        type: array
-      difficulty:
-        type: string
-      exercises:
-        items:
-          $ref: '#/definitions/entity.Exercise'
-        type: array
-      id:
-        type: integer
-      link:
-        type: string
-      name:
-        type: string
-      platform:
-        type: string
-      problem_tracks:
-        items:
-          $ref: '#/definitions/entity.ProblemTrack'
-        type: array
-      submissions:
-        description: Relations
-        items:
-          $ref: '#/definitions/entity.Submission'
-        type: array
-      tag:
-        type: string
-      track:
-        $ref: '#/definitions/entity.Track'
-      track_id:
-        type: integer
-      updated_at:
-        type: string
-      votes:
-        items:
-          $ref: '#/definitions/entity.Vote'
-        type: array
-    type: object
-  entity.ProblemTrack:
-    properties:
-      created_at:
-        type: string
-      id:
-        type: integer
-      problem:
-        $ref: '#/definitions/entity.Problem'
-      problem_id:
-        type: integer
-      track:
-        $ref: '#/definitions/entity.Track'
-      track_id:
-        type: integer
-      updated_at:
-        type: string
-    type: object
-  entity.RecentAction:
-    properties:
-      created_at:
-        type: string
-      description:
-        type: string
-      id:
-        type: integer
-      type:
-        type: string
-      updated_at:
-        type: string
-      user:
-        $ref: '#/definitions/entity.User'
-      user_id:
-        type: integer
-    type: object
-  entity.Role:
-    properties:
-      created_at:
-        type: string
-      id:
-        type: integer
-      invites:
-        items:
-          $ref: '#/definitions/entity.Invite'
-        type: array
-      type:
-        type: string
-      updated_at:
-        type: string
-      users:
-        description: Relations
-        items:
-          $ref: '#/definitions/entity.User'
-        type: array
-    type: object
-  entity.Session:
-    properties:
-      attendances:
-        description: Relations
-        items:
-          $ref: '#/definitions/entity.Attendance'
-        type: array
-      calendar_event_id:
-        type: string
-      created_at:
-        type: string
-      description:
-        type: string
-      end_time:
-        type: string
-      fund:
-        $ref: '#/definitions/entity.Fund'
-      fund_id:
-        type: integer
-      group_sessions:
-        items:
-          $ref: '#/definitions/entity.GroupSession'
-        type: array
-      id:
-        type: integer
-      lecturer:
-        $ref: '#/definitions/entity.User'
-      lecturer_id:
-        type: integer
-      location:
-        type: string
-      meet_link:
-        type: string
-      name:
-        type: string
-      recording_link:
-        type: string
-      resource_link:
-        type: string
-      start_time:
-        type: string
-      stipends:
-        items:
-          $ref: '#/definitions/entity.Stipend'
-        type: array
-      updated_at:
-        type: string
-    type: object
-  entity.Stipend:
-    properties:
-      created_at:
-        type: string
-      fund:
-        $ref: '#/definitions/entity.Fund'
-      fund_id:
-        type: integer
-      id:
-        type: integer
-      paid:
-        type: boolean
-      session:
-        $ref: '#/definitions/entity.Session'
-      session_id:
-        type: integer
-      share:
-        description: Share of the fund amount
-        type: number
-      updated_at:
-        type: string
-      user:
-        $ref: '#/definitions/entity.User'
-      user_id:
-        type: integer
-    type: object
-  entity.Submission:
-    properties:
-      code:
-        type: string
-      comments:
-        description: Relations
-        items:
-          $ref: '#/definitions/entity.Comment'
-        type: array
-      created_at:
-        type: string
-      id:
-        type: integer
-      in_contest:
-        description: Whether it was solved in a contest
-        type: integer
-      language:
-        type: string
-      problem:
-        $ref: '#/definitions/entity.Problem'
-      problem_id:
-        type: integer
-      time_spent:
-        description: Time spent in seconds
-        type: integer
-      tries:
-        description: Number of attempts
-        type: integer
-      updated_at:
-        type: string
-      user:
-        $ref: '#/definitions/entity.User'
-      user_id:
-        type: integer
-      verified:
-        type: boolean
-      votes:
-        items:
-          $ref: '#/definitions/entity.Vote'
-        type: array
-    type: object
-  entity.SuperGroup:
-    properties:
-      contests:
-        items:
-          $ref: '#/definitions/entity.Contest'
-        type: array
-      created_at:
-        type: string
-      daily_problems:
-        items:
-          $ref: '#/definitions/entity.DailyProblem'
-        type: array
-      id:
-        type: integer
-      name:
-        type: string
-      super_to_groups:
-        items:
-          $ref: '#/definitions/entity.SuperToGroup'
-        type: array
-      tracks:
-        description: Relations
-        items:
-          $ref: '#/definitions/entity.Track'
-        type: array
-      updated_at:
-        type: string
-    type: object
-  entity.SuperToGroup:
-    properties:
-      created_at:
-        type: string
-      group:
-        $ref: '#/definitions/entity.Group'
-      group_id:
-        type: integer
-      id:
-        type: integer
-      super_group:
-        $ref: '#/definitions/entity.SuperGroup'
-      super_group_id:
-        type: integer
-      updated_at:
-        type: string
-    type: object
-  entity.Track:
-    properties:
-      active:
-        type: boolean
-      comments:
-        items:
-          $ref: '#/definitions/entity.Comment'
-        type: array
-      created_at:
-        type: string
-      exercises:
-        items:
-          $ref: '#/definitions/entity.Exercise'
-        type: array
-      id:
-        type: integer
-      name:
-        type: string
-      problem_tracks:
-        items:
-          $ref: '#/definitions/entity.ProblemTrack'
-        type: array
-      problems:
-        description: Relations
-        items:
-          $ref: '#/definitions/entity.Problem'
-        type: array
-      super_group:
-        $ref: '#/definitions/entity.SuperGroup'
-      super_group_id:
-        type: integer
-      updated_at:
-        type: string
-      votes:
-        items:
-          $ref: '#/definitions/entity.Vote'
-        type: array
-    type: object
-  entity.User:
-    properties:
-      api_tokens:
-        items:
-          $ref: '#/definitions/entity.APIToken'
-        type: array
-      attendances:
-        items:
-          $ref: '#/definitions/entity.Attendance'
-        type: array
-      birthday:
-        description: Personal Information
-        type: string
-      code_of_conduct:
-        type: string
-      codeforces:
-        type: string
-      comments:
-        items:
-          $ref: '#/definitions/entity.Comment'
-        type: array
-      config:
-        type: string
-      country:
-        $ref: '#/definitions/entity.Country'
-      country_id:
-        type: integer
-      created_at:
-        description: Timestamps
-        type: string
-      cv:
-        description: Professional Details
-        type: string
-      department:
-        type: string
-      email:
-        type: string
-      expected_graduation_date:
-        type: string
-      gender:
-        type: string
-      github:
-        type: string
-      group:
-        $ref: '#/definitions/entity.Group'
-      group_id:
-        type: integer
-      hackerrank:
-        type: string
-      head_attendances:
-        items:
-          $ref: '#/definitions/entity.Attendance'
-        type: array
-      id:
-        description: Core Identity Fields
-        type: integer
-      inactive:
-        type: boolean
-      instagram:
-        type: string
-      joined_date:
-        type: string
-      leetcode:
-        description: |-
-          Coding Profiles (optional)
-          Use pointer types so that if no value is provided, they remain nil.
-        type: string
-      linkedin:
-        description: Social Media (all optional)
-        type: string
-      mentor_name:
-        type: string
-      name:
-        type: string
-      phone:
-        description: Contact Information
-        type: string
-      photo:
-        description: System Fields
-        type: string
-      posts:
-        items:
-          $ref: '#/definitions/entity.Post'
-        type: array
-      preferred_language:
-        type: string
-      recent_actions:
-        items:
-          $ref: '#/definitions/entity.RecentAction'
-        type: array
-      role:
-        $ref: '#/definitions/entity.Role'
-      role_id:
-        description: Role and Relationships
-        type: integer
-      short_bio:
-        type: string
-      student_id:
-        type: string
-      submissions:
-        description: Relations (using GORM associations)
-        items:
-          $ref: '#/definitions/entity.Submission'
-        type: array
-      telegram_uid:
-        type: string
-      telegram_username:
-        type: string
-      tshirt_color:
-        description: Physical Attributes
-        type: string
-      tshirt_size:
-        type: string
-      university:
-        description: Academic Information
-        type: string
-      updated_at:
-        type: string
-    type: object
-  entity.Vote:
-    properties:
-      comment:
-        $ref: '#/definitions/entity.Comment'
-      comment_id:
-        type: integer
-      contest:
-        $ref: '#/definitions/entity.Contest'
-      contest_id:
-        type: integer
-      created_at:
-        type: string
-      id:
-        type: integer
-      post:
-        $ref: '#/definitions/entity.Post'
-      post_id:
-        type: integer
-      problem:
-        $ref: '#/definitions/entity.Problem'
-      problem_id:
-        type: integer
-      submission:
-        $ref: '#/definitions/entity.Submission'
-      submission_id:
-        type: integer
-      track:
-        $ref: '#/definitions/entity.Track'
-      track_id:
-        type: integer
-      type:
-        description: e.g., 1=upvote, -1=downvote
-        type: integer
-      updated_at:
-        type: string
-      user:
-        $ref: '#/definitions/entity.User'
-      user_id:
-        type: integer
-    type: object
   handlers.BulkRegistrationRequest:
     properties:
       country_id:
@@ -909,228 +28,725 @@ definitions:
     - emails
     - group_id
     type: object
-  schemas.AuthTokenResponse:
+  schemas.CreateCountryRequest:
     properties:
-      token:
+      code:
+        example: ET
         type: string
-      user:
-        $ref: '#/definitions/entity.User'
+      name:
+        example: Ethiopia
+        type: string
+    required:
+    - code
+    - name
     type: object
-  schemas.CreateUserInput:
+  schemas.CreateGroupRequest:
+    properties:
+      country_id:
+        example: 1
+        type: integer
+      description:
+        example: A competitive programming team
+        type: string
+      hoa_id:
+        example: 5
+        type: integer
+      name:
+        example: Team Alpha
+        type: string
+      short_name:
+        example: Alpha
+        type: string
+    required:
+    - country_id
+    - name
+    type: object
+  schemas.CreateProblemRequest:
+    properties:
+      description:
+        example: Find two numbers that add up to target
+        type: string
+      difficulty:
+        allOf:
+        - $ref: '#/definitions/schemas.Difficulty'
+        example: medium
+      link:
+        example: https://leetcode.com/problems/two-sum
+        type: string
+      name:
+        description: 'Required: true'
+        example: Two Sum
+        type: string
+      platform:
+        example: leetcode
+        type: string
+      tags:
+        example:
+        - '[''array'''
+        - '''hash-table'']'
+        items:
+          type: string
+        type: array
+    required:
+    - description
+    - difficulty
+    - link
+    - name
+    - platform
+    type: object
+  schemas.CreateRecentActionRequest:
+    properties:
+      action_type:
+        example: problem_solved
+        type: string
+      description:
+        example: Solved Two Sum problem
+        type: string
+      entity_id:
+        example: 123
+        type: integer
+      entity_type:
+        example: problem
+        type: string
+      user_id:
+        description: 'Required: true'
+        example: 1
+        type: integer
+    required:
+    - action_type
+    - description
+    - entity_id
+    - entity_type
+    - user_id
+    type: object
+  schemas.CreateRoleRequest:
+    properties:
+      description:
+        example: Can moderate content
+        type: string
+      type:
+        description: 'Required: true'
+        example: Moderator
+        type: string
+    required:
+    - type
+    type: object
+  schemas.CreateSessionRequest:
+    properties:
+      description:
+        example: Introduction to Data Structures
+        type: string
+      end_time:
+        type: string
+      group_id:
+        example: 1
+        type: integer
+      host_id:
+        example: 1
+        type: integer
+      location:
+        example: Room 101
+        type: string
+      meeting_link:
+        example: https://meet.google.com/abc-xyz
+        type: string
+      name:
+        description: 'Required: true'
+        example: 'DSA Session #1'
+        type: string
+      start_time:
+        type: string
+    required:
+    - description
+    - end_time
+    - group_id
+    - host_id
+    - name
+    - start_time
+    type: object
+  schemas.CreateStipendRequest:
+    properties:
+      account_name:
+        example: John Doe
+        type: string
+      account_number:
+        example: "1234567890"
+        type: string
+      amount:
+        example: 500
+        type: number
+      bank_name:
+        description: Optional fields
+        example: Example Bank
+        type: string
+      currency:
+        example: USD
+        type: string
+      description:
+        example: Monthly stipend for April 2025
+        type: string
+      month:
+        type: string
+      payment_method:
+        allOf:
+        - $ref: '#/definitions/schemas.PaymentMethod'
+        example: bank_transfer
+      phone_number:
+        example: "+1234567890"
+        type: string
+      user_id:
+        description: 'Required: true'
+        example: 1
+        type: integer
+    required:
+    - amount
+    - currency
+    - month
+    - payment_method
+    - user_id
+    type: object
+  schemas.CreateSubmissionRequest:
+    properties:
+      code:
+        example: def two_sum(nums, target):...
+        type: string
+      language:
+        allOf:
+        - $ref: '#/definitions/schemas.Language'
+        example: python
+      problem_id:
+        example: 1
+        type: integer
+      user_id:
+        description: 'Required: true'
+        example: 1
+        type: integer
+    required:
+    - code
+    - language
+    - problem_id
+    - user_id
+    type: object
+  schemas.CreateSuperGroupRequest:
+    properties:
+      country_id:
+        example: 1
+        type: integer
+      description:
+        example: Second generation of A2SV students
+        type: string
+      name:
+        description: 'Required: true'
+        example: A2SV Generation 2
+        type: string
+    required:
+    - country_id
+    - description
+    - name
+    type: object
+  schemas.CreateTrackRequest:
+    properties:
+      description:
+        example: Advanced Data Structures and Algorithms
+        type: string
+      end_date:
+        type: string
+      group_id:
+        example: 1
+        type: integer
+      name:
+        description: 'Required: true'
+        example: DSA Advanced Track
+        type: string
+      start_date:
+        type: string
+      type:
+        allOf:
+        - $ref: '#/definitions/schemas.TrackType'
+        example: dsa
+    required:
+    - description
+    - end_date
+    - group_id
+    - name
+    - start_date
+    - type
+    type: object
+  schemas.CreateUserRequest:
     properties:
       birthday:
         type: string
       codeforces:
+        example: cf_user
         type: string
+      country_id:
+        example: 1
+        type: integer
       department:
+        example: Computer Science
         type: string
       email:
+        example: user@example.com
         type: string
       expected_graduation_date:
         type: string
-      github:
+      gender:
+        example: male
         type: string
+      github:
+        example: github_user
+        type: string
+      group_id:
+        example: 1
+        type: integer
       hackerrank:
+        example: hr_user
         type: string
       instagram:
+        example: insta_user
         type: string
       leetcode:
+        example: leetcode_user
         type: string
       linkedin:
+        example: linkedin_profile
         type: string
       name:
+        example: John Doe
+        type: string
+      password:
+        example: MySecret123
         type: string
       phone:
+        example: "+1234567890"
+        type: string
+      preferred_language:
+        example: en
         type: string
       role_id:
+        example: 2
         type: integer
+      short_bio:
+        example: Software developer passionate about algorithms
+        type: string
       student_id:
+        example: STU123
         type: string
       telegram_uid:
+        example: "123456789"
         type: string
       telegram_username:
+        example: '@username'
         type: string
       university:
+        example: Example University
         type: string
     required:
     - email
+    - name
+    - password
     type: object
+  schemas.CreateVoteRequest:
+    properties:
+      entity_id:
+        example: 123
+        type: integer
+      entity_type:
+        description: comment, post, track, submission, problem
+        example: comment
+        type: string
+      user_id:
+        description: 'Required: true'
+        example: 1
+        type: integer
+      vote_type:
+        allOf:
+        - $ref: '#/definitions/schemas.VoteType'
+        example: upvote
+    required:
+    - entity_id
+    - entity_type
+    - user_id
+    - vote_type
+    type: object
+  schemas.Difficulty:
+    enum:
+    - easy
+    - medium
+    - hard
+    - very_hard
+    type: string
+    x-enum-varnames:
+    - Easy
+    - Medium
+    - Hard
+    - VeryHard
   schemas.ErrorResponse:
     properties:
       code:
+        example: 400
         type: integer
       details:
+        example: Email field is required
         type: string
       message:
+        example: Invalid request parameters
         type: string
     type: object
-  schemas.LoginInput:
+  schemas.Language:
+    enum:
+    - python
+    - java
+    - cpp
+    - javascript
+    - go
+    type: string
+    x-enum-varnames:
+    - Python
+    - Java
+    - CPP
+    - JavaScript
+    - Go
+  schemas.LoginRequest:
     properties:
       email:
+        example: user@example.com
         type: string
       password:
+        example: mypassword123
         type: string
     required:
     - email
     - password
     type: object
-  schemas.LoginResponse:
-    properties:
-      message:
-        type: string
-      token:
-        type: string
-      user:
-        $ref: '#/definitions/schemas.ResponseUser'
-    type: object
-  schemas.PaginatedUsers:
-    properties:
-      data:
-        items:
-          $ref: '#/definitions/entity.User'
-        type: array
-      meta:
-        $ref: '#/definitions/schemas.PaginationMeta'
-    type: object
-  schemas.PaginationMeta:
-    properties:
-      page:
-        type: integer
-      page_size:
-        type: integer
-      total:
-        type: integer
-      total_pages:
-        type: integer
-    type: object
-  schemas.ResponseUser:
-    properties:
-      birthday:
-        description: Personal Information
-        type: string
-      code_of_conduct:
-        type: string
-      codeforces:
-        type: string
-      config:
-        type: string
-      country_id:
-        type: integer
-      created_at:
-        description: Timestamps
-        type: string
-      cv:
-        description: Professional Details
-        type: string
-      department:
-        type: string
-      email:
-        type: string
-      expected_graduation_date:
-        type: string
-      gender:
-        type: string
-      github:
-        type: string
-      group_id:
-        type: integer
-      hackerrank:
-        type: string
-      id:
-        description: Core Identity Fields
-        type: integer
-      inactive:
-        type: boolean
-      instagram:
-        type: string
-      joined_date:
-        type: string
-      leetcode:
-        description: |-
-          Coding Profiles (optional)
-          Use pointer types so that if no value is provided, they remain nil.
-        type: string
-      linkedin:
-        description: Social Media (all optional)
-        type: string
-      mentor_name:
-        type: string
-      name:
-        type: string
-      phone:
-        description: Contact Information
-        type: string
-      photo:
-        description: System Fields
-        type: string
-      preferred_language:
-        type: string
-      role_id:
-        description: Default role ID (adjust as necessary)
-        type: integer
-      short_bio:
-        type: string
-      student_id:
-        type: string
-      telegram_uid:
-        type: string
-      telegram_username:
-        type: string
-      tshirt_color:
-        description: Physical Attributes
-        type: string
-      tshirt_size:
-        type: string
-      university:
-        description: Academic Information
-        type: string
-      updated_at:
-        type: string
-    type: object
+  schemas.PaymentMethod:
+    enum:
+    - bank_transfer
+    - mobile_money
+    - cash
+    type: string
+    x-enum-varnames:
+    - BankTransfer
+    - MobileMoney
+    - Cash
+  schemas.PaymentStatus:
+    enum:
+    - pending
+    - approved
+    - rejected
+    - paid
+    - failed
+    type: string
+    x-enum-varnames:
+    - PaymentPending
+    - PaymentApproved
+    - PaymentRejected
+    - PaymentPaid
+    - PaymentFailed
   schemas.SuccessResponse:
     properties:
       data: {}
       message:
+        example: Operation successful
         type: string
     type: object
-  schemas.UpdateUserInput:
+  schemas.SuperToGroupRequest:
+    properties:
+      group_ids:
+        example:
+        - 1
+        - 2
+        - 3
+        items:
+          type: integer
+        type: array
+    required:
+    - group_ids
+    type: object
+  schemas.TrackType:
+    enum:
+    - dsa
+    - project
+    - system_design
+    type: string
+    x-enum-varnames:
+    - DSATrack
+    - ProjectTrack
+    - SystemTrack
+  schemas.UpdateCountryRequest:
+    properties:
+      code:
+        example: ET
+        type: string
+      name:
+        example: Ethiopia
+        type: string
+    type: object
+  schemas.UpdateGroupRequest:
+    properties:
+      country_id:
+        example: 2
+        type: integer
+      description:
+        example: An advanced competitive programming team
+        type: string
+      hoa_id:
+        example: 6
+        type: integer
+      name:
+        example: Team Beta
+        type: string
+      short_name:
+        example: Beta
+        type: string
+    type: object
+  schemas.UpdateProblemRequest:
+    properties:
+      description:
+        type: string
+      difficulty:
+        allOf:
+        - $ref: '#/definitions/schemas.Difficulty'
+        example: hard
+      id:
+        example: 1
+        type: integer
+      link:
+        type: string
+      name:
+        example: Two Sum Problem
+        type: string
+      platform:
+        example: leetcode
+        type: string
+      tags:
+        example:
+        - '[''array'''
+        - '''hash-table'''
+        - '''two-pointer'']'
+        items:
+          type: string
+        type: array
+    type: object
+  schemas.UpdateRecentActionRequest:
+    properties:
+      action_type:
+        example: problem_attempted
+        type: string
+      description:
+        example: Attempted Two Sum problem
+        type: string
+      entity_id:
+        example: 123
+        type: integer
+      entity_type:
+        example: problem
+        type: string
+      id:
+        example: 1
+        type: integer
+    type: object
+  schemas.UpdateRoleRequest:
+    properties:
+      description:
+        example: Can moderate all content
+        type: string
+      type:
+        example: Senior Moderator
+        type: string
+    type: object
+  schemas.UpdateSessionRequest:
+    properties:
+      description:
+        example: Updated Introduction to Data Structures
+        type: string
+      end_time:
+        type: string
+      group_id:
+        example: 1
+        type: integer
+      host_id:
+        example: 1
+        type: integer
+      location:
+        example: Room 102
+        type: string
+      meeting_link:
+        example: https://meet.google.com/new-link
+        type: string
+      name:
+        example: 'DSA Session #1 - Updated'
+        type: string
+      start_time:
+        type: string
+      status:
+        example: completed
+        type: string
+    type: object
+  schemas.UpdateStipendRequest:
+    properties:
+      account_name:
+        example: John Doe
+        type: string
+      account_number:
+        example: "0987654321"
+        type: string
+      amount:
+        example: 550
+        type: number
+      bank_name:
+        example: New Bank
+        type: string
+      currency:
+        example: USD
+        type: string
+      description:
+        example: Updated monthly stipend
+        type: string
+      notes:
+        example: Payment processed successfully
+        type: string
+      paid_at:
+        type: string
+      payment_method:
+        allOf:
+        - $ref: '#/definitions/schemas.PaymentMethod'
+        example: mobile_money
+      phone_number:
+        example: "+1234567890"
+        type: string
+      status:
+        allOf:
+        - $ref: '#/definitions/schemas.PaymentStatus'
+        example: payment_approved
+      transaction_id:
+        description: Payment processing fields
+        example: TXN123456
+        type: string
+    type: object
+  schemas.UpdateSuperGroupRequest:
+    properties:
+      country_id:
+        example: 1
+        type: integer
+      description:
+        example: Advanced track of second generation
+        type: string
+      name:
+        example: A2SV Generation 2 - Advanced
+        type: string
+      status:
+        example: active
+        type: string
+    type: object
+  schemas.UpdateTrackRequest:
+    properties:
+      description:
+        example: Expert level algorithms
+        type: string
+      end_date:
+        type: string
+      group_id:
+        example: 1
+        type: integer
+      name:
+        example: DSA Expert Track
+        type: string
+      start_date:
+        type: string
+      status:
+        example: active
+        type: string
+      type:
+        allOf:
+        - $ref: '#/definitions/schemas.TrackType'
+        example: dsa
+    type: object
+  schemas.UpdateUserRequest:
     properties:
       birthday:
         type: string
       codeforces:
+        example: cf_user
         type: string
+      country_id:
+        example: 1
+        type: integer
       department:
+        example: Computer Science
         type: string
       email:
+        example: user@example.com
         type: string
       expected_graduation_date:
         type: string
-      github:
+      gender:
+        example: male
         type: string
+      github:
+        example: github_user
+        type: string
+      group_id:
+        example: 1
+        type: integer
       hackerrank:
+        example: hr_user
         type: string
       instagram:
+        example: insta_user
         type: string
       leetcode:
+        example: leetcode_user
         type: string
       linkedin:
+        example: linkedin_profile
         type: string
       name:
+        example: John Doe
+        type: string
+      password:
+        example: MySecret123
         type: string
       phone:
+        example: "+1234567890"
+        type: string
+      preferred_language:
+        example: en
         type: string
       role_id:
+        example: 2
         type: integer
+      short_bio:
+        example: Software developer passionate about algorithms
+        type: string
       student_id:
+        example: STU123
         type: string
       telegram_uid:
+        example: "123456789"
         type: string
       telegram_username:
+        example: '@username'
         type: string
       university:
+        example: Example University
         type: string
     type: object
-host: yene-hub-ls0y.onrender.com
+  schemas.UpdateVoteRequest:
+    properties:
+      vote_type:
+        allOf:
+        - $ref: '#/definitions/schemas.VoteType'
+        example: downvote
+    type: object
+  schemas.VoteType:
+    enum:
+    - upvote
+    - downvote
+    type: string
+    x-enum-varnames:
+    - Upvote
+    - Downvote
 info:
   contact:
     email: support@hub.a2sv.org
@@ -1145,33 +761,40 @@ info:
 paths:
   /api/auth/google:
     get:
-      description: Redirects to Google's OAuth2 authentication page
+      consumes:
+      - application/json
+      description: Initiates the OAuth2 flow by redirecting to Google's authentication
+        page
       produces:
       - application/json
       responses:
         "302":
           description: Redirect to Google OAuth
+          schema:
+            $ref: '#/definitions/schemas.SuccessResponse'
         "500":
-          description: OAuth configuration error
+          description: Failed to initiate OAuth flow
           schema:
             $ref: '#/definitions/schemas.ErrorResponse'
       summary: Start Google OAuth
       tags:
-      - Authentication
+      - auth
   /api/auth/google/callback:
     get:
-      description: Handle Google OAuth callback and return JWT token
+      consumes:
+      - application/json
+      description: Process Google OAuth callback, verify user, and return JWT token
       parameters:
-      - description: Authorization code from Google
+      - description: OAuth2 authorization code from Google
         in: query
         name: code
         required: true
         type: string
-      - description: OAuth state parameter
+      - description: OAuth state for CSRF protection
         in: query
         name: state
         type: string
-      - description: OAuth error description
+      - description: Error message from OAuth provider
         in: query
         name: error
         type: string
@@ -1179,58 +802,62 @@ paths:
       - application/json
       responses:
         "200":
-          description: Authentication token
+          description: Authentication successful
           schema:
-            $ref: '#/definitions/schemas.AuthTokenResponse'
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
-          description: Missing code parameter
+          description: Missing or invalid authorization code
           schema:
             $ref: '#/definitions/schemas.ErrorResponse'
         "401":
-          description: Unauthorized/Unverified email
+          description: User not registered or email not verified
           schema:
             $ref: '#/definitions/schemas.ErrorResponse'
-        "500":
-          description: Token exchange error
-          schema:
-            $ref: '#/definitions/schemas.ErrorResponse'
-      summary: Google OAuth callback
-      tags:
-      - Authentication
-  /api/auth/login:
-    post:
-      consumes:
-      - application/json
-      description: Authenticate user and return JWT token
-      parameters:
-      - description: Login credentials
-        in: body
-        name: login
-        required: true
-        schema:
-          $ref: '#/definitions/schemas.LoginInput'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Login successful
-          schema:
-            $ref: '#/definitions/schemas.LoginResponse'
-        "400":
-          description: Invalid request format
-          schema:
-            $ref: '#/definitions/schemas.ErrorResponse'
-        "401":
-          description: Invalid email or password
+        "403":
+          description: Invalid OAuth state
           schema:
             $ref: '#/definitions/schemas.ErrorResponse'
         "500":
           description: Internal server error
           schema:
             $ref: '#/definitions/schemas.ErrorResponse'
-      summary: User login
+      summary: Handle Google OAuth callback
       tags:
-      - Auth
+      - auth
+  /api/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate a user with email and password
+      parameters:
+      - description: Login credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Login successful
+          schema:
+            $ref: '#/definitions/schemas.SuccessResponse'
+        "400":
+          description: Invalid request format
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: Login user
+      tags:
+      - auth
   /api/countries:
     get:
       description: Get a list of all countries
@@ -1240,9 +867,11 @@ paths:
         "200":
           description: List of countries
           schema:
-            items:
-              $ref: '#/definitions/entity.Country'
-            type: array
+            $ref: '#/definitions/schemas.SuccessResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: List countries
       tags:
       - Countries
@@ -1256,26 +885,22 @@ paths:
         name: country
         required: true
         schema:
-          $ref: '#/definitions/entity.Country'
+          $ref: '#/definitions/schemas.CreateCountryRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Country created successfully
           schema:
-            $ref: '#/definitions/entity.Country'
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid request body
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Create a new country
       tags:
       - Countries
@@ -1294,21 +919,15 @@ paths:
         "200":
           description: Country deleted successfully
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid country ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
         "404":
           description: Country not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Delete a country
       tags:
       - Countries
@@ -1326,19 +945,15 @@ paths:
         "200":
           description: Country details
           schema:
-            $ref: '#/definitions/entity.Country'
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid country ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
         "404":
           description: Country not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Get country by ID
       tags:
       - Countries
@@ -1357,27 +972,27 @@ paths:
         name: country
         required: true
         schema:
-          $ref: '#/definitions/entity.Country'
+          $ref: '#/definitions/schemas.UpdateCountryRequest'
       produces:
       - application/json
       responses:
         "200":
           description: Country updated successfully
           schema:
-            $ref: '#/definitions/entity.Country'
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
-          description: Invalid input
+          description: Invalid request body or country ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "404":
+          description: Country not found
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Update a country
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: Update country
       tags:
       - Countries
   /api/groups:
@@ -1389,9 +1004,11 @@ paths:
         "200":
           description: List of groups
           schema:
-            items:
-              $ref: '#/definitions/entity.Group'
-            type: array
+            $ref: '#/definitions/schemas.SuccessResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: List groups
       tags:
       - Groups
@@ -1405,26 +1022,22 @@ paths:
         name: group
         required: true
         schema:
-          $ref: '#/definitions/entity.Group'
+          $ref: '#/definitions/schemas.CreateGroupRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Group created successfully
           schema:
-            $ref: '#/definitions/entity.Group'
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid request body
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Create a new group
       tags:
       - Groups
@@ -1443,21 +1056,19 @@ paths:
         "200":
           description: Group deleted successfully
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid group ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
         "404":
           description: Group not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Delete a group
       tags:
       - Groups
@@ -1475,19 +1086,19 @@ paths:
         "200":
           description: Group details
           schema:
-            $ref: '#/definitions/entity.Group'
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid group ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
         "404":
           description: Group not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Get group by ID
       tags:
       - Groups
@@ -1506,27 +1117,27 @@ paths:
         name: group
         required: true
         schema:
-          $ref: '#/definitions/entity.Group'
+          $ref: '#/definitions/schemas.UpdateGroupRequest'
       produces:
       - application/json
       responses:
         "200":
           description: Group updated successfully
           schema:
-            $ref: '#/definitions/entity.Group'
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
-          description: Invalid input
+          description: Invalid request body or group ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "404":
+          description: Group not found
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Update a group
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: Update group
       tags:
       - Groups
   /api/groups/country/{country_id}:
@@ -1544,9 +1155,11 @@ paths:
         "200":
           description: List of groups
           schema:
-            items:
-              $ref: '#/definitions/entity.Group'
-            type: array
+            $ref: '#/definitions/schemas.SuccessResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: List groups by country ID
       tags:
       - Groups
@@ -1559,9 +1172,11 @@ paths:
         "200":
           description: List of problems
           schema:
-            items:
-              $ref: '#/definitions/entity.Problem'
-            type: array
+            $ref: '#/definitions/schemas.SuccessResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: List problems
       tags:
       - Problems
@@ -1575,26 +1190,22 @@ paths:
         name: problem
         required: true
         schema:
-          $ref: '#/definitions/entity.Problem'
+          $ref: '#/definitions/schemas.CreateProblemRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Problem created successfully
           schema:
-            $ref: '#/definitions/entity.Problem'
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid request body
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Create a new problem
       tags:
       - Problems
@@ -1613,21 +1224,19 @@ paths:
         "200":
           description: Problem deleted successfully
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid problem ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
         "404":
           description: Problem not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Delete a problem
       tags:
       - Problems
@@ -1645,19 +1254,15 @@ paths:
         "200":
           description: Problem details
           schema:
-            $ref: '#/definitions/entity.Problem'
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid problem ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
         "404":
           description: Problem not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Get problem by ID
       tags:
       - Problems
@@ -1676,26 +1281,26 @@ paths:
         name: problem
         required: true
         schema:
-          $ref: '#/definitions/entity.Problem'
+          $ref: '#/definitions/schemas.UpdateProblemRequest'
       produces:
       - application/json
       responses:
         "200":
           description: Problem updated successfully
           schema:
-            $ref: '#/definitions/entity.Problem'
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
-          description: Invalid input
+          description: Invalid request body or problem ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "404":
+          description: Problem not found
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Update a problem
       tags:
       - Problems
@@ -1714,23 +1319,19 @@ paths:
         "200":
           description: Problem details
           schema:
-            $ref: '#/definitions/entity.Problem'
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid problem name
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
         "404":
           description: Problem not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Get problem by name
       tags:
       - Problems
-  /api/recent-actions:
+  /api/recent_actions:
     get:
       description: Get a list of all recent user actions
       produces:
@@ -1739,9 +1340,11 @@ paths:
         "200":
           description: List of recent actions
           schema:
-            items:
-              $ref: '#/definitions/entity.RecentAction'
-            type: array
+            $ref: '#/definitions/schemas.SuccessResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: List recent actions
       tags:
       - RecentActions
@@ -1755,26 +1358,26 @@ paths:
         name: recentAction
         required: true
         schema:
-          $ref: '#/definitions/entity.RecentAction'
+          $ref: '#/definitions/schemas.CreateRecentActionRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Recent action created
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid request body
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Create recent action
       tags:
       - RecentActions
-  /api/recent-actions/{id}:
+  /api/recent_actions/{id}:
     delete:
       description: Delete a recent user action
       parameters:
@@ -1789,15 +1392,19 @@ paths:
         "200":
           description: Recent action deleted
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "404":
+          description: Recent action not found
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Delete recent action
       tags:
       - RecentActions
@@ -1815,23 +1422,23 @@ paths:
         "200":
           description: Recent action details
           schema:
-            $ref: '#/definitions/entity.RecentAction'
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
         "404":
           description: Not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Get recent action by ID
       tags:
       - RecentActions
-    put:
+    patch:
       consumes:
       - application/json
       description: Update a recent user action
@@ -1846,26 +1453,30 @@ paths:
         name: recentAction
         required: true
         schema:
-          $ref: '#/definitions/entity.RecentAction'
+          $ref: '#/definitions/schemas.UpdateRecentActionRequest'
       produces:
       - application/json
       responses:
         "200":
           description: Recent action updated
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid request body
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "404":
+          description: Recent action not found
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Update recent action
       tags:
       - RecentActions
-  /api/recent-actions/type/{action_type}:
+  /api/recent_actions/type/{action_type}:
     get:
       description: Get a list of recent actions for a specific type
       parameters:
@@ -1880,13 +1491,19 @@ paths:
         "200":
           description: List of recent actions for the type
           schema:
-            items:
-              $ref: '#/definitions/entity.RecentAction'
-            type: array
+            $ref: '#/definitions/schemas.SuccessResponse'
+        "400":
+          description: Invalid action type
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Get recent actions by type
       tags:
       - RecentActions
-  /api/recent-actions/user/{user_id}:
+  /api/recent_actions/user/{user_id}:
     get:
       description: Get a list of recent actions for a specific user
       parameters:
@@ -1901,15 +1518,15 @@ paths:
         "200":
           description: List of recent actions for the user
           schema:
-            items:
-              $ref: '#/definitions/entity.RecentAction'
-            type: array
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid user ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Get recent actions by user ID
       tags:
       - RecentActions
@@ -1931,18 +1548,15 @@ paths:
         "200":
           description: Bulk registration processed
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid input
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Register multiple users in bulk
       tags:
       - Registration
@@ -1970,75 +1584,124 @@ paths:
         "200":
           description: Bulk registration processed
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid input
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Register multiple users with a specific role
       tags:
       - Registration
   /api/roles:
     get:
-      description: Get a list of all roles
+      consumes:
+      - application/json
+      description: Get a paginated list of roles
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - default: 0
+        description: Page number
+        in: query
+        minimum: 0
+        name: page
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        maximum: 100
+        minimum: 1
+        name: page_size
+        type: integer
       produces:
       - application/json
       responses:
         "200":
-          description: List of roles
+          description: List of roles retrieved successfully
           schema:
-            items:
-              $ref: '#/definitions/entity.Role'
-            type: array
+            $ref: '#/definitions/schemas.SuccessResponse'
+        "400":
+          description: Invalid query parameters
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "401":
+          description: Unauthorized - Invalid or missing token
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "403":
+          description: Forbidden - Insufficient permissions
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: List roles
       tags:
-      - Roles
+      - roles
     post:
       consumes:
       - application/json
-      description: Create a new role entry
+      description: Create a new role with the provided information
       parameters:
-      - description: Role data
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Role creation data
         in: body
-        name: role
+        name: request
         required: true
         schema:
-          $ref: '#/definitions/entity.Role'
+          $ref: '#/definitions/schemas.CreateRoleRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Role created successfully
           schema:
-            $ref: '#/definitions/entity.Role'
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
-          description: Invalid request body
+          description: Invalid request format
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "401":
+          description: Unauthorized - Invalid or missing token
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "403":
+          description: Forbidden - Insufficient permissions
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Create a new role
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: Create role
       tags:
-      - Roles
+      - roles
   /api/roles/{id}:
     delete:
-      description: Delete a role by its ID
+      consumes:
+      - application/json
+      description: Delete an existing role
       parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Role ID
         in: path
+        minimum: 1
         name: id
         required: true
         type: integer
@@ -2048,29 +1711,43 @@ paths:
         "200":
           description: Role deleted successfully
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
-          description: Invalid role ID
+          description: Invalid role ID format
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "401":
+          description: Unauthorized - Invalid or missing token
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "403":
+          description: Forbidden - Insufficient permissions
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
         "404":
           description: Role not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Delete a role
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: Delete role
       tags:
-      - Roles
+      - roles
     get:
-      description: Get a role by its ID
+      consumes:
+      - application/json
+      description: Get detailed information about a specific role
       parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Role ID
         in: path
+        minimum: 1
         name: id
         required: true
         type: integer
@@ -2078,62 +1755,84 @@ paths:
       - application/json
       responses:
         "200":
-          description: Role details
+          description: Role details retrieved successfully
           schema:
-            $ref: '#/definitions/entity.Role'
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
-          description: Invalid role ID
+          description: Invalid role ID format
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "401":
+          description: Unauthorized - Invalid or missing token
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "403":
+          description: Forbidden - Insufficient permissions
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
         "404":
           description: Role not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Get role by ID
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: Get role
       tags:
-      - Roles
+      - roles
     patch:
       consumes:
       - application/json
-      description: Update a role by its ID
+      description: Update an existing role's information
       parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Role ID
         in: path
+        minimum: 1
         name: id
         required: true
         type: integer
-      - description: Role data
+      - description: Role update data
         in: body
-        name: role
+        name: request
         required: true
         schema:
-          $ref: '#/definitions/entity.Role'
+          $ref: '#/definitions/schemas.UpdateRoleRequest'
       produces:
       - application/json
       responses:
         "200":
           description: Role updated successfully
           schema:
-            $ref: '#/definitions/entity.Role'
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
-          description: Invalid input
+          description: Invalid request format or role ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "401":
+          description: Unauthorized - Invalid or missing token
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "403":
+          description: Forbidden - Insufficient permissions
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "404":
+          description: Role not found
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Update a role
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: Update role
       tags:
-      - Roles
+      - roles
   /api/sessions:
     get:
       description: Get a list of all sessions
@@ -2143,9 +1842,11 @@ paths:
         "200":
           description: List of sessions
           schema:
-            items:
-              $ref: '#/definitions/entity.Session'
-            type: array
+            $ref: '#/definitions/schemas.SuccessResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: List sessions
       tags:
       - Sessions
@@ -2159,25 +1860,22 @@ paths:
         name: session
         required: true
         schema:
-          $ref: '#/definitions/entity.Session'
+          $ref: '#/definitions/schemas.CreateSessionRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Session created successfully
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid request body
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Create a new session
       tags:
       - Sessions
@@ -2196,18 +1894,15 @@ paths:
         "200":
           description: Session deleted successfully
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid session ID
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
         "404":
           description: Session not found
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Delete a session
       tags:
       - Sessions
@@ -2225,17 +1920,15 @@ paths:
         "200":
           description: Session details
           schema:
-            $ref: '#/definitions/entity.Session'
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid session ID
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
         "404":
           description: Session not found
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Get session by ID
       tags:
       - Sessions
@@ -2254,25 +1947,22 @@ paths:
         name: session
         required: true
         schema:
-          $ref: '#/definitions/entity.Session'
+          $ref: '#/definitions/schemas.UpdateSessionRequest'
       produces:
       - application/json
       responses:
         "200":
           description: Session updated successfully
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid request body
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
         "404":
           description: Session not found
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Update a session
       tags:
       - Sessions
@@ -2291,9 +1981,15 @@ paths:
         "200":
           description: Session details
           schema:
-            items:
-              $ref: '#/definitions/entity.Session'
-            type: array
+            $ref: '#/definitions/schemas.SuccessResponse'
+        "400":
+          description: Invalid session name
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "404":
+          description: Session not found
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Get session by name
       tags:
       - Sessions
@@ -2312,9 +2008,15 @@ paths:
         "200":
           description: Session details
           schema:
-            items:
-              $ref: '#/definitions/entity.Session'
-            type: array
+            $ref: '#/definitions/schemas.SuccessResponse'
+        "400":
+          description: Invalid session start time
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "404":
+          description: Session not found
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Get session by start time
       tags:
       - Sessions
@@ -2327,14 +2029,11 @@ paths:
         "200":
           description: List of stipends
           schema:
-            items:
-              $ref: '#/definitions/entity.Stipend'
-            type: array
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Failed to fetch stippends
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: List stipends
       tags:
       - Stipends
@@ -2348,20 +2047,18 @@ paths:
         name: stipend
         required: true
         schema:
-          $ref: '#/definitions/entity.Stipend'
+          $ref: '#/definitions/schemas.CreateStipendRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Stipend created successfully
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid request body
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Create a new stipend
       tags:
       - Stipends
@@ -2380,13 +2077,15 @@ paths:
         "200":
           description: Stipend deleted successfully
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid stipend ID
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "404":
+          description: Stipend not found
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Delete a stipend
       tags:
       - Stipends
@@ -2404,12 +2103,15 @@ paths:
         "200":
           description: Stipend details
           schema:
-            $ref: '#/definitions/entity.Stipend'
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid stipend ID
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "404":
+          description: Stipend not found
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Get stipend by ID
       tags:
       - Stipends
@@ -2428,20 +2130,18 @@ paths:
         name: stipend
         required: true
         schema:
-          $ref: '#/definitions/entity.Stipend'
+          $ref: '#/definitions/schemas.UpdateStipendRequest'
       produces:
       - application/json
       responses:
         "200":
           description: Stipend updated successfully
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid input
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Update a stipend
       tags:
       - Stipends
@@ -2454,9 +2154,7 @@ paths:
         "200":
           description: List of submissions
           schema:
-            items:
-              $ref: '#/definitions/entity.Submission'
-            type: array
+            $ref: '#/definitions/schemas.SuccessResponse'
       summary: List submissions
       tags:
       - Submissions
@@ -2470,26 +2168,22 @@ paths:
         name: submission
         required: true
         schema:
-          $ref: '#/definitions/entity.Submission'
+          $ref: '#/definitions/schemas.CreateSubmissionRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Submission created successfully
           schema:
-            $ref: '#/definitions/entity.Submission'
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid request body
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Create a new submission
       tags:
       - Submissions
@@ -2508,19 +2202,15 @@ paths:
         "200":
           description: Submission details
           schema:
-            $ref: '#/definitions/entity.Submission'
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid submission ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
         "404":
           description: Submission not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Get submission by ID
       tags:
       - Submissions
@@ -2539,15 +2229,11 @@ paths:
         "200":
           description: Submissions for problem
           schema:
-            items:
-              $ref: '#/definitions/entity.Submission'
-            type: array
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid problem ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Get submissions by problem ID
       tags:
       - Submissions
@@ -2566,18 +2252,49 @@ paths:
         "200":
           description: Submissions for user
           schema:
-            items:
-              $ref: '#/definitions/entity.Submission'
-            type: array
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid user ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Get submissions by user ID
       tags:
       - Submissions
+  /api/super-groups/{super_group_id}/groups:
+    post:
+      consumes:
+      - application/json
+      description: Associate one or more groups with a super group
+      parameters:
+      - description: Super Group ID
+        in: path
+        name: super_group_id
+        required: true
+        type: integer
+      - description: Group IDs to associate
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.SuperToGroupRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Groups added to super group successfully
+          schema:
+            $ref: '#/definitions/schemas.SuccessResponse'
+        "400":
+          description: Invalid request body or super group ID
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "404":
+          description: Super group not found
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: Add groups to a super group
+      tags:
+      - SuperGroups
   /api/super_groups:
     get:
       description: Get a list of all super groups
@@ -2587,9 +2304,7 @@ paths:
         "200":
           description: List of super groups
           schema:
-            items:
-              $ref: '#/definitions/entity.SuperGroup'
-            type: array
+            $ref: '#/definitions/schemas.SuccessResponse'
       summary: List super groups
       tags:
       - SuperGroups
@@ -2603,26 +2318,22 @@ paths:
         name: super_group
         required: true
         schema:
-          $ref: '#/definitions/entity.SuperGroup'
+          $ref: '#/definitions/schemas.CreateSuperGroupRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Super group created successfully
           schema:
-            $ref: '#/definitions/entity.SuperGroup'
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid request body
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Create a new super group
       tags:
       - SuperGroups
@@ -2641,21 +2352,15 @@ paths:
         "200":
           description: Super group deleted successfully
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid super group ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
         "404":
           description: Super group not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Delete a super group
       tags:
       - SuperGroups
@@ -2673,19 +2378,15 @@ paths:
         "200":
           description: Super group details
           schema:
-            $ref: '#/definitions/entity.SuperGroup'
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid super group ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
         "404":
           description: Super group not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Get super group by ID
       tags:
       - SuperGroups
@@ -2704,26 +2405,22 @@ paths:
         name: super_group
         required: true
         schema:
-          $ref: '#/definitions/entity.SuperGroup'
+          $ref: '#/definitions/schemas.UpdateSuperGroupRequest'
       produces:
       - application/json
       responses:
         "200":
           description: Super group updated successfully
           schema:
-            $ref: '#/definitions/entity.SuperGroup'
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid input
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Update a super group
       tags:
       - SuperGroups
@@ -2736,43 +2433,8 @@ paths:
         "200":
           description: List of super to groups
           schema:
-            items:
-              $ref: '#/definitions/entity.SuperToGroup'
-            type: array
+            $ref: '#/definitions/schemas.SuccessResponse'
       summary: List super to groups
-      tags:
-      - SuperToGroups
-    post:
-      consumes:
-      - application/json
-      description: Create a new super to group entry
-      parameters:
-      - description: SuperToGroup data
-        in: body
-        name: super_to_group
-        required: true
-        schema:
-          $ref: '#/definitions/entity.SuperToGroup'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Super to group created successfully
-          schema:
-            $ref: '#/definitions/entity.SuperToGroup'
-        "400":
-          description: Invalid request body
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal server error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Create a new super to group
       tags:
       - SuperToGroups
   /api/super_to_groups/{id}:
@@ -2790,21 +2452,15 @@ paths:
         "200":
           description: Super to group deleted successfully
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid super to group ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
         "404":
           description: Super to group not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Delete a super to group
       tags:
       - SuperToGroups
@@ -2822,19 +2478,15 @@ paths:
         "200":
           description: Super to group details
           schema:
-            $ref: '#/definitions/entity.SuperToGroup'
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid super to group ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
         "404":
           description: Super to group not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Get super to group by ID
       tags:
       - SuperToGroups
@@ -2853,26 +2505,22 @@ paths:
         name: super_to_group
         required: true
         schema:
-          $ref: '#/definitions/entity.SuperToGroup'
+          $ref: '#/definitions/schemas.SuperToGroupRequest'
       produces:
       - application/json
       responses:
         "200":
           description: Super to group updated successfully
           schema:
-            $ref: '#/definitions/entity.SuperToGroup'
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid input
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Update a super to group
       tags:
       - SuperToGroups
@@ -2885,9 +2533,7 @@ paths:
         "200":
           description: List of tracks
           schema:
-            items:
-              $ref: '#/definitions/entity.Track'
-            type: array
+            $ref: '#/definitions/schemas.SuccessResponse'
       summary: List tracks
       tags:
       - Tracks
@@ -2901,26 +2547,22 @@ paths:
         name: track
         required: true
         schema:
-          $ref: '#/definitions/entity.Track'
+          $ref: '#/definitions/schemas.CreateTrackRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Track created successfully
           schema:
-            $ref: '#/definitions/entity.Track'
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid request body
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Create a new track
       tags:
       - Tracks
@@ -2939,21 +2581,15 @@ paths:
         "200":
           description: Track deleted successfully
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid track ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
         "404":
           description: Track not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Delete a track
       tags:
       - Tracks
@@ -2971,19 +2607,15 @@ paths:
         "200":
           description: Track details
           schema:
-            $ref: '#/definitions/entity.Track'
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid track ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
         "404":
           description: Track not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Get track by ID
       tags:
       - Tracks
@@ -3002,26 +2634,22 @@ paths:
         name: track
         required: true
         schema:
-          $ref: '#/definitions/entity.Track'
+          $ref: '#/definitions/schemas.UpdateTrackRequest'
       produces:
       - application/json
       responses:
         "200":
           description: Track updated successfully
           schema:
-            $ref: '#/definitions/entity.Track'
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid input
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Update a track
       tags:
       - Tracks
@@ -3040,105 +2668,142 @@ paths:
         "200":
           description: Track details
           schema:
-            $ref: '#/definitions/entity.Track'
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid track name
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
         "404":
           description: Track not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Get track by name
       tags:
       - Tracks
   /api/users:
     get:
-      description: Get paginated list of users with optional filters
+      consumes:
+      - application/json
+      description: Get a paginated list of users with optional filters
       parameters:
-      - default: 0
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - default: 1
         description: Page number
         in: query
-        minimum: 0
+        minimum: 1
         name: page
         type: integer
-      - default: 20
-        description: Items per page
+      - default: 10
+        description: Number of items per page
         in: query
         maximum: 100
         minimum: 1
         name: page_size
         type: integer
+      - description: Search term for filtering users
+        in: query
+        name: search
+        type: string
+      - description: Filter by role ID
+        in: query
+        minimum: 1
+        name: role_id
+        type: integer
+      - description: Filter by group ID
+        in: query
+        minimum: 1
+        name: group_id
+        type: integer
       produces:
       - application/json
       responses:
         "200":
-          description: List of users
+          description: List of users retrieved successfully
           schema:
-            $ref: '#/definitions/schemas.PaginatedUsers'
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
-          description: Invalid pagination parameters
+          description: Invalid query parameters
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "401":
+          description: Unauthorized - Invalid or missing token
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "403":
+          description: Forbidden - Insufficient permissions
           schema:
             $ref: '#/definitions/schemas.ErrorResponse'
         "500":
           description: Internal server error
           schema:
             $ref: '#/definitions/schemas.ErrorResponse'
-      security:
-      - BearerAuth: []
       summary: List users
       tags:
-      - Users
+      - users
     post:
       consumes:
       - application/json
-      description: Create a new user account with required information
+      description: Create a new user account with the provided information
       parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: User creation data
         in: body
-        name: user
+        name: request
         required: true
         schema:
-          $ref: '#/definitions/schemas.CreateUserInput'
+          $ref: '#/definitions/schemas.CreateUserRequest'
       produces:
       - application/json
       responses:
         "201":
-          description: Successfully created user
+          description: User created successfully
           schema:
-            $ref: '#/definitions/schemas.ResponseUser'
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
-          description: Invalid request format
+          description: Invalid request format or validation error
           schema:
             $ref: '#/definitions/schemas.ErrorResponse'
         "401":
-          description: Unauthorized
+          description: Unauthorized - Invalid or missing token
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "403":
+          description: Forbidden - Insufficient permissions
           schema:
             $ref: '#/definitions/schemas.ErrorResponse'
         "409":
-          description: User already exists
+          description: Conflict - User already exists
           schema:
             $ref: '#/definitions/schemas.ErrorResponse'
         "500":
           description: Internal server error
           schema:
             $ref: '#/definitions/schemas.ErrorResponse'
-      security:
-      - BearerAuth: []
       summary: Create a new user
       tags:
-      - Users
+      - users
   /api/users/{id}:
     delete:
-      description: Permanently delete a user account and associated data
+      consumes:
+      - application/json
+      description: Delete an existing user
       parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: User ID
-        format: uint32
         in: path
+        minimum: 1
         name: id
         required: true
         type: integer
@@ -3150,15 +2815,15 @@ paths:
           schema:
             $ref: '#/definitions/schemas.SuccessResponse'
         "400":
-          description: Invalid ID format
+          description: Invalid user ID format
           schema:
             $ref: '#/definitions/schemas.ErrorResponse'
         "401":
-          description: Unauthorized
+          description: Unauthorized - Invalid or missing token
           schema:
             $ref: '#/definitions/schemas.ErrorResponse'
         "403":
-          description: Forbidden
+          description: Forbidden - Insufficient permissions
           schema:
             $ref: '#/definitions/schemas.ErrorResponse'
         "404":
@@ -3169,17 +2834,22 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/schemas.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Delete user account
+      summary: Delete user
       tags:
-      - Users
+      - users
     get:
+      consumes:
+      - application/json
       description: Get detailed information about a specific user
       parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: User ID
-        format: int64
         in: path
+        minimum: 1
         name: id
         required: true
         type: integer
@@ -3187,11 +2857,19 @@ paths:
       - application/json
       responses:
         "200":
-          description: User details
+          description: User details retrieved successfully
           schema:
-            $ref: '#/definitions/schemas.ResponseUser'
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
-          description: Invalid user ID
+          description: Invalid user ID format
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "401":
+          description: Unauthorized - Invalid or missing token
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "403":
+          description: Forbidden - Insufficient permissions
           schema:
             $ref: '#/definitions/schemas.ErrorResponse'
         "404":
@@ -3202,29 +2880,31 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/schemas.ErrorResponse'
-      security:
-      - BearerAuth: []
       summary: Get user details
       tags:
-      - Users
+      - users
     patch:
       consumes:
       - application/json
-      description: Update existing user information. Only provided fields will be
-        updated.
+      description: Update an existing user's information
       parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: User ID
-        format: uint32
         in: path
+        minimum: 1
         name: id
         required: true
         type: integer
-      - description: Partial user data for update
+      - description: User update data
         in: body
-        name: user
+        name: request
         required: true
         schema:
-          $ref: '#/definitions/schemas.UpdateUserInput'
+          $ref: '#/definitions/schemas.UpdateUserRequest'
       produces:
       - application/json
       responses:
@@ -3233,15 +2913,15 @@ paths:
           schema:
             $ref: '#/definitions/schemas.SuccessResponse'
         "400":
-          description: Invalid ID format or request body
+          description: Invalid request format or validation error
           schema:
             $ref: '#/definitions/schemas.ErrorResponse'
         "401":
-          description: Unauthorized
+          description: Unauthorized - Invalid or missing token
           schema:
             $ref: '#/definitions/schemas.ErrorResponse'
         "403":
-          description: Forbidden
+          description: Forbidden - Insufficient permissions
           schema:
             $ref: '#/definitions/schemas.ErrorResponse'
         "404":
@@ -3252,11 +2932,9 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/schemas.ErrorResponse'
-      security:
-      - BearerAuth: []
       summary: Update user details
       tags:
-      - Users
+      - users
   /api/votes:
     get:
       description: Get a list of votes
@@ -3266,9 +2944,7 @@ paths:
         "200":
           description: List of votes
           schema:
-            items:
-              $ref: '#/definitions/entity.Vote'
-            type: array
+            $ref: '#/definitions/schemas.SuccessResponse'
       summary: List votes
       tags:
       - Votes
@@ -3282,26 +2958,22 @@ paths:
         name: vote
         required: true
         schema:
-          $ref: '#/definitions/entity.Vote'
+          $ref: '#/definitions/schemas.CreateVoteRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Vote created successfully
           schema:
-            $ref: '#/definitions/entity.Vote'
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid request body
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Create a new vote
       tags:
       - Votes
@@ -3320,21 +2992,15 @@ paths:
         "200":
           description: Vote deleted successfully
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid vote ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
         "404":
           description: Vote not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Delete a vote
       tags:
       - Votes
@@ -3352,19 +3018,15 @@ paths:
         "200":
           description: Vote details
           schema:
-            $ref: '#/definitions/entity.Vote'
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid vote ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
         "404":
           description: Vote not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Get vote by ID
       tags:
       - Votes
@@ -3383,26 +3045,22 @@ paths:
         name: vote
         required: true
         schema:
-          $ref: '#/definitions/entity.Vote'
+          $ref: '#/definitions/schemas.UpdateVoteRequest'
       produces:
       - application/json
       responses:
         "200":
           description: Vote updated successfully
           schema:
-            $ref: '#/definitions/entity.Vote'
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid input
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Update a vote
       tags:
       - Votes
@@ -3421,15 +3079,11 @@ paths:
         "200":
           description: Votes for comment
           schema:
-            items:
-              $ref: '#/definitions/entity.Vote'
-            type: array
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid comment ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Get votes by comment ID
       tags:
       - Votes
@@ -3448,15 +3102,11 @@ paths:
         "200":
           description: Votes for post
           schema:
-            items:
-              $ref: '#/definitions/entity.Vote'
-            type: array
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid post ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Get votes by post ID
       tags:
       - Votes
@@ -3475,15 +3125,11 @@ paths:
         "200":
           description: Votes for problem
           schema:
-            items:
-              $ref: '#/definitions/entity.Vote'
-            type: array
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid problem ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Get votes by problem ID
       tags:
       - Votes
@@ -3502,15 +3148,11 @@ paths:
         "200":
           description: Votes for submission
           schema:
-            items:
-              $ref: '#/definitions/entity.Vote'
-            type: array
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid submission ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Get votes by submission ID
       tags:
       - Votes
@@ -3529,15 +3171,11 @@ paths:
         "200":
           description: Votes for track
           schema:
-            items:
-              $ref: '#/definitions/entity.Vote'
-            type: array
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid track ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Get votes by track ID
       tags:
       - Votes
@@ -3556,15 +3194,11 @@ paths:
         "200":
           description: Votes for user
           schema:
-            items:
-              $ref: '#/definitions/entity.Vote'
-            type: array
+            $ref: '#/definitions/schemas.SuccessResponse'
         "400":
           description: Invalid user ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: Get votes by user ID
       tags:
       - Votes

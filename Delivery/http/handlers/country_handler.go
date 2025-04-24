@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"net/http"
 	"strconv"
 
 	"a2sv.org/hub/Delivery/http/schemas"
@@ -25,15 +24,15 @@ func NewCountryHandler(countryUseCase usecases.CountryUseCase) *CountryHandler {
 // @Accept json
 // @Produce json
 // @Param country body schemas.CreateCountryRequest true "Country data"
-// @Success 201 {object} schemas.CountryResponse "Country created successfully"
+// @Success 201 {object} schemas.SuccessResponse "Country created successfully"
 // @Failure 400 {object} schemas.ErrorResponse "Invalid request body"
 // @Failure 500 {object} schemas.ErrorResponse "Internal server error"
 // @Router /api/countries [post]
 func (h *CountryHandler) CreateCountry(c *gin.Context) {
 	var input schemas.CreateCountryRequest
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{
-			Code: http.StatusBadRequest,
+		c.JSON(400, schemas.ErrorResponse{
+			Code: 400,
 			Message: "Invalid request body",
 			Details: err.Error(),
 		})
@@ -41,14 +40,14 @@ func (h *CountryHandler) CreateCountry(c *gin.Context) {
 	}
 	createdCountry, err := h.countryUseCase.Create(&input)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{
-			Code: http.StatusInternalServerError,
+		c.JSON(500, schemas.ErrorResponse{
+			Code: 500,
 			Message: "Could not create country",
 			Details: err.Error(),
 		})
 		return
 	}
-	c.JSON(http.StatusCreated, createdCountry)
+	c.JSON(201, schemas.SuccessResponse{Message: "Country created successfully", Data: createdCountry})
 }
 
 // GetCountryByID handles getting a country by ID
@@ -57,7 +56,7 @@ func (h *CountryHandler) CreateCountry(c *gin.Context) {
 // @Tags Countries
 // @Produce json
 // @Param id path int true "Country ID"
-// @Success 200 {object} schemas.CountryResponse "Country details"
+// @Success 200 {object} schemas.SuccessResponse "Country details"
 // @Failure 400 {object} schemas.ErrorResponse "Invalid country ID"
 // @Failure 404 {object} schemas.ErrorResponse "Country not found"
 // @Router /api/countries/{id} [get]
@@ -65,8 +64,8 @@ func (h *CountryHandler) GetCountryByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 32)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{
-			Code: http.StatusBadRequest,
+		c.JSON(400, schemas.ErrorResponse{
+			Code: 400,
 			Message: "Invalid country ID",
 			Details: err.Error(),
 		})
@@ -74,14 +73,14 @@ func (h *CountryHandler) GetCountryByID(c *gin.Context) {
 	}
 	country, err := h.countryUseCase.GetByID(uint(id))
 	if err != nil {
-		c.JSON(http.StatusNotFound, schemas.ErrorResponse{
-			Code: http.StatusNotFound,
+		c.JSON(404, schemas.ErrorResponse{
+			Code: 404,
 			Message: "Country not found",
 			Details: err.Error(),
 		})
 		return
 	}
-	c.JSON(http.StatusOK, country)
+	c.JSON(200, schemas.SuccessResponse{Message: "Country details", Data: country})
 }
 
 // UpdateCountry handles updating a country
@@ -92,7 +91,7 @@ func (h *CountryHandler) GetCountryByID(c *gin.Context) {
 // @Produce json
 // @Param id path int true "Country ID"
 // @Param country body schemas.UpdateCountryRequest true "Country data"
-// @Success 200 {object} schemas.CountryResponse "Country updated successfully"
+// @Success 200 {object} schemas.SuccessResponse "Country updated successfully"
 // @Failure 400 {object} schemas.ErrorResponse "Invalid request body or country ID"
 // @Failure 404 {object} schemas.ErrorResponse "Country not found"
 // @Failure 500 {object} schemas.ErrorResponse "Internal server error"
@@ -101,8 +100,8 @@ func (h *CountryHandler) UpdateCountry(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 32)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{
-			Code: http.StatusBadRequest,
+		c.JSON(400, schemas.ErrorResponse{
+			Code: 400,
 			Message: "Invalid country ID",
 			Details: err.Error(),
 		})
@@ -110,8 +109,8 @@ func (h *CountryHandler) UpdateCountry(c *gin.Context) {
 	}
 	var input schemas.UpdateCountryRequest
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{
-			Code: http.StatusBadRequest,
+		c.JSON(400, schemas.ErrorResponse{
+			Code: 400,
 			Message: "Invalid request body",
 			Details: err.Error(),
 		})
@@ -119,14 +118,14 @@ func (h *CountryHandler) UpdateCountry(c *gin.Context) {
 	}
 	updatedCountry, err := h.countryUseCase.Update(uint(id), &input)
 	if err != nil {
-		c.JSON(http.StatusNotFound, schemas.ErrorResponse{
-			Code: http.StatusNotFound,
+		c.JSON(404, schemas.ErrorResponse{
+			Code: 404,
 			Message: "Country not found",
 			Details: err.Error(),
 		})
 		return
 	}
-	c.JSON(http.StatusOK, updatedCountry)
+	c.JSON(200, schemas.SuccessResponse{Message: "Country updated successfully", Data: updatedCountry})
 }
 
 // DeleteCountry handles deleting a country
@@ -143,8 +142,8 @@ func (h *CountryHandler) DeleteCountry(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 32)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{
-			Code: http.StatusBadRequest,
+		c.JSON(400, schemas.ErrorResponse{
+			Code: 400,
 			Message: "Invalid country ID",
 			Details: err.Error(),
 		})
@@ -152,14 +151,14 @@ func (h *CountryHandler) DeleteCountry(c *gin.Context) {
 	}
 	err = h.countryUseCase.Delete(uint(id))
 	if err != nil {
-		c.JSON(http.StatusNotFound, schemas.ErrorResponse{
-			Code: http.StatusNotFound,
+		c.JSON(404, schemas.ErrorResponse{
+			Code: 404,
 			Message: "Country not found",
 			Details: err.Error(),
 		})
 		return
 	}
-	c.JSON(http.StatusOK, schemas.SuccessResponse{Message: "Country deleted successfully"})
+	c.JSON(200, schemas.SuccessResponse{Message: "Country deleted successfully", Data: nil})
 }
 
 // ListCountries handles listing all countries
@@ -167,17 +166,18 @@ func (h *CountryHandler) DeleteCountry(c *gin.Context) {
 // @Description Get a list of all countries
 // @Tags Countries
 // @Produce json
-// @Success 200 {object} schemas.CountryListResponse "List of countries"
+// @Success 200 {object} schemas.SuccessResponse "List of countries"
+// @Failure 500 {object} schemas.ErrorResponse "Internal server error"
 // @Router /api/countries [get]
 func (h *CountryHandler) ListCountries(c *gin.Context) {
-	countries, meta, err := h.countryUseCase.List()
+	countries, _, err := h.countryUseCase.List()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{
-			Code: http.StatusInternalServerError,
+		c.JSON(500, schemas.ErrorResponse{
+			Code: 500,
 			Message: "Failed to list countries",
 			Details: err.Error(),
 		})
 		return
 	}
-	c.JSON(http.StatusOK, schemas.CountryListResponse{Data: countries, Meta: *meta})
+	c.JSON(200, schemas.SuccessResponse{Message: "List of countries", Data: countries})
 }

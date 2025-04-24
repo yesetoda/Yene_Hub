@@ -25,20 +25,26 @@ const docTemplate = `{
     "paths": {
         "/api/auth/google": {
             "get": {
-                "description": "Redirects to Google's OAuth2 authentication page",
+                "description": "Initiates the OAuth2 flow by redirecting to Google's authentication page",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Authentication"
+                    "auth"
                 ],
                 "summary": "Start Google OAuth",
                 "responses": {
                     "302": {
-                        "description": "Redirect to Google OAuth"
+                        "description": "Redirect to Google OAuth",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.SuccessResponse"
+                        }
                     },
                     "500": {
-                        "description": "OAuth configuration error",
+                        "description": "Failed to initiate OAuth flow",
                         "schema": {
                             "$ref": "#/definitions/schemas.ErrorResponse"
                         }
@@ -48,56 +54,65 @@ const docTemplate = `{
         },
         "/api/auth/google/callback": {
             "get": {
-                "description": "Handle Google OAuth callback and return JWT token",
+                "description": "Process Google OAuth callback, verify user, and return JWT token",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Authentication"
+                    "auth"
                 ],
-                "summary": "Google OAuth callback",
+                "summary": "Handle Google OAuth callback",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Authorization code from Google",
+                        "description": "OAuth2 authorization code from Google",
                         "name": "code",
                         "in": "query",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "OAuth state parameter",
+                        "description": "OAuth state for CSRF protection",
                         "name": "state",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "OAuth error description",
+                        "description": "Error message from OAuth provider",
                         "name": "error",
                         "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Authentication token",
+                        "description": "Authentication successful",
                         "schema": {
-                            "$ref": "#/definitions/schemas.AuthTokenResponse"
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
-                        "description": "Missing code parameter",
+                        "description": "Missing or invalid authorization code",
                         "schema": {
                             "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "401": {
-                        "description": "Unauthorized/Unverified email",
+                        "description": "User not registered or email not verified",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Invalid OAuth state",
                         "schema": {
                             "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "500": {
-                        "description": "Token exchange error",
+                        "description": "Internal server error",
                         "schema": {
                             "$ref": "#/definitions/schemas.ErrorResponse"
                         }
@@ -107,7 +122,7 @@ const docTemplate = `{
         },
         "/api/auth/login": {
             "post": {
-                "description": "Authenticate user and return JWT token",
+                "description": "Authenticate a user with email and password",
                 "consumes": [
                     "application/json"
                 ],
@@ -115,17 +130,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Auth"
+                    "auth"
                 ],
-                "summary": "User login",
+                "summary": "Login user",
                 "parameters": [
                     {
                         "description": "Login credentials",
-                        "name": "login",
+                        "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/schemas.LoginInput"
+                            "$ref": "#/definitions/schemas.LoginRequest"
                         }
                     }
                 ],
@@ -133,7 +148,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Login successful",
                         "schema": {
-                            "$ref": "#/definitions/schemas.LoginResponse"
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
@@ -143,7 +158,7 @@ const docTemplate = `{
                         }
                     },
                     "401": {
-                        "description": "Invalid email or password",
+                        "description": "Invalid credentials",
                         "schema": {
                             "$ref": "#/definitions/schemas.ErrorResponse"
                         }
@@ -171,10 +186,13 @@ const docTemplate = `{
                     "200": {
                         "description": "List of countries",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entity.Country"
-                            }
+                            "$ref": "#/definitions/schemas.SuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -198,7 +216,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.Country"
+                            "$ref": "#/definitions/schemas.CreateCountryRequest"
                         }
                     }
                 ],
@@ -206,25 +224,19 @@ const docTemplate = `{
                     "201": {
                         "description": "Country created successfully",
                         "schema": {
-                            "$ref": "#/definitions/entity.Country"
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid request body",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -253,25 +265,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Country details",
                         "schema": {
-                            "$ref": "#/definitions/entity.Country"
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid country ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Country not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -298,28 +304,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Country deleted successfully",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid country ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Country not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -335,7 +332,7 @@ const docTemplate = `{
                 "tags": [
                     "Countries"
                 ],
-                "summary": "Update a country",
+                "summary": "Update country",
                 "parameters": [
                     {
                         "type": "integer",
@@ -350,7 +347,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.Country"
+                            "$ref": "#/definitions/schemas.UpdateCountryRequest"
                         }
                     }
                 ],
@@ -358,25 +355,25 @@ const docTemplate = `{
                     "200": {
                         "description": "Country updated successfully",
                         "schema": {
-                            "$ref": "#/definitions/entity.Country"
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
-                        "description": "Invalid input",
+                        "description": "Invalid request body or country ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Country not found",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -396,10 +393,13 @@ const docTemplate = `{
                     "200": {
                         "description": "List of groups",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entity.Group"
-                            }
+                            "$ref": "#/definitions/schemas.SuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -423,7 +423,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.Group"
+                            "$ref": "#/definitions/schemas.CreateGroupRequest"
                         }
                     }
                 ],
@@ -431,25 +431,19 @@ const docTemplate = `{
                     "201": {
                         "description": "Group created successfully",
                         "schema": {
-                            "$ref": "#/definitions/entity.Group"
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid request body",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -478,10 +472,13 @@ const docTemplate = `{
                     "200": {
                         "description": "List of groups",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entity.Group"
-                            }
+                            "$ref": "#/definitions/schemas.SuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -510,25 +507,25 @@ const docTemplate = `{
                     "200": {
                         "description": "Group details",
                         "schema": {
-                            "$ref": "#/definitions/entity.Group"
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid group ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Group not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -555,28 +552,25 @@ const docTemplate = `{
                     "200": {
                         "description": "Group deleted successfully",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid group ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Group not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -592,7 +586,7 @@ const docTemplate = `{
                 "tags": [
                     "Groups"
                 ],
-                "summary": "Update a group",
+                "summary": "Update group",
                 "parameters": [
                     {
                         "type": "integer",
@@ -607,7 +601,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.Group"
+                            "$ref": "#/definitions/schemas.UpdateGroupRequest"
                         }
                     }
                 ],
@@ -615,25 +609,25 @@ const docTemplate = `{
                     "200": {
                         "description": "Group updated successfully",
                         "schema": {
-                            "$ref": "#/definitions/entity.Group"
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
-                        "description": "Invalid input",
+                        "description": "Invalid request body or group ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Group not found",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -653,10 +647,13 @@ const docTemplate = `{
                     "200": {
                         "description": "List of problems",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entity.Problem"
-                            }
+                            "$ref": "#/definitions/schemas.SuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -680,7 +677,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.Problem"
+                            "$ref": "#/definitions/schemas.CreateProblemRequest"
                         }
                     }
                 ],
@@ -688,25 +685,19 @@ const docTemplate = `{
                     "201": {
                         "description": "Problem created successfully",
                         "schema": {
-                            "$ref": "#/definitions/entity.Problem"
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid request body",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -735,25 +726,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Problem details",
                         "schema": {
-                            "$ref": "#/definitions/entity.Problem"
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid problem name",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Problem not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -782,25 +767,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Problem details",
                         "schema": {
-                            "$ref": "#/definitions/entity.Problem"
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid problem ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Problem not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -827,28 +806,25 @@ const docTemplate = `{
                     "200": {
                         "description": "Problem deleted successfully",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid problem ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Problem not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -879,7 +855,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.Problem"
+                            "$ref": "#/definitions/schemas.UpdateProblemRequest"
                         }
                     }
                 ],
@@ -887,31 +863,31 @@ const docTemplate = `{
                     "200": {
                         "description": "Problem updated successfully",
                         "schema": {
-                            "$ref": "#/definitions/entity.Problem"
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
-                        "description": "Invalid input",
+                        "description": "Invalid request body or problem ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Problem not found",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
             }
         },
-        "/api/recent-actions": {
+        "/api/recent_actions": {
             "get": {
                 "description": "Get a list of all recent user actions",
                 "produces": [
@@ -925,10 +901,13 @@ const docTemplate = `{
                     "200": {
                         "description": "List of recent actions",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entity.RecentAction"
-                            }
+                            "$ref": "#/definitions/schemas.SuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -952,7 +931,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.RecentAction"
+                            "$ref": "#/definitions/schemas.CreateRecentActionRequest"
                         }
                     }
                 ],
@@ -960,25 +939,25 @@ const docTemplate = `{
                     "201": {
                         "description": "Recent action created",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid request body",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
             }
         },
-        "/api/recent-actions/type/{action_type}": {
+        "/api/recent_actions/type/{action_type}": {
             "get": {
                 "description": "Get a list of recent actions for a specific type",
                 "produces": [
@@ -1001,16 +980,25 @@ const docTemplate = `{
                     "200": {
                         "description": "List of recent actions for the type",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entity.RecentAction"
-                            }
+                            "$ref": "#/definitions/schemas.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid action type",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
             }
         },
-        "/api/recent-actions/user/{user_id}": {
+        "/api/recent_actions/user/{user_id}": {
             "get": {
                 "description": "Get a list of recent actions for a specific user",
                 "produces": [
@@ -1033,25 +1021,25 @@ const docTemplate = `{
                     "200": {
                         "description": "List of recent actions for the user",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entity.RecentAction"
-                            }
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid user ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
             }
         },
-        "/api/recent-actions/{id}": {
+        "/api/recent_actions/{id}": {
             "get": {
                 "description": "Get details of a recent action by its ID",
                 "produces": [
@@ -1074,76 +1062,25 @@ const docTemplate = `{
                     "200": {
                         "description": "Recent action details",
                         "schema": {
-                            "$ref": "#/definitions/entity.RecentAction"
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            },
-            "put": {
-                "description": "Update a recent user action",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "RecentActions"
-                ],
-                "summary": "Update recent action",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Recent Action ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Recent action details",
-                        "name": "recentAction",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/entity.RecentAction"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Recent action updated",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
-                    "400": {
-                        "description": "Invalid request body",
+                    "500": {
+                        "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -1170,19 +1107,82 @@ const docTemplate = `{
                     "200": {
                         "description": "Recent action deleted",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Recent action not found",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Update a recent user action",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "RecentActions"
+                ],
+                "summary": "Update recent action",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Recent Action ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Recent action details",
+                        "name": "recentAction",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.UpdateRecentActionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Recent action updated",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Recent action not found",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -1216,22 +1216,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Bulk registration processed",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid input",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -1272,22 +1269,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Bulk registration processed",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid input",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -1295,28 +1289,7 @@ const docTemplate = `{
         },
         "/api/roles": {
             "get": {
-                "description": "Get a list of all roles",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Roles"
-                ],
-                "summary": "List roles",
-                "responses": {
-                    "200": {
-                        "description": "List of roles",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entity.Role"
-                            }
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "Create a new role entry",
+                "description": "Get a paginated list of roles",
                 "consumes": [
                     "application/json"
                 ],
@@ -1324,17 +1297,95 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Roles"
+                    "roles"
                 ],
-                "summary": "Create a new role",
+                "summary": "List roles",
                 "parameters": [
                     {
-                        "description": "Role data",
-                        "name": "role",
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "minimum": 0,
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "maximum": 100,
+                        "minimum": 1,
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Number of items per page",
+                        "name": "page_size",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of roles retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid query parameters",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid or missing token",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Insufficient permissions",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new role with the provided information",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "roles"
+                ],
+                "summary": "Create role",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Role creation data",
+                        "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.Role"
+                            "$ref": "#/definitions/schemas.CreateRoleRequest"
                         }
                     }
                 ],
@@ -1342,25 +1393,31 @@ const docTemplate = `{
                     "201": {
                         "description": "Role created successfully",
                         "schema": {
-                            "$ref": "#/definitions/entity.Role"
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
-                        "description": "Invalid request body",
+                        "description": "Invalid request format",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid or missing token",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Insufficient permissions",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -1368,16 +1425,27 @@ const docTemplate = `{
         },
         "/api/roles/{id}": {
             "get": {
-                "description": "Get a role by its ID",
+                "description": "Get detailed information about a specific role",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Roles"
+                    "roles"
                 ],
-                "summary": "Get role by ID",
+                "summary": "Get role",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Role ID",
                         "name": "id",
@@ -1387,42 +1455,65 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Role details",
+                        "description": "Role details retrieved successfully",
                         "schema": {
-                            "$ref": "#/definitions/entity.Role"
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
-                        "description": "Invalid role ID",
+                        "description": "Invalid role ID format",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid or missing token",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Insufficient permissions",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Role not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
             },
             "delete": {
-                "description": "Delete a role by its ID",
+                "description": "Delete an existing role",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Roles"
+                    "roles"
                 ],
-                "summary": "Delete a role",
+                "summary": "Delete role",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Role ID",
                         "name": "id",
@@ -1434,34 +1525,43 @@ const docTemplate = `{
                     "200": {
                         "description": "Role deleted successfully",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
-                        "description": "Invalid role ID",
+                        "description": "Invalid role ID format",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid or missing token",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Insufficient permissions",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Role not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
             },
             "patch": {
-                "description": "Update a role by its ID",
+                "description": "Update an existing role's information",
                 "consumes": [
                     "application/json"
                 ],
@@ -1469,11 +1569,19 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Roles"
+                    "roles"
                 ],
-                "summary": "Update a role",
+                "summary": "Update role",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "minimum": 1,
                         "type": "integer",
                         "description": "Role ID",
                         "name": "id",
@@ -1481,12 +1589,12 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "Role data",
-                        "name": "role",
+                        "description": "Role update data",
+                        "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.Role"
+                            "$ref": "#/definitions/schemas.UpdateRoleRequest"
                         }
                     }
                 ],
@@ -1494,25 +1602,37 @@ const docTemplate = `{
                     "200": {
                         "description": "Role updated successfully",
                         "schema": {
-                            "$ref": "#/definitions/entity.Role"
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
-                        "description": "Invalid input",
+                        "description": "Invalid request format or role ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid or missing token",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Insufficient permissions",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Role not found",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -1532,10 +1652,13 @@ const docTemplate = `{
                     "200": {
                         "description": "List of sessions",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entity.Session"
-                            }
+                            "$ref": "#/definitions/schemas.SuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -1559,7 +1682,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.Session"
+                            "$ref": "#/definitions/schemas.CreateSessionRequest"
                         }
                     }
                 ],
@@ -1567,22 +1690,19 @@ const docTemplate = `{
                     "201": {
                         "description": "Session created successfully",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid request body",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -1611,10 +1731,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Session details",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entity.Session"
-                            }
+                            "$ref": "#/definitions/schemas.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid session name",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Session not found",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -1643,10 +1772,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Session details",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entity.Session"
-                            }
+                            "$ref": "#/definitions/schemas.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid session start time",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Session not found",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -1675,21 +1813,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Session details",
                         "schema": {
-                            "$ref": "#/definitions/entity.Session"
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid session ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Session not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -1716,22 +1852,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Session deleted successfully",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid session ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Session not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -1762,7 +1895,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.Session"
+                            "$ref": "#/definitions/schemas.UpdateSessionRequest"
                         }
                     }
                 ],
@@ -1770,22 +1903,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Session updated successfully",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid request body",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Session not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -1805,17 +1935,13 @@ const docTemplate = `{
                     "200": {
                         "description": "List of stipends",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entity.Stipend"
-                            }
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Failed to fetch stippends",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -1839,7 +1965,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.Stipend"
+                            "$ref": "#/definitions/schemas.CreateStipendRequest"
                         }
                     }
                 ],
@@ -1847,15 +1973,13 @@ const docTemplate = `{
                     "201": {
                         "description": "Stipend created successfully",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid request body",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -1884,14 +2008,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Stipend details",
                         "schema": {
-                            "$ref": "#/definitions/entity.Stipend"
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid stipend ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Stipend not found",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -1918,15 +2047,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Stipend deleted successfully",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid stipend ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Stipend not found",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -1957,7 +2090,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.Stipend"
+                            "$ref": "#/definitions/schemas.UpdateStipendRequest"
                         }
                     }
                 ],
@@ -1965,15 +2098,13 @@ const docTemplate = `{
                     "200": {
                         "description": "Stipend updated successfully",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid input",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -1993,10 +2124,7 @@ const docTemplate = `{
                     "200": {
                         "description": "List of submissions",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entity.Submission"
-                            }
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     }
                 }
@@ -2020,7 +2148,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.Submission"
+                            "$ref": "#/definitions/schemas.CreateSubmissionRequest"
                         }
                     }
                 ],
@@ -2028,25 +2156,19 @@ const docTemplate = `{
                     "201": {
                         "description": "Submission created successfully",
                         "schema": {
-                            "$ref": "#/definitions/entity.Submission"
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid request body",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -2075,19 +2197,13 @@ const docTemplate = `{
                     "200": {
                         "description": "Submissions for problem",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entity.Submission"
-                            }
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid problem ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -2116,19 +2232,13 @@ const docTemplate = `{
                     "200": {
                         "description": "Submissions for user",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entity.Submission"
-                            }
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid user ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -2157,25 +2267,72 @@ const docTemplate = `{
                     "200": {
                         "description": "Submission details",
                         "schema": {
-                            "$ref": "#/definitions/entity.Submission"
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid submission ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Submission not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/super-groups/{super_group_id}/groups": {
+            "post": {
+                "description": "Associate one or more groups with a super group",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SuperGroups"
+                ],
+                "summary": "Add groups to a super group",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Super Group ID",
+                        "name": "super_group_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Group IDs to associate",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.SuperToGroupRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Groups added to super group successfully",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body or super group ID",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Super group not found",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -2195,10 +2352,7 @@ const docTemplate = `{
                     "200": {
                         "description": "List of super groups",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entity.SuperGroup"
-                            }
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     }
                 }
@@ -2222,7 +2376,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.SuperGroup"
+                            "$ref": "#/definitions/schemas.CreateSuperGroupRequest"
                         }
                     }
                 ],
@@ -2230,25 +2384,19 @@ const docTemplate = `{
                     "201": {
                         "description": "Super group created successfully",
                         "schema": {
-                            "$ref": "#/definitions/entity.SuperGroup"
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid request body",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -2277,25 +2425,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Super group details",
                         "schema": {
-                            "$ref": "#/definitions/entity.SuperGroup"
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid super group ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Super group not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -2322,28 +2464,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Super group deleted successfully",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid super group ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Super group not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -2374,7 +2507,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.SuperGroup"
+                            "$ref": "#/definitions/schemas.UpdateSuperGroupRequest"
                         }
                     }
                 ],
@@ -2382,25 +2515,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Super group updated successfully",
                         "schema": {
-                            "$ref": "#/definitions/entity.SuperGroup"
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid input",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -2420,60 +2547,7 @@ const docTemplate = `{
                     "200": {
                         "description": "List of super to groups",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entity.SuperToGroup"
-                            }
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "Create a new super to group entry",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "SuperToGroups"
-                ],
-                "summary": "Create a new super to group",
-                "parameters": [
-                    {
-                        "description": "SuperToGroup data",
-                        "name": "super_to_group",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/entity.SuperToGroup"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Super to group created successfully",
-                        "schema": {
-                            "$ref": "#/definitions/entity.SuperToGroup"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid request body",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     }
                 }
@@ -2502,25 +2576,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Super to group details",
                         "schema": {
-                            "$ref": "#/definitions/entity.SuperToGroup"
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid super to group ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Super to group not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -2547,28 +2615,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Super to group deleted successfully",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid super to group ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Super to group not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -2599,7 +2658,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.SuperToGroup"
+                            "$ref": "#/definitions/schemas.SuperToGroupRequest"
                         }
                     }
                 ],
@@ -2607,25 +2666,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Super to group updated successfully",
                         "schema": {
-                            "$ref": "#/definitions/entity.SuperToGroup"
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid input",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -2645,10 +2698,7 @@ const docTemplate = `{
                     "200": {
                         "description": "List of tracks",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entity.Track"
-                            }
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     }
                 }
@@ -2672,7 +2722,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.Track"
+                            "$ref": "#/definitions/schemas.CreateTrackRequest"
                         }
                     }
                 ],
@@ -2680,25 +2730,19 @@ const docTemplate = `{
                     "201": {
                         "description": "Track created successfully",
                         "schema": {
-                            "$ref": "#/definitions/entity.Track"
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid request body",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -2727,25 +2771,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Track details",
                         "schema": {
-                            "$ref": "#/definitions/entity.Track"
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid track name",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Track not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -2774,25 +2812,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Track details",
                         "schema": {
-                            "$ref": "#/definitions/entity.Track"
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid track ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Track not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -2819,28 +2851,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Track deleted successfully",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid track ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Track not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -2871,7 +2894,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.Track"
+                            "$ref": "#/definitions/schemas.UpdateTrackRequest"
                         }
                     }
                 ],
@@ -2879,25 +2902,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Track updated successfully",
                         "schema": {
-                            "$ref": "#/definitions/entity.Track"
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid input",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -2905,24 +2922,29 @@ const docTemplate = `{
         },
         "/api/users": {
             "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
+                "description": "Get a paginated list of users with optional filters",
+                "consumes": [
+                    "application/json"
                 ],
-                "description": "Get paginated list of users with optional filters",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Users"
+                    "users"
                 ],
                 "summary": "List users",
                 "parameters": [
                     {
-                        "minimum": 0,
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "minimum": 1,
                         "type": "integer",
-                        "default": 0,
+                        "default": 1,
                         "description": "Page number",
                         "name": "page",
                         "in": "query"
@@ -2931,21 +2953,53 @@ const docTemplate = `{
                         "maximum": 100,
                         "minimum": 1,
                         "type": "integer",
-                        "default": 20,
-                        "description": "Items per page",
+                        "default": 10,
+                        "description": "Number of items per page",
                         "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search term for filtering users",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Filter by role ID",
+                        "name": "role_id",
+                        "in": "query"
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Filter by group ID",
+                        "name": "group_id",
                         "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "List of users",
+                        "description": "List of users retrieved successfully",
                         "schema": {
-                            "$ref": "#/definitions/schemas.PaginatedUsers"
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
-                        "description": "Invalid pagination parameters",
+                        "description": "Invalid query parameters",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid or missing token",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Insufficient permissions",
                         "schema": {
                             "$ref": "#/definitions/schemas.ErrorResponse"
                         }
@@ -2959,12 +3013,7 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Create a new user account with required information",
+                "description": "Create a new user account with the provided information",
                 "consumes": [
                     "application/json"
                 ],
@@ -2972,41 +3021,54 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Users"
+                    "users"
                 ],
                 "summary": "Create a new user",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "description": "User creation data",
-                        "name": "user",
+                        "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/schemas.CreateUserInput"
+                            "$ref": "#/definitions/schemas.CreateUserRequest"
                         }
                     }
                 ],
                 "responses": {
                     "201": {
-                        "description": "Successfully created user",
+                        "description": "User created successfully",
                         "schema": {
-                            "$ref": "#/definitions/schemas.ResponseUser"
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
-                        "description": "Invalid request format",
+                        "description": "Invalid request format or validation error",
                         "schema": {
                             "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
+                        "description": "Unauthorized - Invalid or missing token",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Insufficient permissions",
                         "schema": {
                             "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "409": {
-                        "description": "User already exists",
+                        "description": "Conflict - User already exists",
                         "schema": {
                             "$ref": "#/definitions/schemas.ErrorResponse"
                         }
@@ -3022,23 +3084,28 @@ const docTemplate = `{
         },
         "/api/users/{id}": {
             "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
                 "description": "Get detailed information about a specific user",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Users"
+                    "users"
                 ],
                 "summary": "Get user details",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "minimum": 1,
                         "type": "integer",
-                        "format": "int64",
                         "description": "User ID",
                         "name": "id",
                         "in": "path",
@@ -3047,13 +3114,25 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "User details",
+                        "description": "User details retrieved successfully",
                         "schema": {
-                            "$ref": "#/definitions/schemas.ResponseUser"
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
-                        "description": "Invalid user ID",
+                        "description": "Invalid user ID format",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid or missing token",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Insufficient permissions",
                         "schema": {
                             "$ref": "#/definitions/schemas.ErrorResponse"
                         }
@@ -3073,23 +3152,28 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
+                "description": "Delete an existing user",
+                "consumes": [
+                    "application/json"
                 ],
-                "description": "Permanently delete a user account and associated data",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Users"
+                    "users"
                 ],
-                "summary": "Delete user account",
+                "summary": "Delete user",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "minimum": 1,
                         "type": "integer",
-                        "format": "uint32",
                         "description": "User ID",
                         "name": "id",
                         "in": "path",
@@ -3104,19 +3188,19 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Invalid ID format",
+                        "description": "Invalid user ID format",
                         "schema": {
                             "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
+                        "description": "Unauthorized - Invalid or missing token",
                         "schema": {
                             "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "403": {
-                        "description": "Forbidden",
+                        "description": "Forbidden - Insufficient permissions",
                         "schema": {
                             "$ref": "#/definitions/schemas.ErrorResponse"
                         }
@@ -3136,12 +3220,7 @@ const docTemplate = `{
                 }
             },
             "patch": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Update existing user information. Only provided fields will be updated.",
+                "description": "Update an existing user's information",
                 "consumes": [
                     "application/json"
                 ],
@@ -3149,25 +3228,32 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Users"
+                    "users"
                 ],
                 "summary": "Update user details",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "minimum": 1,
                         "type": "integer",
-                        "format": "uint32",
                         "description": "User ID",
                         "name": "id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Partial user data for update",
-                        "name": "user",
+                        "description": "User update data",
+                        "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/schemas.UpdateUserInput"
+                            "$ref": "#/definitions/schemas.UpdateUserRequest"
                         }
                     }
                 ],
@@ -3179,19 +3265,19 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Invalid ID format or request body",
+                        "description": "Invalid request format or validation error",
                         "schema": {
                             "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
+                        "description": "Unauthorized - Invalid or missing token",
                         "schema": {
                             "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "403": {
-                        "description": "Forbidden",
+                        "description": "Forbidden - Insufficient permissions",
                         "schema": {
                             "$ref": "#/definitions/schemas.ErrorResponse"
                         }
@@ -3225,10 +3311,7 @@ const docTemplate = `{
                     "200": {
                         "description": "List of votes",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entity.Vote"
-                            }
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     }
                 }
@@ -3252,7 +3335,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.Vote"
+                            "$ref": "#/definitions/schemas.CreateVoteRequest"
                         }
                     }
                 ],
@@ -3260,25 +3343,19 @@ const docTemplate = `{
                     "201": {
                         "description": "Vote created successfully",
                         "schema": {
-                            "$ref": "#/definitions/entity.Vote"
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid request body",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -3307,19 +3384,13 @@ const docTemplate = `{
                     "200": {
                         "description": "Votes for comment",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entity.Vote"
-                            }
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid comment ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -3348,19 +3419,13 @@ const docTemplate = `{
                     "200": {
                         "description": "Votes for post",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entity.Vote"
-                            }
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid post ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -3389,19 +3454,13 @@ const docTemplate = `{
                     "200": {
                         "description": "Votes for problem",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entity.Vote"
-                            }
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid problem ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -3430,19 +3489,13 @@ const docTemplate = `{
                     "200": {
                         "description": "Votes for submission",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entity.Vote"
-                            }
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid submission ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -3471,19 +3524,13 @@ const docTemplate = `{
                     "200": {
                         "description": "Votes for track",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entity.Vote"
-                            }
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid track ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -3512,19 +3559,13 @@ const docTemplate = `{
                     "200": {
                         "description": "Votes for user",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entity.Vote"
-                            }
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid user ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -3553,25 +3594,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Vote details",
                         "schema": {
-                            "$ref": "#/definitions/entity.Vote"
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid vote ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Vote not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -3598,28 +3633,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Vote deleted successfully",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid vote ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Vote not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -3650,7 +3676,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.Vote"
+                            "$ref": "#/definitions/schemas.UpdateVoteRequest"
                         }
                     }
                 ],
@@ -3658,25 +3684,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Vote updated successfully",
                         "schema": {
-                            "$ref": "#/definitions/entity.Vote"
+                            "$ref": "#/definitions/schemas.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid input",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -3684,1316 +3704,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "entity.APIToken": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "expires_at": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "token": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
-                },
-                "user": {
-                    "$ref": "#/definitions/entity.User"
-                },
-                "user_id": {
-                    "type": "integer"
-                }
-            }
-        },
-        "entity.Attendance": {
-            "type": "object",
-            "properties": {
-                "at": {
-                    "description": "Time when attendance was taken",
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "head": {
-                    "$ref": "#/definitions/entity.User"
-                },
-                "head_id": {
-                    "description": "The head who recorded this attendance",
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "session": {
-                    "$ref": "#/definitions/entity.Session"
-                },
-                "session_id": {
-                    "type": "integer"
-                },
-                "status": {
-                    "description": "e.g., 0=absent, 1=present, 2=excused",
-                    "type": "integer"
-                },
-                "type": {
-                    "description": "Type of attendance record",
-                    "type": "integer"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "user": {
-                    "$ref": "#/definitions/entity.User"
-                },
-                "user_id": {
-                    "type": "integer"
-                }
-            }
-        },
-        "entity.Comment": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "post": {
-                    "$ref": "#/definitions/entity.Post"
-                },
-                "post_id": {
-                    "type": "integer"
-                },
-                "problem": {
-                    "$ref": "#/definitions/entity.Problem"
-                },
-                "problem_id": {
-                    "type": "integer"
-                },
-                "replies": {
-                    "description": "Relations",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Comment"
-                    }
-                },
-                "reply": {
-                    "$ref": "#/definitions/entity.Comment"
-                },
-                "reply_id": {
-                    "type": "integer"
-                },
-                "submission": {
-                    "$ref": "#/definitions/entity.Submission"
-                },
-                "submission_id": {
-                    "type": "integer"
-                },
-                "text": {
-                    "type": "string"
-                },
-                "track": {
-                    "$ref": "#/definitions/entity.Track"
-                },
-                "track_id": {
-                    "type": "integer"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "user": {
-                    "$ref": "#/definitions/entity.User"
-                },
-                "user_id": {
-                    "type": "integer"
-                },
-                "votes": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Vote"
-                    }
-                }
-            }
-        },
-        "entity.Contest": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "link": {
-                    "type": "string"
-                },
-                "link2": {
-                    "type": "string"
-                },
-                "link3": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "problem_count": {
-                    "type": "integer"
-                },
-                "problems": {
-                    "description": "Relations",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Problem"
-                    }
-                },
-                "super_group": {
-                    "$ref": "#/definitions/entity.SuperGroup"
-                },
-                "super_group_id": {
-                    "type": "integer"
-                },
-                "type": {
-                    "type": "string"
-                },
-                "unrated": {
-                    "type": "boolean"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "votes": {
-                    "description": "Ratings       []Rating       ` + "`" + `json:\"ratings,omitempty\" gorm:\"foreignKey:ContestID\"` + "`" + `\nDivisionUsers []DivisionUser ` + "`" + `json:\"division_users,omitempty\" gorm:\"foreignKey:ContestID\"` + "`" + `",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Vote"
-                    }
-                }
-            }
-        },
-        "entity.Country": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "groups": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Group"
-                    }
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "short_code": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "users": {
-                    "description": "Relations",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.User"
-                    }
-                }
-            }
-        },
-        "entity.DailyProblem": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "for_date": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "problem": {
-                    "$ref": "#/definitions/entity.Problem"
-                },
-                "problem_id": {
-                    "type": "integer"
-                },
-                "super_group": {
-                    "$ref": "#/definitions/entity.SuperGroup"
-                },
-                "super_group_id": {
-                    "type": "integer"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "entity.Exercise": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "group": {
-                    "$ref": "#/definitions/entity.Group"
-                },
-                "group_id": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "problem": {
-                    "$ref": "#/definitions/entity.Problem"
-                },
-                "problem_id": {
-                    "type": "integer"
-                },
-                "track": {
-                    "$ref": "#/definitions/entity.Track"
-                },
-                "track_id": {
-                    "type": "integer"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "entity.Fund": {
-            "type": "object",
-            "properties": {
-                "amount": {
-                    "type": "number"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "currency": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "sessions": {
-                    "description": "Relations",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Session"
-                    }
-                },
-                "stipends": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Stipend"
-                    }
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "entity.GoogleOAuth": {
-            "type": "object",
-            "properties": {
-                "calendar_id": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "encrypted_token_string": {
-                    "type": "string"
-                },
-                "group": {
-                    "$ref": "#/definitions/entity.Group"
-                },
-                "group_id": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "user": {
-                    "$ref": "#/definitions/entity.User"
-                },
-                "user_id": {
-                    "type": "integer"
-                }
-            }
-        },
-        "entity.Group": {
-            "type": "object",
-            "properties": {
-                "country": {
-                    "$ref": "#/definitions/entity.Country"
-                },
-                "country_id": {
-                    "type": "integer"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "exercises": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Exercise"
-                    }
-                },
-                "google_oauths": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.GoogleOAuth"
-                    }
-                },
-                "group_sessions": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.GroupSession"
-                    }
-                },
-                "hoa_id": {
-                    "description": "Head of Academy ID",
-                    "type": "integer"
-                },
-                "hoas": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.HOA"
-                    }
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "invites": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Invite"
-                    }
-                },
-                "name": {
-                    "type": "string"
-                },
-                "short_name": {
-                    "type": "string"
-                },
-                "super_to_groups": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.SuperToGroup"
-                    }
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "users": {
-                    "description": "Relations",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.User"
-                    }
-                }
-            }
-        },
-        "entity.GroupSession": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "group": {
-                    "$ref": "#/definitions/entity.Group"
-                },
-                "group_id": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "session": {
-                    "$ref": "#/definitions/entity.Session"
-                },
-                "session_id": {
-                    "type": "integer"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "entity.HOA": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "group": {
-                    "$ref": "#/definitions/entity.Group"
-                },
-                "group_id": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "user": {
-                    "$ref": "#/definitions/entity.User"
-                },
-                "user_id": {
-                    "type": "integer"
-                }
-            }
-        },
-        "entity.Invite": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "group": {
-                    "$ref": "#/definitions/entity.Group"
-                },
-                "group_id": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "key": {
-                    "description": "Unique invite key",
-                    "type": "string"
-                },
-                "role": {
-                    "$ref": "#/definitions/entity.Role"
-                },
-                "role_id": {
-                    "type": "integer"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "used": {
-                    "description": "Whether the invite has been used",
-                    "type": "boolean"
-                },
-                "user": {
-                    "$ref": "#/definitions/entity.User"
-                },
-                "user_id": {
-                    "description": "User who created the invite",
-                    "type": "integer"
-                }
-            }
-        },
-        "entity.Post": {
-            "type": "object",
-            "properties": {
-                "body": {
-                    "type": "string"
-                },
-                "comments": {
-                    "description": "Relations",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Comment"
-                    }
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "post_to_tags": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.PostToTag"
-                    }
-                },
-                "title": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "user": {
-                    "$ref": "#/definitions/entity.User"
-                },
-                "user_id": {
-                    "type": "integer"
-                },
-                "votes": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Vote"
-                    }
-                }
-            }
-        },
-        "entity.PostTag": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "post_to_tags": {
-                    "description": "Relations",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.PostToTag"
-                    }
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "entity.PostToTag": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "post": {
-                    "$ref": "#/definitions/entity.Post"
-                },
-                "post_id": {
-                    "type": "integer"
-                },
-                "post_tag": {
-                    "$ref": "#/definitions/entity.PostTag"
-                },
-                "post_tag_id": {
-                    "type": "integer"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "entity.Problem": {
-            "type": "object",
-            "properties": {
-                "comments": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Comment"
-                    }
-                },
-                "contest": {
-                    "$ref": "#/definitions/entity.Contest"
-                },
-                "contest_id": {
-                    "type": "integer"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "daily_problems": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.DailyProblem"
-                    }
-                },
-                "difficulty": {
-                    "type": "string"
-                },
-                "exercises": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Exercise"
-                    }
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "link": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "platform": {
-                    "type": "string"
-                },
-                "problem_tracks": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.ProblemTrack"
-                    }
-                },
-                "submissions": {
-                    "description": "Relations",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Submission"
-                    }
-                },
-                "tag": {
-                    "type": "string"
-                },
-                "track": {
-                    "$ref": "#/definitions/entity.Track"
-                },
-                "track_id": {
-                    "type": "integer"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "votes": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Vote"
-                    }
-                }
-            }
-        },
-        "entity.ProblemTrack": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "problem": {
-                    "$ref": "#/definitions/entity.Problem"
-                },
-                "problem_id": {
-                    "type": "integer"
-                },
-                "track": {
-                    "$ref": "#/definitions/entity.Track"
-                },
-                "track_id": {
-                    "type": "integer"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "entity.RecentAction": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "type": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "user": {
-                    "$ref": "#/definitions/entity.User"
-                },
-                "user_id": {
-                    "type": "integer"
-                }
-            }
-        },
-        "entity.Role": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "invites": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Invite"
-                    }
-                },
-                "type": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "users": {
-                    "description": "Relations",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.User"
-                    }
-                }
-            }
-        },
-        "entity.Session": {
-            "type": "object",
-            "properties": {
-                "attendances": {
-                    "description": "Relations",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Attendance"
-                    }
-                },
-                "calendar_event_id": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "end_time": {
-                    "type": "string"
-                },
-                "fund": {
-                    "$ref": "#/definitions/entity.Fund"
-                },
-                "fund_id": {
-                    "type": "integer"
-                },
-                "group_sessions": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.GroupSession"
-                    }
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "lecturer": {
-                    "$ref": "#/definitions/entity.User"
-                },
-                "lecturer_id": {
-                    "type": "integer"
-                },
-                "location": {
-                    "type": "string"
-                },
-                "meet_link": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "recording_link": {
-                    "type": "string"
-                },
-                "resource_link": {
-                    "type": "string"
-                },
-                "start_time": {
-                    "type": "string"
-                },
-                "stipends": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Stipend"
-                    }
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "entity.Stipend": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "fund": {
-                    "$ref": "#/definitions/entity.Fund"
-                },
-                "fund_id": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "paid": {
-                    "type": "boolean"
-                },
-                "session": {
-                    "$ref": "#/definitions/entity.Session"
-                },
-                "session_id": {
-                    "type": "integer"
-                },
-                "share": {
-                    "description": "Share of the fund amount",
-                    "type": "number"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "user": {
-                    "$ref": "#/definitions/entity.User"
-                },
-                "user_id": {
-                    "type": "integer"
-                }
-            }
-        },
-        "entity.Submission": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "type": "string"
-                },
-                "comments": {
-                    "description": "Relations",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Comment"
-                    }
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "in_contest": {
-                    "description": "Whether it was solved in a contest",
-                    "type": "integer"
-                },
-                "language": {
-                    "type": "string"
-                },
-                "problem": {
-                    "$ref": "#/definitions/entity.Problem"
-                },
-                "problem_id": {
-                    "type": "integer"
-                },
-                "time_spent": {
-                    "description": "Time spent in seconds",
-                    "type": "integer"
-                },
-                "tries": {
-                    "description": "Number of attempts",
-                    "type": "integer"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "user": {
-                    "$ref": "#/definitions/entity.User"
-                },
-                "user_id": {
-                    "type": "integer"
-                },
-                "verified": {
-                    "type": "boolean"
-                },
-                "votes": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Vote"
-                    }
-                }
-            }
-        },
-        "entity.SuperGroup": {
-            "type": "object",
-            "properties": {
-                "contests": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Contest"
-                    }
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "daily_problems": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.DailyProblem"
-                    }
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "super_to_groups": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.SuperToGroup"
-                    }
-                },
-                "tracks": {
-                    "description": "Relations",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Track"
-                    }
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "entity.SuperToGroup": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "group": {
-                    "$ref": "#/definitions/entity.Group"
-                },
-                "group_id": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "super_group": {
-                    "$ref": "#/definitions/entity.SuperGroup"
-                },
-                "super_group_id": {
-                    "type": "integer"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "entity.Track": {
-            "type": "object",
-            "properties": {
-                "active": {
-                    "type": "boolean"
-                },
-                "comments": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Comment"
-                    }
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "exercises": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Exercise"
-                    }
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "problem_tracks": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.ProblemTrack"
-                    }
-                },
-                "problems": {
-                    "description": "Relations",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Problem"
-                    }
-                },
-                "super_group": {
-                    "$ref": "#/definitions/entity.SuperGroup"
-                },
-                "super_group_id": {
-                    "type": "integer"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "votes": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Vote"
-                    }
-                }
-            }
-        },
-        "entity.User": {
-            "type": "object",
-            "properties": {
-                "api_tokens": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.APIToken"
-                    }
-                },
-                "attendances": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Attendance"
-                    }
-                },
-                "birthday": {
-                    "description": "Personal Information",
-                    "type": "string"
-                },
-                "code_of_conduct": {
-                    "type": "string"
-                },
-                "codeforces": {
-                    "type": "string"
-                },
-                "comments": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Comment"
-                    }
-                },
-                "config": {
-                    "type": "string"
-                },
-                "country": {
-                    "$ref": "#/definitions/entity.Country"
-                },
-                "country_id": {
-                    "type": "integer"
-                },
-                "created_at": {
-                    "description": "Timestamps",
-                    "type": "string"
-                },
-                "cv": {
-                    "description": "Professional Details",
-                    "type": "string"
-                },
-                "department": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "expected_graduation_date": {
-                    "type": "string"
-                },
-                "gender": {
-                    "type": "string"
-                },
-                "github": {
-                    "type": "string"
-                },
-                "group": {
-                    "$ref": "#/definitions/entity.Group"
-                },
-                "group_id": {
-                    "type": "integer"
-                },
-                "hackerrank": {
-                    "type": "string"
-                },
-                "head_attendances": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Attendance"
-                    }
-                },
-                "id": {
-                    "description": "Core Identity Fields",
-                    "type": "integer"
-                },
-                "inactive": {
-                    "type": "boolean"
-                },
-                "instagram": {
-                    "type": "string"
-                },
-                "joined_date": {
-                    "type": "string"
-                },
-                "leetcode": {
-                    "description": "Coding Profiles (optional)\nUse pointer types so that if no value is provided, they remain nil.",
-                    "type": "string"
-                },
-                "linkedin": {
-                    "description": "Social Media (all optional)",
-                    "type": "string"
-                },
-                "mentor_name": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "phone": {
-                    "description": "Contact Information",
-                    "type": "string"
-                },
-                "photo": {
-                    "description": "System Fields",
-                    "type": "string"
-                },
-                "posts": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Post"
-                    }
-                },
-                "preferred_language": {
-                    "type": "string"
-                },
-                "recent_actions": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.RecentAction"
-                    }
-                },
-                "role": {
-                    "$ref": "#/definitions/entity.Role"
-                },
-                "role_id": {
-                    "description": "Role and Relationships",
-                    "type": "integer"
-                },
-                "short_bio": {
-                    "type": "string"
-                },
-                "student_id": {
-                    "type": "string"
-                },
-                "submissions": {
-                    "description": "Relations (using GORM associations)",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Submission"
-                    }
-                },
-                "telegram_uid": {
-                    "type": "string"
-                },
-                "telegram_username": {
-                    "type": "string"
-                },
-                "tshirt_color": {
-                    "description": "Physical Attributes",
-                    "type": "string"
-                },
-                "tshirt_size": {
-                    "type": "string"
-                },
-                "university": {
-                    "description": "Academic Information",
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "entity.Vote": {
-            "type": "object",
-            "properties": {
-                "comment": {
-                    "$ref": "#/definitions/entity.Comment"
-                },
-                "comment_id": {
-                    "type": "integer"
-                },
-                "contest": {
-                    "$ref": "#/definitions/entity.Contest"
-                },
-                "contest_id": {
-                    "type": "integer"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "post": {
-                    "$ref": "#/definitions/entity.Post"
-                },
-                "post_id": {
-                    "type": "integer"
-                },
-                "problem": {
-                    "$ref": "#/definitions/entity.Problem"
-                },
-                "problem_id": {
-                    "type": "integer"
-                },
-                "submission": {
-                    "$ref": "#/definitions/entity.Submission"
-                },
-                "submission_id": {
-                    "type": "integer"
-                },
-                "track": {
-                    "$ref": "#/definitions/entity.Track"
-                },
-                "track_id": {
-                    "type": "integer"
-                },
-                "type": {
-                    "description": "e.g., 1=upvote, -1=downvote",
-                    "type": "integer"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "user": {
-                    "$ref": "#/definitions/entity.User"
-                },
-                "user_id": {
-                    "type": "integer"
-                }
-            }
-        },
         "handlers.BulkRegistrationRequest": {
             "type": "object",
             "required": [
@@ -5035,91 +3745,528 @@ const docTemplate = `{
                 }
             }
         },
-        "schemas.AuthTokenResponse": {
+        "schemas.CreateCountryRequest": {
             "type": "object",
+            "required": [
+                "code",
+                "name"
+            ],
             "properties": {
-                "token": {
-                    "type": "string"
+                "code": {
+                    "type": "string",
+                    "example": "ET"
                 },
-                "user": {
-                    "$ref": "#/definitions/entity.User"
+                "name": {
+                    "type": "string",
+                    "example": "Ethiopia"
                 }
             }
         },
-        "schemas.CreateUserInput": {
+        "schemas.CreateGroupRequest": {
             "type": "object",
             "required": [
-                "email"
+                "country_id",
+                "name"
+            ],
+            "properties": {
+                "country_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "description": {
+                    "type": "string",
+                    "example": "A competitive programming team"
+                },
+                "hoa_id": {
+                    "type": "integer",
+                    "example": 5
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Team Alpha"
+                },
+                "short_name": {
+                    "type": "string",
+                    "example": "Alpha"
+                }
+            }
+        },
+        "schemas.CreateProblemRequest": {
+            "type": "object",
+            "required": [
+                "description",
+                "difficulty",
+                "link",
+                "name",
+                "platform"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "example": "Find two numbers that add up to target"
+                },
+                "difficulty": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/schemas.Difficulty"
+                        }
+                    ],
+                    "example": "medium"
+                },
+                "link": {
+                    "type": "string",
+                    "example": "https://leetcode.com/problems/two-sum"
+                },
+                "name": {
+                    "description": "Required: true",
+                    "type": "string",
+                    "example": "Two Sum"
+                },
+                "platform": {
+                    "type": "string",
+                    "example": "leetcode"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "['array'",
+                        "'hash-table']"
+                    ]
+                }
+            }
+        },
+        "schemas.CreateRecentActionRequest": {
+            "type": "object",
+            "required": [
+                "action_type",
+                "description",
+                "entity_id",
+                "entity_type",
+                "user_id"
+            ],
+            "properties": {
+                "action_type": {
+                    "type": "string",
+                    "example": "problem_solved"
+                },
+                "description": {
+                    "type": "string",
+                    "example": "Solved Two Sum problem"
+                },
+                "entity_id": {
+                    "type": "integer",
+                    "example": 123
+                },
+                "entity_type": {
+                    "type": "string",
+                    "example": "problem"
+                },
+                "user_id": {
+                    "description": "Required: true",
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "schemas.CreateRoleRequest": {
+            "type": "object",
+            "required": [
+                "type"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "example": "Can moderate content"
+                },
+                "type": {
+                    "description": "Required: true",
+                    "type": "string",
+                    "example": "Moderator"
+                }
+            }
+        },
+        "schemas.CreateSessionRequest": {
+            "type": "object",
+            "required": [
+                "description",
+                "end_time",
+                "group_id",
+                "host_id",
+                "name",
+                "start_time"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "example": "Introduction to Data Structures"
+                },
+                "end_time": {
+                    "type": "string"
+                },
+                "group_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "host_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "location": {
+                    "type": "string",
+                    "example": "Room 101"
+                },
+                "meeting_link": {
+                    "type": "string",
+                    "example": "https://meet.google.com/abc-xyz"
+                },
+                "name": {
+                    "description": "Required: true",
+                    "type": "string",
+                    "example": "DSA Session #1"
+                },
+                "start_time": {
+                    "type": "string"
+                }
+            }
+        },
+        "schemas.CreateStipendRequest": {
+            "type": "object",
+            "required": [
+                "amount",
+                "currency",
+                "month",
+                "payment_method",
+                "user_id"
+            ],
+            "properties": {
+                "account_name": {
+                    "type": "string",
+                    "example": "John Doe"
+                },
+                "account_number": {
+                    "type": "string",
+                    "example": "1234567890"
+                },
+                "amount": {
+                    "type": "number",
+                    "example": 500
+                },
+                "bank_name": {
+                    "description": "Optional fields",
+                    "type": "string",
+                    "example": "Example Bank"
+                },
+                "currency": {
+                    "type": "string",
+                    "example": "USD"
+                },
+                "description": {
+                    "type": "string",
+                    "example": "Monthly stipend for April 2025"
+                },
+                "month": {
+                    "type": "string"
+                },
+                "payment_method": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/schemas.PaymentMethod"
+                        }
+                    ],
+                    "example": "bank_transfer"
+                },
+                "phone_number": {
+                    "type": "string",
+                    "example": "+1234567890"
+                },
+                "user_id": {
+                    "description": "Required: true",
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "schemas.CreateSubmissionRequest": {
+            "type": "object",
+            "required": [
+                "code",
+                "language",
+                "problem_id",
+                "user_id"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string",
+                    "example": "def two_sum(nums, target):..."
+                },
+                "language": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/schemas.Language"
+                        }
+                    ],
+                    "example": "python"
+                },
+                "problem_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "user_id": {
+                    "description": "Required: true",
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "schemas.CreateSuperGroupRequest": {
+            "type": "object",
+            "required": [
+                "country_id",
+                "description",
+                "name"
+            ],
+            "properties": {
+                "country_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "description": {
+                    "type": "string",
+                    "example": "Second generation of A2SV students"
+                },
+                "name": {
+                    "description": "Required: true",
+                    "type": "string",
+                    "example": "A2SV Generation 2"
+                }
+            }
+        },
+        "schemas.CreateTrackRequest": {
+            "type": "object",
+            "required": [
+                "description",
+                "end_date",
+                "group_id",
+                "name",
+                "start_date",
+                "type"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "example": "Advanced Data Structures and Algorithms"
+                },
+                "end_date": {
+                    "type": "string"
+                },
+                "group_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "name": {
+                    "description": "Required: true",
+                    "type": "string",
+                    "example": "DSA Advanced Track"
+                },
+                "start_date": {
+                    "type": "string"
+                },
+                "type": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/schemas.TrackType"
+                        }
+                    ],
+                    "example": "dsa"
+                }
+            }
+        },
+        "schemas.CreateUserRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "name",
+                "password"
             ],
             "properties": {
                 "birthday": {
                     "type": "string"
                 },
                 "codeforces": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "cf_user"
+                },
+                "country_id": {
+                    "type": "integer",
+                    "example": 1
                 },
                 "department": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Computer Science"
                 },
                 "email": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "user@example.com"
                 },
                 "expected_graduation_date": {
                     "type": "string"
                 },
+                "gender": {
+                    "type": "string",
+                    "example": "male"
+                },
                 "github": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "github_user"
+                },
+                "group_id": {
+                    "type": "integer",
+                    "example": 1
                 },
                 "hackerrank": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "hr_user"
                 },
                 "instagram": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "insta_user"
                 },
                 "leetcode": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "leetcode_user"
                 },
                 "linkedin": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "linkedin_profile"
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "John Doe"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "MySecret123"
                 },
                 "phone": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "+1234567890"
+                },
+                "preferred_language": {
+                    "type": "string",
+                    "example": "en"
                 },
                 "role_id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 2
+                },
+                "short_bio": {
+                    "type": "string",
+                    "example": "Software developer passionate about algorithms"
                 },
                 "student_id": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "STU123"
                 },
                 "telegram_uid": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "123456789"
                 },
                 "telegram_username": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "@username"
                 },
                 "university": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Example University"
                 }
             }
+        },
+        "schemas.CreateVoteRequest": {
+            "type": "object",
+            "required": [
+                "entity_id",
+                "entity_type",
+                "user_id",
+                "vote_type"
+            ],
+            "properties": {
+                "entity_id": {
+                    "type": "integer",
+                    "example": 123
+                },
+                "entity_type": {
+                    "description": "comment, post, track, submission, problem",
+                    "type": "string",
+                    "example": "comment"
+                },
+                "user_id": {
+                    "description": "Required: true",
+                    "type": "integer",
+                    "example": 1
+                },
+                "vote_type": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/schemas.VoteType"
+                        }
+                    ],
+                    "example": "upvote"
+                }
+            }
+        },
+        "schemas.Difficulty": {
+            "type": "string",
+            "enum": [
+                "easy",
+                "medium",
+                "hard",
+                "very_hard"
+            ],
+            "x-enum-varnames": [
+                "Easy",
+                "Medium",
+                "Hard",
+                "VeryHard"
+            ]
         },
         "schemas.ErrorResponse": {
             "type": "object",
             "properties": {
                 "code": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 400
                 },
                 "details": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Email field is required"
                 },
                 "message": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Invalid request parameters"
                 }
             }
         },
-        "schemas.LoginInput": {
+        "schemas.Language": {
+            "type": "string",
+            "enum": [
+                "python",
+                "java",
+                "cpp",
+                "javascript",
+                "go"
+            ],
+            "x-enum-varnames": [
+                "Python",
+                "Java",
+                "CPP",
+                "JavaScript",
+                "Go"
+            ]
+        },
+        "schemas.LoginRequest": {
             "type": "object",
             "required": [
                 "email",
@@ -5127,240 +4274,479 @@ const docTemplate = `{
             ],
             "properties": {
                 "email": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "user@example.com"
                 },
                 "password": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "mypassword123"
                 }
             }
         },
-        "schemas.LoginResponse": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                },
-                "token": {
-                    "type": "string"
-                },
-                "user": {
-                    "$ref": "#/definitions/schemas.ResponseUser"
-                }
-            }
+        "schemas.PaymentMethod": {
+            "type": "string",
+            "enum": [
+                "bank_transfer",
+                "mobile_money",
+                "cash"
+            ],
+            "x-enum-varnames": [
+                "BankTransfer",
+                "MobileMoney",
+                "Cash"
+            ]
         },
-        "schemas.PaginatedUsers": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.User"
-                    }
-                },
-                "meta": {
-                    "$ref": "#/definitions/schemas.PaginationMeta"
-                }
-            }
-        },
-        "schemas.PaginationMeta": {
-            "type": "object",
-            "properties": {
-                "page": {
-                    "type": "integer"
-                },
-                "page_size": {
-                    "type": "integer"
-                },
-                "total": {
-                    "type": "integer"
-                },
-                "total_pages": {
-                    "type": "integer"
-                }
-            }
-        },
-        "schemas.ResponseUser": {
-            "type": "object",
-            "properties": {
-                "birthday": {
-                    "description": "Personal Information",
-                    "type": "string"
-                },
-                "code_of_conduct": {
-                    "type": "string"
-                },
-                "codeforces": {
-                    "type": "string"
-                },
-                "config": {
-                    "type": "string"
-                },
-                "country_id": {
-                    "type": "integer"
-                },
-                "created_at": {
-                    "description": "Timestamps",
-                    "type": "string"
-                },
-                "cv": {
-                    "description": "Professional Details",
-                    "type": "string"
-                },
-                "department": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "expected_graduation_date": {
-                    "type": "string"
-                },
-                "gender": {
-                    "type": "string"
-                },
-                "github": {
-                    "type": "string"
-                },
-                "group_id": {
-                    "type": "integer"
-                },
-                "hackerrank": {
-                    "type": "string"
-                },
-                "id": {
-                    "description": "Core Identity Fields",
-                    "type": "integer"
-                },
-                "inactive": {
-                    "type": "boolean"
-                },
-                "instagram": {
-                    "type": "string"
-                },
-                "joined_date": {
-                    "type": "string"
-                },
-                "leetcode": {
-                    "description": "Coding Profiles (optional)\nUse pointer types so that if no value is provided, they remain nil.",
-                    "type": "string"
-                },
-                "linkedin": {
-                    "description": "Social Media (all optional)",
-                    "type": "string"
-                },
-                "mentor_name": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "phone": {
-                    "description": "Contact Information",
-                    "type": "string"
-                },
-                "photo": {
-                    "description": "System Fields",
-                    "type": "string"
-                },
-                "preferred_language": {
-                    "type": "string"
-                },
-                "role_id": {
-                    "description": "Default role ID (adjust as necessary)",
-                    "type": "integer"
-                },
-                "short_bio": {
-                    "type": "string"
-                },
-                "student_id": {
-                    "type": "string"
-                },
-                "telegram_uid": {
-                    "type": "string"
-                },
-                "telegram_username": {
-                    "type": "string"
-                },
-                "tshirt_color": {
-                    "description": "Physical Attributes",
-                    "type": "string"
-                },
-                "tshirt_size": {
-                    "type": "string"
-                },
-                "university": {
-                    "description": "Academic Information",
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
+        "schemas.PaymentStatus": {
+            "type": "string",
+            "enum": [
+                "pending",
+                "approved",
+                "rejected",
+                "paid",
+                "failed"
+            ],
+            "x-enum-varnames": [
+                "PaymentPending",
+                "PaymentApproved",
+                "PaymentRejected",
+                "PaymentPaid",
+                "PaymentFailed"
+            ]
         },
         "schemas.SuccessResponse": {
             "type": "object",
             "properties": {
                 "data": {},
                 "message": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Operation successful"
                 }
             }
         },
-        "schemas.UpdateUserInput": {
+        "schemas.SuperToGroupRequest": {
+            "type": "object",
+            "required": [
+                "group_ids"
+            ],
+            "properties": {
+                "group_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    },
+                    "example": [
+                        1,
+                        2,
+                        3
+                    ]
+                }
+            }
+        },
+        "schemas.TrackType": {
+            "type": "string",
+            "enum": [
+                "dsa",
+                "project",
+                "system_design"
+            ],
+            "x-enum-varnames": [
+                "DSATrack",
+                "ProjectTrack",
+                "SystemTrack"
+            ]
+        },
+        "schemas.UpdateCountryRequest": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string",
+                    "example": "ET"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Ethiopia"
+                }
+            }
+        },
+        "schemas.UpdateGroupRequest": {
+            "type": "object",
+            "properties": {
+                "country_id": {
+                    "type": "integer",
+                    "example": 2
+                },
+                "description": {
+                    "type": "string",
+                    "example": "An advanced competitive programming team"
+                },
+                "hoa_id": {
+                    "type": "integer",
+                    "example": 6
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Team Beta"
+                },
+                "short_name": {
+                    "type": "string",
+                    "example": "Beta"
+                }
+            }
+        },
+        "schemas.UpdateProblemRequest": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "difficulty": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/schemas.Difficulty"
+                        }
+                    ],
+                    "example": "hard"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "link": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Two Sum Problem"
+                },
+                "platform": {
+                    "type": "string",
+                    "example": "leetcode"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "['array'",
+                        "'hash-table'",
+                        "'two-pointer']"
+                    ]
+                }
+            }
+        },
+        "schemas.UpdateRecentActionRequest": {
+            "type": "object",
+            "properties": {
+                "action_type": {
+                    "type": "string",
+                    "example": "problem_attempted"
+                },
+                "description": {
+                    "type": "string",
+                    "example": "Attempted Two Sum problem"
+                },
+                "entity_id": {
+                    "type": "integer",
+                    "example": 123
+                },
+                "entity_type": {
+                    "type": "string",
+                    "example": "problem"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "schemas.UpdateRoleRequest": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "example": "Can moderate all content"
+                },
+                "type": {
+                    "type": "string",
+                    "example": "Senior Moderator"
+                }
+            }
+        },
+        "schemas.UpdateSessionRequest": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "example": "Updated Introduction to Data Structures"
+                },
+                "end_time": {
+                    "type": "string"
+                },
+                "group_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "host_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "location": {
+                    "type": "string",
+                    "example": "Room 102"
+                },
+                "meeting_link": {
+                    "type": "string",
+                    "example": "https://meet.google.com/new-link"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "DSA Session #1 - Updated"
+                },
+                "start_time": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "completed"
+                }
+            }
+        },
+        "schemas.UpdateStipendRequest": {
+            "type": "object",
+            "properties": {
+                "account_name": {
+                    "type": "string",
+                    "example": "John Doe"
+                },
+                "account_number": {
+                    "type": "string",
+                    "example": "0987654321"
+                },
+                "amount": {
+                    "type": "number",
+                    "example": 550
+                },
+                "bank_name": {
+                    "type": "string",
+                    "example": "New Bank"
+                },
+                "currency": {
+                    "type": "string",
+                    "example": "USD"
+                },
+                "description": {
+                    "type": "string",
+                    "example": "Updated monthly stipend"
+                },
+                "notes": {
+                    "type": "string",
+                    "example": "Payment processed successfully"
+                },
+                "paid_at": {
+                    "type": "string"
+                },
+                "payment_method": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/schemas.PaymentMethod"
+                        }
+                    ],
+                    "example": "mobile_money"
+                },
+                "phone_number": {
+                    "type": "string",
+                    "example": "+1234567890"
+                },
+                "status": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/schemas.PaymentStatus"
+                        }
+                    ],
+                    "example": "payment_approved"
+                },
+                "transaction_id": {
+                    "description": "Payment processing fields",
+                    "type": "string",
+                    "example": "TXN123456"
+                }
+            }
+        },
+        "schemas.UpdateSuperGroupRequest": {
+            "type": "object",
+            "properties": {
+                "country_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "description": {
+                    "type": "string",
+                    "example": "Advanced track of second generation"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "A2SV Generation 2 - Advanced"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "active"
+                }
+            }
+        },
+        "schemas.UpdateTrackRequest": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "example": "Expert level algorithms"
+                },
+                "end_date": {
+                    "type": "string"
+                },
+                "group_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "name": {
+                    "type": "string",
+                    "example": "DSA Expert Track"
+                },
+                "start_date": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "active"
+                },
+                "type": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/schemas.TrackType"
+                        }
+                    ],
+                    "example": "dsa"
+                }
+            }
+        },
+        "schemas.UpdateUserRequest": {
             "type": "object",
             "properties": {
                 "birthday": {
                     "type": "string"
                 },
                 "codeforces": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "cf_user"
+                },
+                "country_id": {
+                    "type": "integer",
+                    "example": 1
                 },
                 "department": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Computer Science"
                 },
                 "email": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "user@example.com"
                 },
                 "expected_graduation_date": {
                     "type": "string"
                 },
+                "gender": {
+                    "type": "string",
+                    "example": "male"
+                },
                 "github": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "github_user"
+                },
+                "group_id": {
+                    "type": "integer",
+                    "example": 1
                 },
                 "hackerrank": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "hr_user"
                 },
                 "instagram": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "insta_user"
                 },
                 "leetcode": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "leetcode_user"
                 },
                 "linkedin": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "linkedin_profile"
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "John Doe"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "MySecret123"
                 },
                 "phone": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "+1234567890"
+                },
+                "preferred_language": {
+                    "type": "string",
+                    "example": "en"
                 },
                 "role_id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 2
+                },
+                "short_bio": {
+                    "type": "string",
+                    "example": "Software developer passionate about algorithms"
                 },
                 "student_id": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "STU123"
                 },
                 "telegram_uid": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "123456789"
                 },
                 "telegram_username": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "@username"
                 },
                 "university": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Example University"
                 }
             }
+        },
+        "schemas.UpdateVoteRequest": {
+            "type": "object",
+            "properties": {
+                "vote_type": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/schemas.VoteType"
+                        }
+                    ],
+                    "example": "downvote"
+                }
+            }
+        },
+        "schemas.VoteType": {
+            "type": "string",
+            "enum": [
+                "upvote",
+                "downvote"
+            ],
+            "x-enum-varnames": [
+                "Upvote",
+                "Downvote"
+            ]
         }
     },
     "securityDefinitions": {
@@ -5376,7 +4762,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "yene-hub-ls0y.onrender.com",
+	Host:             "",
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Hub API",

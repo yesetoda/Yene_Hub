@@ -1,13 +1,12 @@
 package repository
 
 import (
-	"a2sv.org/hub/Delivery/http/schemas"
 	"a2sv.org/hub/Domain/entity"
 )
 
 // RecentActionRepository defines methods for RecentAction data opeRecentActiontions
 type RecentActionRepository interface {
-	CreateRecentAction(RecentAction *schemas.CreateRecentActionRequest) error
+	CreateRecentAction(RecentAction *entity.RecentAction) error
 
 	ListRecentAction() ([]*entity.RecentAction, error)
 
@@ -16,7 +15,7 @@ type RecentActionRepository interface {
 	GetRecentActionByType(actionType string) ([]*entity.RecentAction, error)
 	
 
-	UpdateRecentAction(RecentAction *schemas.UpdateRecentActionRequest) error
+	UpdateRecentAction(RecentAction *entity.RecentAction) error
 
 	DeleteRecentAction(id uint) error
 }
