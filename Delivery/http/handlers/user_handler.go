@@ -31,7 +31,6 @@ func NewUserHandler(userUseCase usecases.UserUseCase) *UserHandler {
 // @Tags users
 // @Accept json
 // @Produce json
-// @Param Authorization header string true "Bearer token"
 // @Param request body schemas.CreateUserRequest true "User creation data"
 // @Success 201 {object} schemas.SuccessResponse "User created successfully"
 // @Failure 400 {object} schemas.ErrorResponse "Invalid request format or validation error"
