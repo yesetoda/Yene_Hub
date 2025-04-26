@@ -25,6 +25,43 @@ func NewUserHandler(userUseCase usecases.UserUseCase) *UserHandler {
 	}
 }
 
+// parseUintParam parses a uint parameter from the path or query and returns an error response if invalid.
+func parseUintParam(c *gin.Context, param string, source string) (uint, bool) {
+	var valueStr string
+	if source == "path" {
+		valueStr = c.Param(param)
+	} else {
+		valueStr = c.Query(param)
+	}
+	value, err := strconv.ParseUint(valueStr, 10, 32)
+	if err != nil || value < 1 {
+		c.JSON(400, schemas.ErrorResponse{
+			Code:    400,
+			Message: "Invalid " + param,
+			Details: param + " must be a positive integer",
+		})
+		return 0, false
+	}
+	return uint(value), true
+}
+
+// respondError standardizes error responses
+func respondError(c *gin.Context, code int, message, details string) {
+	c.JSON(code, schemas.ErrorResponse{
+		Code:    code,
+		Message: message,
+		Details: details,
+	})
+}
+
+// respondSuccess standardizes success responses
+func respondSuccess(c *gin.Context, code int, message string, data interface{}) {
+	c.JSON(code, schemas.SuccessResponse{
+		Message: message,
+		Data:    data,
+	})
+}
+
 // CreateUser handles creating a new user
 // @Summary Create a new user
 // @Description Create a new user account with the provided information
@@ -42,36 +79,21 @@ func NewUserHandler(userUseCase usecases.UserUseCase) *UserHandler {
 func (h *UserHandler) CreateUser(c *gin.Context) {
 	var input schemas.CreateUserRequest
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(400, schemas.ErrorResponse{
-			Code:    400,
-			Message: "Invalid request format",
-			Details: err.Error(),
-		})
+		respondError(c, 400, "Invalid request format", err.Error())
 		return
 	}
 
 	user, err := h.userUseCase.Create(&input)
 	if err != nil {
 		if err.Error() == "email already exists" {
-			c.JSON(409, schemas.ErrorResponse{
-				Code:    409,
-				Message: "User already exists",
-				Details: "A user with this email already exists",
-			})
+			respondError(c, 409, "User already exists", "A user with this email already exists")
 			return
 		}
-		c.JSON(500, schemas.ErrorResponse{
-			Code:    500,
-			Message: "Failed to create user",
-			Details: err.Error(),
-		})
+		respondError(c, 500, "Failed to create user", "Internal server error")
 		return
 	}
 
-	c.JSON(201, schemas.SuccessResponse{
-		Message: "User created successfully",
-		Data:    user,
-	})
+	respondSuccess(c, 201, "User created successfully", user)
 }
 
 // GetUserByID handles retrieving a user by ID
@@ -90,30 +112,18 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 // @Failure 500 {object} schemas.ErrorResponse "Internal server error"
 // @Router /api/users/{id} [get]
 func (h *UserHandler) GetUserByID(c *gin.Context) {
-	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
-	if err != nil {
-		c.JSON(400, schemas.ErrorResponse{
-			Code:    400,
-			Message: "Invalid user ID",
-			Details: "User ID must be a positive integer",
-		})
+	id, ok := parseUintParam(c, "id", "path")
+	if !ok {
 		return
 	}
 
-	user, err := h.userUseCase.GetByID(uint(id))
+	user, err := h.userUseCase.GetByID(id)
 	if err != nil {
-		c.JSON(404, schemas.ErrorResponse{
-			Code:    404,
-			Message: "User not found",
-			Details: err.Error(),
-		})
+		respondError(c, 404, "User not found", "No user with the given ID")
 		return
 	}
 
-	c.JSON(200, schemas.SuccessResponse{
-		Message: "User details retrieved successfully",
-		Data:    user,
-	})
+	respondSuccess(c, 200, "User details retrieved successfully", user)
 }
 
 // UpdateUser handles updating a user's information
@@ -133,48 +143,34 @@ func (h *UserHandler) GetUserByID(c *gin.Context) {
 // @Failure 500 {object} schemas.ErrorResponse "Internal server error"
 // @Router /api/users/{id} [patch]
 func (h *UserHandler) UpdateUser(c *gin.Context) {
-	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
-	if err != nil {
-		c.JSON(400, schemas.ErrorResponse{
-			Code:    400,
-			Message: "Invalid user ID",
-			Details: "User ID must be a positive integer",
-		})
+	id, ok := parseUintParam(c, "id", "path")
+	if !ok {
 		return
 	}
 
 	var input schemas.UpdateUserRequest
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(400, schemas.ErrorResponse{
-			Code:    400,
-			Message: "Invalid request format",
-			Details: err.Error(),
-		})
+		respondError(c, 400, "Invalid request format", err.Error())
 		return
 	}
 
-	err = h.userUseCase.Update(uint(id), &input)
+	err := h.userUseCase.Update(id, &input)
 	if err != nil {
 		if err.Error() == "user not found" {
-			c.JSON(404, schemas.ErrorResponse{
-				Code:    404,
-				Message: "User not found",
-				Details: err.Error(),
-			})
+			respondError(c, 404, "User not found", "No user with the given ID")
 			return
 		}
-		c.JSON(500, schemas.ErrorResponse{
-			Code:    500,
-			Message: "Failed to update user",
-			Details: err.Error(),
-		})
+		respondError(c, 500, "Failed to update user", "Internal server error")
 		return
 	}
 
-	c.JSON(200, schemas.SuccessResponse{
-		Message: "User updated successfully",
-		Data:    input,
-	})
+	// Fetch updated user for response
+	user, err := h.userUseCase.GetByID(id)
+	if err != nil {
+		respondError(c, 500, "Failed to fetch updated user", "Internal server error")
+		return
+	}
+	respondSuccess(c, 200, "User updated successfully", user)
 }
 
 // DeleteUser handles deleting a user
@@ -193,29 +189,16 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 // @Failure 500 {object} schemas.ErrorResponse "Internal server error"
 // @Router /api/users/{id} [delete]
 func (h *UserHandler) DeleteUser(c *gin.Context) {
-	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
-	if err != nil {
-		c.JSON(400, schemas.ErrorResponse{
-			Code:    400,
-			Message: "Invalid user ID",
-			Details: "User ID must be a positive integer",
-		})
+	id, ok := parseUintParam(c, "id", "path")
+	if !ok {
 		return
 	}
 
-	if err := h.userUseCase.Delete(uint(id)); err != nil {
-		c.JSON(500, schemas.ErrorResponse{
-			Code:    500,
-			Message: "Failed to delete user",
-			Details: err.Error(),
-		})
+	if err := h.userUseCase.Delete(id); err != nil {
+		respondError(c, 500, "Failed to delete user", "Internal server error")
 		return
 	}
-
-	c.JSON(200, schemas.SuccessResponse{
-		Message: "User deleted successfully",
-		Data:    nil,
-	})
+	respondSuccess(c, 200, "User deleted successfully", nil)
 }
 
 // ListUsers handles listing users with pagination and filters
@@ -239,57 +222,36 @@ func (h *UserHandler) DeleteUser(c *gin.Context) {
 func (h *UserHandler) ListUsers(c *gin.Context) {
 	var query schemas.UserListQuery
 
-	// Parse page parameter
 	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
 	if err != nil || page < 1 {
-		c.JSON(400, schemas.ErrorResponse{
-			Code:    400,
-			Message: "Invalid page number",
-			Details: "Page number must be a positive integer",
-		})
+		respondError(c, 400, "Invalid page number", "Page number must be a positive integer")
 		return
 	}
 	query.Page = page
 
-	// Parse page_size parameter
 	pageSize, err := strconv.Atoi(c.DefaultQuery("page_size", "10"))
 	if err != nil || pageSize < 1 || pageSize > 100 {
-		c.JSON(400, schemas.ErrorResponse{
-			Code:    400,
-			Message: "Invalid page size",
-			Details: "Page size must be between 1 and 100",
-		})
+		respondError(c, 400, "Invalid page size", "Page size must be between 1 and 100")
 		return
 	}
 	query.PageSize = pageSize
 
-	// Parse search parameter
 	query.Search = c.Query("search")
 
-	// Parse role_id parameter
 	if roleIDStr := c.Query("role_id"); roleIDStr != "" {
 		roleID, err := strconv.ParseUint(roleIDStr, 10, 32)
-		if err != nil {
-			c.JSON(400, schemas.ErrorResponse{
-				Code:    400,
-				Message: "Invalid role ID",
-				Details: "Role ID must be a positive integer",
-			})
+		if err != nil || roleID < 1 {
+			respondError(c, 400, "Invalid role ID", "Role ID must be a positive integer")
 			return
 		}
 		roleIDUint := uint(roleID)
 		query.RoleID = &roleIDUint
 	}
 
-	// Parse group_id parameter
 	if groupIDStr := c.Query("group_id"); groupIDStr != "" {
 		groupID, err := strconv.ParseUint(groupIDStr, 10, 32)
-		if err != nil {
-			c.JSON(400, schemas.ErrorResponse{
-				Code:    400,
-				Message: "Invalid group ID",
-				Details: "Group ID must be a positive integer",
-			})
+		if err != nil || groupID < 1 {
+			respondError(c, 400, "Invalid group ID", "Group ID must be a positive integer")
 			return
 		}
 		groupIDUint := uint(groupID)
@@ -298,18 +260,10 @@ func (h *UserHandler) ListUsers(c *gin.Context) {
 
 	result, err := h.userUseCase.List(&query)
 	if err != nil {
-		c.JSON(500, schemas.ErrorResponse{
-			Code:    500,
-			Message: "Failed to list users",
-			Details: err.Error(),
-		})
+		respondError(c, 500, "Failed to list users", "Internal server error")
 		return
 	}
-
-	c.JSON(200, schemas.SuccessResponse{
-		Message: "List of users retrieved successfully",
-		Data:    result,
-	})
+	respondSuccess(c, 200, "List of users retrieved successfully", result)
 }
 
 // Login handles user authentication
@@ -327,26 +281,14 @@ func (h *UserHandler) ListUsers(c *gin.Context) {
 func (h *UserHandler) Login(c *gin.Context) {
 	var input schemas.LoginRequest
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(400, schemas.ErrorResponse{
-			Code:    400,
-			Message: "Invalid request format",
-			Details: err.Error(),
-		})
+		respondError(c, 400, "Invalid request format", "Check your email and password format.")
 		return
 	}
 
 	result, err := h.userUseCase.Login(input.Email, input.Password)
 	if err != nil {
-		c.JSON(401, schemas.ErrorResponse{
-			Code:    401,
-			Message: "Invalid credentials",
-			Details: err.Error(),
-		})
+		respondError(c, 401, "Invalid credentials", "Email or password is incorrect.")
 		return
 	}
-
-	c.JSON(200, schemas.SuccessResponse{
-		Message: "Login successful",
-		Data:    result,
-	})
+	respondSuccess(c, 200, "Login successful", result)
 }
