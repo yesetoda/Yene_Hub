@@ -284,11 +284,23 @@ func (h *UserHandler) Login(c *gin.Context) {
 		respondError(c, 400, "Invalid request format", "Check your email and password format.")
 		return
 	}
+	// Basic validation
+	if input.Email == "" || input.Password == "" {
+		respondError(c, 400, "Missing credentials", "Email and password are required.")
+		return
+	}
 
 	result, err := h.userUseCase.Login(input.Email, input.Password)
 	if err != nil {
-		respondError(c, 401, "Invalid credentials", "Email or password is incorrect.")
+		if err.Error() == "invalid credentials" {
+			// Optionally log invalid attempts here
+			respondError(c, 401, "Invalid credentials", "Email or password is incorrect.")
+			return
+		}
+		// Internal error
+		respondError(c, 500, "Internal server error", "An unexpected error occurred.")
 		return
 	}
+	// Optionally log successful login here
 	respondSuccess(c, 200, "Login successful", result)
 }
