@@ -26,15 +26,17 @@ func (r *userRepository) CreateUser(user *entity.User) error {
 		return err
 	}
 
-	// Cache the newly created user
+	// Cache the newly created user, including the password
 	_ = r.cacheDetail("byid", user, user.ID)
 	_ = r.cacheDetail("byemail", user, user.Email)
+	_ = r.cacheDetail("password", user.Password, user.Email)
 
 	// Invalidate list caches
 	r.invalidateCache("list", "byname", "bycountryid", "bygroupid")
 
 	return nil
 }
+
 func (r *userRepository) ListUsers(query *schemas.UserListQuery) ([]*entity.User, int, error) {
 	var users []*entity.User
 	err := r.getCachedList("list", &users, func() error {
@@ -50,8 +52,18 @@ func (r *userRepository) GetUserByID(id uint) (*entity.User, error) {
 	err := r.getCachedDetail("byid", &user, func() error {
 		return r.db.First(&user, id).Error
 	}, id)
-
-	return &user, err
+	if err != nil {
+		return nil, err
+	}
+	// Ensure password is present (fetch from password cache if missing)
+	if user.Password == "" {
+		var pw string
+		_ = r.getCachedDetail("password", &pw, func() error {
+			return r.db.Model(&user).Select("password").Where("id = ?", id).Scan(&pw).Error
+		}, user.Email)
+		user.Password = pw
+	}
+	return &user, nil
 }
 
 // GetUserByName retrieves users by name using the cache
@@ -100,8 +112,18 @@ func (r *userRepository) GetUserByEmail(email string) (*entity.User, error) {
 	err := r.getCachedDetail("byemail", &user, func() error {
 		return r.db.Where("email = ?", email).First(&user).Error
 	}, email)
-
-	return &user, err
+	if err != nil {
+		return nil, err
+	}
+	// Ensure password is present (fetch from password cache if missing)
+	if user.Password == "" {
+		var pw string
+		_ = r.getCachedDetail("password", &pw, func() error {
+			return r.db.Model(&user).Select("password").Where("email = ?", email).Scan(&pw).Error
+		}, email)
+		user.Password = pw
+	}
+	return &user, nil
 }
 
 // ListUser retrieves users with pagination using the cache
