@@ -283,6 +283,9 @@ func (u *UserUseCase) Login(email, password string) (*schemas.LoginResponse, err
 	}
 
 	// Verify password
+	fmt.Println("Password:", password)
+	fmt.Println("Hashed Password:", user.Password)
+	fmt.Println("Password error:", bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)) == nil)
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
 		return nil, errors.New("invalid credentials")
 	}
