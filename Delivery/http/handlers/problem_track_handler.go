@@ -29,7 +29,7 @@ func NewProblemTrackHandler(usecase usecases.ProblemTracksUsecaseInterface) *Pro
 // @Success 201 {object} schemas.SuccessResponse
 // @Failure 400 {object} schemas.ErrorResponse
 // @Failure 500 {object} schemas.ErrorResponse
-// @Router /tracks/tid/{track_id}/problems [post]
+// @Router /api/tracks/tid/{track_id}/problems [post]
 func (h *ProblemTrackHandler) AddProblemToTrack(c *gin.Context) {
 	trackID, err := strconv.ParseUint(c.Param("track_id"), 10, 64)
 	if err != nil {
@@ -62,7 +62,7 @@ func (h *ProblemTrackHandler) AddProblemToTrack(c *gin.Context) {
 // @Success 200 {array} schemas.SuccessResponse
 // @Failure 400 {object} schemas.ErrorResponse
 // @Failure 500 {object} schemas.ErrorResponse
-// @Router /tracks/tid/{track_id}/problems [get]
+// @Router /api/tracks/tid/{track_id}/problems [get]
 func (h *ProblemTrackHandler) ListProblemsInTrack(c *gin.Context) {
 	trackID, err := strconv.ParseUint(c.Param("track_id"), 10, 64)
 	if err != nil {
@@ -104,7 +104,7 @@ func (h *ProblemTrackHandler) ListProblemsInTrack(c *gin.Context) {
 // @Failure 400 {object} schemas.ErrorResponse
 // @Failure 404 {object} schemas.ErrorResponse
 // @Failure 500 {object} schemas.ErrorResponse
-// @Router /tracks/tid/{track_id}/problems/by-name [get]
+// @Router /api/tracks/tid/{track_id}/problems/by-name [get]
 func (h *ProblemTrackHandler) GetProblemInTracksByName(c *gin.Context) {
 	trackID, err := strconv.ParseUint(c.Param("track_id"), 10, 64)
 	if err != nil {
@@ -146,7 +146,7 @@ func (h *ProblemTrackHandler) GetProblemInTracksByName(c *gin.Context) {
 // @Success 200 {object} schemas.SuccessResponse
 // @Failure 400 {object} schemas.ErrorResponse
 // @Failure 500 {object} schemas.ErrorResponse
-// @Router /tracks/tid/{track_id}/problems/by-difficulty [get]
+// @Router /api/tracks/tid/{track_id}/problems/by-difficulty [get]
 func (h *ProblemTrackHandler) GetProblemInTracksByDifficulty(c *gin.Context) {
 	trackID, err := strconv.ParseUint(c.Param("track_id"), 10, 64)
 	if err != nil {
@@ -192,7 +192,7 @@ func (h *ProblemTrackHandler) GetProblemInTracksByDifficulty(c *gin.Context) {
 // @Success 200 {object} schemas.SuccessResponse
 // @Failure 400 {object} schemas.ErrorResponse
 // @Failure 500 {object} schemas.ErrorResponse
-// @Router /tracks/tid/{track_id}/problems/by-tag [get]
+// @Router /api/tracks/tid/{track_id}/problems/by-tag [get]
 func (h *ProblemTrackHandler) GetProblemInTracksByTag(c *gin.Context) {
 	trackID, err := strconv.ParseUint(c.Param("track_id"), 10, 64)
 	if err != nil {
@@ -238,7 +238,7 @@ func (h *ProblemTrackHandler) GetProblemInTracksByTag(c *gin.Context) {
 // @Success 200 {object} schemas.SuccessResponse
 // @Failure 400 {object} schemas.ErrorResponse
 // @Failure 500 {object} schemas.ErrorResponse
-// @Router /tracks/tid/{track_id}/problems/by-platform [get]
+// @Router /api/tracks/tid/{track_id}/problems/by-platform [get]
 func (h *ProblemTrackHandler) GetProblemInTracksByPlatform(c *gin.Context) {
 	trackID, err := strconv.ParseUint(c.Param("track_id"), 10, 64)
 	if err != nil {
@@ -282,7 +282,7 @@ func (h *ProblemTrackHandler) GetProblemInTracksByPlatform(c *gin.Context) {
 // @Success 204 {object} schemas.SuccessResponse
 // @Failure 400 {object} schemas.ErrorResponse
 // @Failure 500 {object} schemas.ErrorResponse
-// @Router /problem-tracks/{id} [delete]
+// @Router /api/problem-tracks/{id} [delete]
 func (h *ProblemTrackHandler) RemoveProblemFromTrack(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {

@@ -25,7 +25,7 @@ func NewExerciseHandler(usecase *usecases.ExerciseUseCase) *ExerciseHandler {
 // @Param exercise body schemas.CreateExerciseRequest true "Exercise"
 // @Success 201 {object} schemas.SuccessResponse
 // @Failure 400 {object} schemas.ErrorResponse
-// @Router /exercises [post]
+// @Router /api/exercises [post]
 func (h *ExerciseHandler) CreateExercise(c *gin.Context) {
 	var exercise entity.Exercise
 	if err := c.ShouldBindJSON(&exercise); err != nil {
@@ -57,7 +57,7 @@ func (h *ExerciseHandler) CreateExercise(c *gin.Context) {
 // @Param id path int true "Exercise ID"
 // @Success 200 {object} schemas.SuccessResponse
 // @Failure 404 {object} schemas.ErrorResponse
-// @Router /exercises/{id} [get]
+// @Router /api/exercises/{id} [get]
 func (h *ExerciseHandler) GetExerciseByID(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
@@ -88,7 +88,7 @@ func (h *ExerciseHandler) GetExerciseByID(c *gin.Context) {
 // @Tags Exercises
 // @Produce json
 // @Success 200 {array} schemas.SuccessResponse
-// @Router /exercises [get]
+// @Router /api/exercises [get]
 func (h *ExerciseHandler) ListExercises(c *gin.Context) {
 	exercises, err := h.Usecase.GetAll()
 	if err != nil {
@@ -123,7 +123,7 @@ func (h *ExerciseHandler) ListExercises(c *gin.Context) {
 // @Success 200 {object} schemas.SuccessResponse
 // @Failure 400 {object} schemas.ErrorResponse
 // @Failure 404 {object} schemas.ErrorResponse
-// @Router /exercises/{id} [patch]
+// @Router /api/exercises/{id} [patch]
 func (h *ExerciseHandler) UpdateExercise(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
@@ -153,7 +153,7 @@ func (h *ExerciseHandler) UpdateExercise(c *gin.Context) {
 // @Success 204 {object} schemas.SuccessResponse
 // @Failure 400 {object} schemas.ErrorResponse
 // @Failure 404 {object} schemas.ErrorResponse
-// @Router /exercises/{id} [delete]
+// @Router /api/exercises/{id} [delete]
 func (h *ExerciseHandler) DeleteExercise(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
@@ -177,7 +177,7 @@ func (h *ExerciseHandler) DeleteExercise(c *gin.Context) {
 // @Param group_id path int true "Group ID"
 // @Success 200 {array} schemas.SuccessResponse
 // @Failure 400 {object} schemas.ErrorResponse
-// @Router /groups/gid/:group_id/exercises [get]	
+// @Router /api/groups/gid/:group_id/exercises [get]	
 func (h *ExerciseHandler) GetExercisesByGroupID(c *gin.Context) {
 	groupID, err := strconv.ParseUint(c.Param("group_id"), 10, 64)
 	if err != nil {
@@ -213,7 +213,7 @@ func (h *ExerciseHandler) GetExercisesByGroupID(c *gin.Context) {
 // @Param track_id path int true "Track ID"
 // @Success 200 {array} schemas.SuccessResponse
 // @Failure 400 {object} schemas.ErrorResponse
-// @Router /tracks/tid/:track_id/exercises [get]
+// @Router /api/tracks/tid/:track_id/exercises [get]
 func (h *ExerciseHandler) GetExercisesByTrackID(c *gin.Context) {
 	trackID, err := strconv.ParseUint(c.Param("track_id"), 10, 64)
 	if err != nil {
@@ -249,7 +249,7 @@ func (h *ExerciseHandler) GetExercisesByTrackID(c *gin.Context) {
 // @Param problem_id path int true "Problem ID"
 // @Success 200 {array} schemas.SuccessResponse
 // @Failure 400 {object} schemas.ErrorResponse
-// @Router /problems/pid/:problem_id/exercises [get]
+// @Router /api/problems/pid/:problem_id/exercises [get]
 func (h *ExerciseHandler) GetExercisesByProblemID(c *gin.Context) {
 	problemID, err := strconv.ParseUint(c.Param("problem_id"), 10, 64)
 	if err != nil {
