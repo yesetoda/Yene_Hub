@@ -135,7 +135,7 @@ func (u *UserUseCase) Create(input *schemas.CreateUserRequest) (*schemas.UserRes
 
 	// Send welcome email with password
 	emailContent := fmt.Sprintf("Welcome to A2SV Hub!\n\nYour account has been created successfully.\nYour temporary password is: %s\n\nPlease change your password after logging in.", userPassword)
-	if err := email_services.SendEmail(user.Email, "Welcome to A2SV Hub", emailContent, "https://yene-hub-ls0y.onrender.com/api/auth/login"); err != nil {
+	if err := email_services.SendEmail(user.Email, "Welcome to A2SV Hub", emailContent, "yene-hub-ls0y.onrender.com/api/auth/login"); err != nil {
 		// Log the error but don't fail the request
 		fmt.Fprintf(os.Stderr, "Failed to send welcome email: %v\n", err)
 	}
