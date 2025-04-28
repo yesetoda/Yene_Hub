@@ -36,12 +36,12 @@ func (h *ProblemTrackHandler) AddProblemToTrack(c *gin.Context) {
 		c.JSON(400, schemas.ErrorResponse{Code: http.StatusBadRequest, Message: "Invalid track ID"})
 		return
 	}
-	var problem entity.Problem
-	if err := c.ShouldBindJSON(&problem); err != nil {
+	var Pt schemas.AddProblemToTrackRequest
+	if err := c.ShouldBindJSON(&Pt); err != nil {
 		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Message: err.Error()})
 		return
 	}
-	if err := h.Usecase.AddProblemToTrack(uint(trackID), &problem); err != nil {
+	if err := h.Usecase.AddProblemToTrack(uint(trackID), Pt.ProblemID); err != nil {
 		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: err.Error()})
 		return
 	}

@@ -17,9 +17,9 @@ func NewProblemInTracksRepository(db *gorm.DB) repository.ProblemInTracksReposit
 }
 
 // AddProblemToTrack adds a problem to a track (creates a ProblemTrack row)
-func (r *ProblemInTracksRepository) AddProblemToTrack(trackID uint, problem *entity.Problem) error {
+func (r *ProblemInTracksRepository) AddProblemToTrack(trackID uint, problemID uint) error {
 	pt := &entity.ProblemTrack{
-		ProblemID: problem.ID,
+		ProblemID: problemID,
 		TrackID:   trackID,
 	}
 	return r.db.Create(pt).Error

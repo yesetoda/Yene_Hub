@@ -7,7 +7,7 @@ import(
 // ProblemTracksRepository defines methods for Problem Tracks data operations
 
 type ProblemInTracksRepository interface {
-	AddProblemToTrack(trackID uint,Problem *entity.Problem) error
+	AddProblemToTrack(trackID uint,problemID uint) error
 
 	ListProblemsInTrack(trackID uint) ([]*entity.Problem, error)
 

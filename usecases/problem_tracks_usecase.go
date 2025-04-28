@@ -6,7 +6,7 @@ import (
 )
 
 type ProblemTracksUsecaseInterface interface {
-	AddProblemToTrack(trackID uint, Problem *entity.Problem) error
+	AddProblemToTrack(trackID , problemID uint) error
 	ListProblemsInTrack(trackID uint) ([]*entity.Problem, error)
 	GetProblemInTracksByName(trackID uint, name string) (*entity.Problem, error)
 	GetProblemInTracksByDifficulty(trackID uint, difficulty string) ([]*entity.Problem, error)
@@ -23,8 +23,8 @@ func NewProblemTracksUsecase(repo repository.ProblemInTracksRepository) *Problem
 	return &ProblemTracksUsecase{repo: repo}
 }
 
-func (u *ProblemTracksUsecase) AddProblemToTrack(trackID uint, problem *entity.Problem) error {
-	return u.repo.AddProblemToTrack(trackID, problem)
+func (u *ProblemTracksUsecase) AddProblemToTrack(trackID uint, problemID uint) error {
+	return u.repo.AddProblemToTrack(trackID, problemID)
 }
 
 func (u *ProblemTracksUsecase) ListProblemsInTrack(trackID uint) ([]*entity.Problem, error) {
