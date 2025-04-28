@@ -814,7 +814,7 @@ definitions:
     x-enum-varnames:
     - Upvote
     - Downvote
-host: https://yene-hub-ls0y.onrender.com
+host: yene-hub-ls0y.onrender.com
 info:
   contact:
     email: support@hub.a2sv.org
