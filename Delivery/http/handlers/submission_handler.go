@@ -100,6 +100,7 @@ func (s *SubmissionHandler) GetSubmissionByID(c *gin.Context) {
 // @Router /api/submissions/problem/{problem_id} [get]
 func (s *SubmissionHandler) GetSubmissionByProblemID(c *gin.Context) {
 	problemID := c.Param("id")
+	
 	pid, err := strconv.Atoi(problemID)
 	if err != nil {
 		c.JSON(400, schemas.ErrorResponse{Code: 400, Message: "Invalid problem ID", Details: err.Error()})

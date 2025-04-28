@@ -104,9 +104,12 @@ func SetupRouter(
 		// User routes
 		users := api.Group("/users")
 		{
-			users.POST("", RoleMiddleware.RoleMiddleware("Head of Academy"), userHandler.CreateUser)
-			users.PATCH("/:id", RoleMiddleware.RoleMiddleware("Head of Academy"), RoleMiddleware.SelfMiddleware(), userHandler.UpdateUser)
-			users.DELETE("/:id", RoleMiddleware.RoleMiddleware("Head of Academy"), userHandler.DeleteUser)
+			// users.POST("", RoleMiddleware.RoleMiddleware("Head of Academy"), userHandler.CreateUser)
+			// users.PATCH("/:id", RoleMiddleware.RoleMiddleware("Head of Academy"), RoleMiddleware.SelfMiddleware(), userHandler.UpdateUser)
+			// users.DELETE("/:id", RoleMiddleware.RoleMiddleware("Head of Academy"), userHandler.DeleteUser)
+			users.POST("", userHandler.CreateUser)
+			users.PATCH("/:id", userHandler.UpdateUser)
+			users.DELETE("/:id", userHandler.DeleteUser)
 
 			users.GET("", userHandler.ListUsers)
 			users.GET("/:id", userHandler.GetUserByID)
