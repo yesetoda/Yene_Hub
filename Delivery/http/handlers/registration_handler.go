@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"a2sv.org/hub/Delivery/http/schemas"
 	"a2sv.org/hub/usecases"
 	"github.com/gin-gonic/gin"
 )
@@ -54,35 +55,32 @@ type RegistrationParam struct {
 func (h *RegistrationHandler) RegisterBulkUsers(c *gin.Context) {
 	var request BulkRegistrationRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error":   "Invalid request body",
-			"details": err.Error(),
-		})
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Code: 400, Message: "Invalid request body"})
 		return
 	}
 
 	// Validate role ID (must be positive)
 	if request.RoleID <= 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid role ID"})
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Code: 400, Message: "Invalid role ID"})
 		return
 	}
 
 	// Validate group ID (must be positive)
 	if request.GroupID <= 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid group ID"})
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Code: 400, Message: "Invalid group ID"})
 		return
 	}
 
 	// Validate country ID if provided (must be positive)
 	if request.CountryID != nil && *request.CountryID <= 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid country ID"})
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Code: 400, Message: "Invalid country ID"})
 		return
 	}
 
 	// Register users
 	results, err := h.bulkRegistrationUseCase.RegisterUsers(request.Emails, request.RoleID, request.GroupID, request.CountryID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Code: 500, Message: "Internal server error"})
 		return
 	}
 
@@ -94,12 +92,16 @@ func (h *RegistrationHandler) RegisterBulkUsers(c *gin.Context) {
 		}
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message":    "Bulk registration processed",
-		"total":      len(results),
-		"successful": successCount,
-		"failed":     len(results) - successCount,
-		"results":    results,
+	c.JSON(http.StatusOK, schemas.SuccessResponse{
+		Success: true,
+		Code:    200,
+		Message: "Bulk registration processed",
+		Data: map[string]interface{}{
+			"total":      len(results),
+			"successful": successCount,
+			"failed":     len(results) - successCount,
+			"results":    results,
+		},
 	})
 }
 
@@ -120,36 +122,33 @@ func (h *RegistrationHandler) RegisterUsersWithRole(c *gin.Context) {
 	roleIDStr := c.Param("role_id")
 	roleID, err := strconv.ParseUint(roleIDStr, 10, 32)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid role ID format"})
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Code: 400, Message: "Invalid role ID format"})
 		return
 	}
 
 	// Get emails and required IDs from request body
 	var request RegistrationParam
 	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error":   "Invalid request body",
-			"details": "The request must include 'emails' and 'group_id' fields",
-		})
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Code: 400, Message: "Invalid request body"})
 		return
 	}
 
 	// Validate group ID (must be positive)
 	if request.GroupID <= 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid group ID"})
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Code: 400, Message: "Invalid group ID"})
 		return
 	}
 
 	// Validate country ID if provided (must be positive)
 	if request.CountryID != nil && *request.CountryID <= 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid country ID"})
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Code: 400, Message: "Invalid country ID"})
 		return
 	}
 
 	// Register users
 	results, err := h.bulkRegistrationUseCase.RegisterUsers(request.Emails, uint(roleID), request.GroupID, request.CountryID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Code: 500, Message: "Internal server error"})
 		return
 	}
 
@@ -161,12 +160,16 @@ func (h *RegistrationHandler) RegisterUsersWithRole(c *gin.Context) {
 		}
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message":    "Bulk registration processed",
-		"total":      len(results),
-		"successful": successCount,
-		"failed":     len(results) - successCount,
-		"results":    results,
+	c.JSON(http.StatusOK, schemas.SuccessResponse{
+		Success: true,
+		Code:    200,
+		Message: "Bulk registration processed",
+		Data: map[string]interface{}{
+			"total":      len(results),
+			"successful": successCount,
+			"failed":     len(results) - successCount,
+			"results":    results,
+		},
 	})
 }
 

@@ -60,6 +60,8 @@ func (h *RoleHandler) CreateRole(c *gin.Context) {
 	}
 
 	c.JSON(201, schemas.SuccessResponse{
+		Success: true,
+		Code:    201,
 		Message: "Role created successfully",
 		Data:    createdRole,
 	})
@@ -102,6 +104,8 @@ func (h *RoleHandler) GetRoleByID(c *gin.Context) {
 	}
 
 	c.JSON(200, schemas.SuccessResponse{
+		Success: true,
+		Code:    200,
 		Message: "Role details retrieved successfully",
 		Data:    role,
 	})
@@ -160,6 +164,7 @@ func (h *RoleHandler) UpdateRole(c *gin.Context) {
 			return
 		}
 		c.JSON(500, schemas.ErrorResponse{
+			Success: false,
 			Code:    500,
 			Message: "Failed to update role",
 			Details: err.Error(),
@@ -168,6 +173,8 @@ func (h *RoleHandler) UpdateRole(c *gin.Context) {
 	}
 
 	c.JSON(200, schemas.SuccessResponse{
+		Success: true,
+		Code:    200,
 		Message: "Role updated successfully",
 		Data:    updatedRole,
 	})
@@ -209,6 +216,7 @@ func (h *RoleHandler) DeleteRole(c *gin.Context) {
 			return
 		}
 		c.JSON(500, schemas.ErrorResponse{
+			Success: false,
 			Code:    500,
 			Message: "Failed to delete role",
 			Details: err.Error(),
@@ -217,6 +225,8 @@ func (h *RoleHandler) DeleteRole(c *gin.Context) {
 	}
 
 	c.JSON(200, schemas.SuccessResponse{
+		Success: true,
+		Code:    200,
 		Message: "Role deleted successfully",
 	})
 }
@@ -260,6 +270,7 @@ func (h *RoleHandler) ListRoles(c *gin.Context) {
 	roles, _, err := h.roleUseCase.List()
 	if err != nil {
 		c.JSON(500, schemas.ErrorResponse{
+			Success: false,
 			Code:    500,
 			Message: "Failed to list roles",
 			Details: err.Error(),
@@ -280,6 +291,9 @@ func (h *RoleHandler) ListRoles(c *gin.Context) {
 	}
 
 	c.JSON(200, schemas.SuccessResponse{
+		Success: true,
+		Code:    200,
 		Message: "List of roles retrieved successfully",
+		Data:    roleResponses,
 	})
 }

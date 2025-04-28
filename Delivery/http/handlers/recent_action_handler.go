@@ -49,6 +49,8 @@ func (h *RecentActionHandler) CreateRecentAction(c *gin.Context) {
 	}
 	// Return a success response
 	resp := schemas.SuccessResponse{
+		Success: true,
+		Code:    201,
 		Message: "Recent action created successfully",
 		Data:    recentAction,
 	}
@@ -71,7 +73,9 @@ func (h *RecentActionHandler) ListRecentActions(c *gin.Context) {
 		return
 	}
 	resp := schemas.SuccessResponse{
-		Message: "Recent actions fetched successfully",
+		Success: true,
+		Code:    200,
+			Message: "Recent actions fetched successfully",
 		Data:    recentActions,
 	}
 	// Return the list of recent actions
@@ -108,6 +112,8 @@ func (h *RecentActionHandler) GetRecentActionByUserID(c *gin.Context) {
 		return
 	}
 	resp := schemas.SuccessResponse{
+		Success: true,
+		Code:    200,
 		Message: "Fetched recent actions for user:" + uid,
 		Data:    recentActions,
 	}
@@ -150,6 +156,8 @@ func (h *RecentActionHandler) GetRecentActionByID(c *gin.Context) {
 		return
 	}
 	resp := schemas.SuccessResponse{
+		Success: true,
+		Code:    200,
 		Message: "Fetched recent actions by ID:" + id,
 		Data:    recentActions,
 	}
@@ -181,7 +189,9 @@ func (h *RecentActionHandler) GetRecentActionByType(c *gin.Context) {
 		return
 	}
 	resp := schemas.SuccessResponse{
-		Message: "Fetched recent actions by type:" + actionType,
+		Success: true,
+		Code:    200,
+			Message: "Fetched recent actions by type:" + actionType,
 		Data:    recentActions,
 	}
 	// Return the list of recent actions for the action type
@@ -231,6 +241,8 @@ func (h *RecentActionHandler) UpdateRecentAction(c *gin.Context) {
 		return
 	}
 	resp := schemas.SuccessResponse{
+		Success: true,
+		Code:    200,
 		Message: "Recent action updated successfully",
 		Data:    recentAction,
 	}
@@ -273,6 +285,8 @@ func (h *RecentActionHandler) DeleteRecentAction(c *gin.Context) {
 	}
 	// Return a success response
 	resp := schemas.SuccessResponse{
+		Success: true,
+		Code:    200,
 		Message: "Recent action deleted successfully",
 		Data:    nil,
 	}

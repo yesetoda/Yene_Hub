@@ -12,6 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"gorm.io/gorm"
 )
 
 // SetupRouter configures all the routes for the application
@@ -44,6 +45,9 @@ func SetupRouter(
 	stippendUsecase usecases.StipendUsecase,
 	problemUsecase usecases.ProblemUsecase,
 	sessionUsecase usecases.SessionUsecase,
+	problemTrackUsecase usecases.ProblemTracksUsecase,
+	exerciseUsecase usecases.ExerciseUseCase,
+	db *gorm.DB, // assuming you have a gorm.DB instance
 
 ) *gin.Engine {
 	// Create a new gin router with default middleware
@@ -81,6 +85,10 @@ func SetupRouter(
 	problemHandler := handlers.NewProblemHandler(&problemUsecase)
 	recentActionHandler := handlers.NewRecentActionHandler(recentActionUseCase)
 	sessionHandler := handlers.NewSessionHandler(sessionUsecase)
+
+	problemTrackHandler := handlers.NewProblemTrackHandler(&problemTrackUsecase)
+	exerciseHandler := handlers.NewExerciseHandler(&exerciseUsecase)
+
 	// API routes group
 	api := router.Group("/api")
 	{
@@ -96,8 +104,8 @@ func SetupRouter(
 		// User routes
 		users := api.Group("/users")
 		{
-			users.POST("", userHandler.CreateUser)
-			users.PATCH("/:id", RoleMiddleware.RoleMiddleware("Head of Academy"), userHandler.UpdateUser)
+			users.POST("", RoleMiddleware.RoleMiddleware("Head of Academy"), userHandler.CreateUser)
+			users.PATCH("/:id", RoleMiddleware.RoleMiddleware("Head of Academy"), RoleMiddleware.SelfMiddleware(), userHandler.UpdateUser)
 			users.DELETE("/:id", RoleMiddleware.RoleMiddleware("Head of Academy"), userHandler.DeleteUser)
 
 			users.GET("", userHandler.ListUsers)
@@ -197,16 +205,7 @@ func SetupRouter(
 		}
 
 		// Track routes
-		tracks := api.Group("/tracks")
-		{
-			tracks.POST("", trackHandler.CreateTrack)
-			tracks.GET("", trackHandler.ListTrack)
-			tracks.GET("/:id", trackHandler.GetTrackByID)
-			tracks.GET("/name/:name", trackHandler.GetTrackByName)
-			tracks.PATCH("/:id", trackHandler.UpdateTrack)
-			tracks.DELETE("/:id", trackHandler.DeleteTrack)
-		}
-
+		
 		// SuperToGroup routes
 		superToGroups := api.Group("/super_to_groups")
 		{
@@ -236,6 +235,46 @@ func SetupRouter(
 			stipends.PATCH("/:id", stippendHandler.UpdateStipend)
 			stipends.DELETE("/:id", stippendHandler.DeleteStipend)
 		}
+
+		// ProblemTracks routes
+		tracks := api.Group("/tracks")
+		{
+			tracks.POST("", trackHandler.CreateTrack)
+			tracks.GET("", trackHandler.ListTrack)
+			tracks.GET("/:id", trackHandler.GetTrackByID)
+			tracks.GET("/name/:name", trackHandler.GetTrackByName)
+			tracks.PATCH("/:id", trackHandler.UpdateTrack)
+			tracks.DELETE("/:id", trackHandler.DeleteTrack)
+			
+			problemTracks := tracks.Group("/tid/:track_id/problems")
+			{
+				problemTracks.POST("", problemTrackHandler.AddProblemToTrack)
+				problemTracks.GET("", problemTrackHandler.ListProblemsInTrack)
+				problemTracks.GET("/by-name", problemTrackHandler.GetProblemInTracksByName)
+				problemTracks.GET("/by-difficulty", problemTrackHandler.GetProblemInTracksByDifficulty)
+				problemTracks.GET("/by-tag", problemTrackHandler.GetProblemInTracksByTag)
+				problemTracks.GET("/by-platform", problemTrackHandler.GetProblemInTracksByPlatform)
+			}
+		}
+
+		api.DELETE("/problem-tracks/:id", problemTrackHandler.RemoveProblemFromTrack)
+
+		// Exercise routes
+		exercises := api.Group("/exercises")
+		{
+			exercises.POST("", exerciseHandler.CreateExercise)
+			exercises.GET("", exerciseHandler.ListExercises)
+			exercises.GET("/:id", exerciseHandler.GetExerciseByID)
+			exercises.PATCH("/:id", exerciseHandler.UpdateExercise)
+			exercises.DELETE("/:id", exerciseHandler.DeleteExercise)
+		}
+
+		// Group-level exercises
+		api.GET("/groups/gid/:group_id/exercises", exerciseHandler.GetExercisesByGroupID)
+		// Track-level exercises
+		api.GET("/tracks/tid/:track_id/exercises", exerciseHandler.GetExercisesByTrackID)
+		// Problem-level exercises
+		api.GET("/problems/pid/:problem_id/exercises", exerciseHandler.GetExercisesByProblemID)
 	}
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{

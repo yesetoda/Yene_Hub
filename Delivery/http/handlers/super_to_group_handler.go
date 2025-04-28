@@ -54,7 +54,7 @@ func (h *SuperToGroupHandler) CreateSuperToGroup(c *gin.Context) {
 		c.JSON(500, schemas.ErrorResponse{Code: 500, Message: "Failed to add groups to super group", Details: err.Error()})
 		return
 	}
-	c.JSON(201, schemas.SuccessResponse{Message: "Groups added to super group successfully"})
+	c.JSON(201, schemas.SuccessResponse{Success: true, Code: 201, Message: "Groups added to super group successfully"})
 }
 
 // ListSuperToGroup handles listing all super to groups
@@ -67,14 +67,11 @@ func (h *SuperToGroupHandler) CreateSuperToGroup(c *gin.Context) {
 func (h *SuperToGroupHandler) ListSuperToGroup(c *gin.Context) {
 	superToGroups, err := h.SuperToGroupUseCase.ListSuperToGroup()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Code: 500, Message: "Internal server error", Details: err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Super to groups retrieved successfully",
-		"data":    superToGroups,
-	})
+	c.JSON(http.StatusOK, schemas.SuccessResponse{Success: true, Code: 200, Message: "Super to groups retrieved successfully", Data: superToGroups})
 }
 
 // GetSuperToGroupByID handles getting a super to group by ID
@@ -91,12 +88,12 @@ func (h *SuperToGroupHandler) GetSuperToGroupByID(c *gin.Context) {
 	superToGroupID := c.Param("superToGroupID")
 	stgid, err := strconv.Atoi(superToGroupID)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Code: 400, Message: "Invalid ID"})
 		return
 	}
 	superToGroup, err := h.SuperToGroupUseCase.GetSuperToGroupByID(uint(stgid))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Code: 500, Message: "Internal server error", Details: err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -122,24 +119,21 @@ func (h *SuperToGroupHandler) UpdateSuperToGroup(c *gin.Context) {
 	superToGroupID := c.Param("superToGroupID")
 	stgid, err := strconv.Atoi(superToGroupID)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Code: 400, Message: "Invalid ID"})
 		return
 	}
 	var superToGroup *entity.SuperToGroup
 	if err := c.ShouldBindJSON(&superToGroup); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Code: 400, Message: "Invalid request body", Details: err.Error()})
 		return
 	}
 	superToGroup.ID = uint(stgid)
 	err = h.SuperToGroupUseCase.UpdateSuperToGroup(superToGroup)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Code: 500, Message: "Internal server error", Details: err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Super to group updated successfully",
-		"data":    superToGroup,
-	})
+	c.JSON(http.StatusOK, schemas.SuccessResponse{Success: true, Code: 200, Message: "Super to group updated successfully", Data: superToGroup})
 }
 
 // DeleteSuperToGroup handles deleting a super to group
@@ -156,15 +150,13 @@ func (h *SuperToGroupHandler) DeleteSuperToGroup(c *gin.Context) {
 	superToGroupID := c.Param("superToGroupID")
 	stgid, err := strconv.Atoi(superToGroupID)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Code: 400, Message: "Invalid ID"})
 		return
 	}
 	err = h.SuperToGroupUseCase.DeleteSuperToGroup(uint(stgid))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Code: 500, Message: "Internal server error", Details: err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Super to group deleted successfully",
-	})
+	c.JSON(http.StatusOK, schemas.SuccessResponse{Success: true, Code: 200, Message: "Super to group deleted successfully"})
 }

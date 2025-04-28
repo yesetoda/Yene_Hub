@@ -10,6 +10,7 @@ import (
 	"a2sv.org/hub/Repository/postgres"
 	"a2sv.org/hub/infrastructure"
 	"a2sv.org/hub/usecases"
+
 	"github.com/joho/godotenv"
 )
 
@@ -21,7 +22,7 @@ import (
 // @contact.email  support@hub.a2sv.org
 // @license.name  MIT
 // @license.url   https://opensource.org/licenses/MIT
-// @host
+// @host      https://yene-hub-ls0y.onrender.com
 // @BasePath  /
 // @securityDefinitions.apikey BearerAuth
 // @in header
@@ -56,6 +57,8 @@ func main() {
 	superToGroupRepo := postgres.NewSuperToGroupRepository(db) // should implement repository.SuperToGroupRepository
 	problemRepo := postgres.NewProblemRepository(db)           // should implement repository.ProblemRepository
 	sessionRepo := postgres.NewSessionRepository(db)           // should implement repository.SessionRepository
+	problemTrackRepo := postgres.NewProblemInTracksRepository(db) // should implement repository.ProblemInTracksRepository
+	exerciseRepo := postgres.NewExerciseRepository(db) // implement repository.ExerciseRepository
 
 	// Initialize use case
 	userUseCase := usecases.NewUserUseCase(userRepo)
@@ -72,6 +75,8 @@ func main() {
 	superToGroupUseCase := usecases.NewSuperToGroupUsecase(superToGroupRepo)
 	problemUseCase := usecases.NewProblemUsecase(problemRepo)
 	sessionUsecase := usecases.NewSessionUsecase(sessionRepo)
+	problemTrackUsecase := usecases.NewProblemTracksUsecase(problemTrackRepo)
+	exerciseUsecase := usecases.NewExerciseUseCase(exerciseRepo)
 	// Setup router
 	router := deliveryHttp.SetupRouter(
 		*userUseCase,
@@ -88,6 +93,9 @@ func main() {
 		*stippendUseCase,
 		*problemUseCase,
 		*sessionUsecase,
+		*problemTrackUsecase,
+		*exerciseUsecase, // pass as value for compatibility with router signature
+		db,
 	)
 	// Print all registered routes for debugging
 	log.Println("Routes registered successfully")

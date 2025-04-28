@@ -66,6 +66,7 @@ func (r *BaseRepository) getCachedDetail(operation string, result interface{}, l
 	}
 
 	return json.Unmarshal([]byte(data), result)
+	
 }
 
 // cacheList caches a list of entities
@@ -77,6 +78,7 @@ func (r *BaseRepository) cacheList(operation string, data interface{}, params ..
 
 	key := r.getCacheKey(operation, params...)
 	return caching.SetRedisValue(key, string(jsonData))
+	// return fmt.Errorf("intensionaly disabled caching")
 }
 
 // getCachedList retrieves a cached list

@@ -43,7 +43,7 @@ func (h *VoteHandler) CreateVote(c *gin.Context) {
 		return
 	}
 	// Return the created vote
-	c.JSON(http.StatusCreated, schemas.SuccessResponse{Message: "Vote created successfully", Data: vote})
+	c.JSON(http.StatusCreated, schemas.SuccessResponse{Success: true, Code: http.StatusCreated, Message: "Vote created successfully", Data: vote})
 }
 
 // ListVote handles listing votes
@@ -61,7 +61,7 @@ func (h *VoteHandler) ListVote(c *gin.Context) {
 		return
 	}
 	// Return the created vote
-	c.JSON(http.StatusOK, schemas.SuccessResponse{Message: "List of votes", Data: votes})
+	c.JSON(http.StatusOK, schemas.SuccessResponse{Success: true, Code: http.StatusOK, Message: "List of votes", Data: votes})
 }
 
 // GetVoteByID handles getting a vote by ID
@@ -90,7 +90,7 @@ func (h *VoteHandler) GetVoteByID(c *gin.Context) {
 		return
 	}
 	// Return the vote
-	c.JSON(http.StatusOK, schemas.SuccessResponse{Message: "Vote details", Data: vote})
+	c.JSON(http.StatusOK, schemas.SuccessResponse{Success: true, Code: http.StatusOK, Message: "Vote details", Data: vote})
 }
 
 // GetVoteByCommentID handles getting votes by comment ID
@@ -118,7 +118,7 @@ func (h *VoteHandler) GetVoteByCommentID(c *gin.Context) {
 		return
 	}
 	// Return the vote
-	c.JSON(http.StatusOK, schemas.SuccessResponse{Message: "Votes for comment", Data: vote})
+	c.JSON(http.StatusOK, schemas.SuccessResponse{Success: true, Code: http.StatusOK, Message: "Votes for comment", Data: vote})
 }
 
 // GetVoteByPostID handles getting votes by post ID
@@ -146,7 +146,7 @@ func (h *VoteHandler) GetVoteByPostID(c *gin.Context) {
 		return
 	}
 	// Return the vote
-	c.JSON(http.StatusOK, schemas.SuccessResponse{Message: "Votes for post", Data: vote})
+	c.JSON(http.StatusOK, schemas.SuccessResponse{Success: true, Code: http.StatusOK, Message: "Votes for post", Data: vote})
 }
 
 // GetVoteByUserID handles getting votes by user ID
@@ -174,7 +174,7 @@ func (h *VoteHandler) GetVoteByUserID(c *gin.Context) {
 		return
 	}
 	// Return the vote
-	c.JSON(http.StatusOK, schemas.SuccessResponse{Message: "Votes for user", Data: vote})
+	c.JSON(http.StatusOK, schemas.SuccessResponse{Success: true, Code: http.StatusOK, Message: "Votes for user", Data: vote})
 }
 
 // GetVoteByTrackID handles getting votes by track ID
@@ -202,7 +202,7 @@ func (h *VoteHandler) GetVoteByTrackID(c *gin.Context) {
 		return
 	}
 	// Return the vote
-	c.JSON(http.StatusOK, schemas.SuccessResponse{Message: "Votes for track", Data: vote})
+	c.JSON(http.StatusOK, schemas.SuccessResponse{Success: true, Code: http.StatusOK, Message: "Votes for track", Data: vote})
 }
 
 // GetVoteBySubmissionID handles getting votes by submission ID
@@ -230,7 +230,7 @@ func (h *VoteHandler) GetVoteBySubmissionID(c *gin.Context) {
 		return
 	}
 	// Return the vote
-	c.JSON(http.StatusOK, schemas.SuccessResponse{Message: "Votes for submission", Data: vote})
+	c.JSON(http.StatusOK, schemas.SuccessResponse{Success: true, Code: http.StatusOK, Message: "Votes for submission", Data: vote})
 }
 
 // GetVoteByProblemID handles getting votes by problem ID
@@ -258,7 +258,7 @@ func (h *VoteHandler) GetVoteByProblemID(c *gin.Context) {
 		return
 	}
 	// Return the vote
-	c.JSON(http.StatusOK, schemas.SuccessResponse{Message: "Votes for problem", Data: vote})
+	c.JSON(http.StatusOK, schemas.SuccessResponse{Success: true, Code: http.StatusOK, Message: "Votes for problem", Data: vote})
 }
 
 // UpdateVote handles updating a vote
@@ -295,7 +295,7 @@ func (h *VoteHandler) UpdateVote(c *gin.Context) {
 		return
 	}
 	// Return the updated vote
-	c.JSON(http.StatusOK, schemas.SuccessResponse{Message: "Vote updated successfully", Data: vote})
+	c.JSON(http.StatusOK, schemas.SuccessResponse{Success: true, Code: http.StatusOK, Message: "Vote updated successfully", Data: vote})
 }
 
 // DeleteVote handles deleting a vote
@@ -323,7 +323,7 @@ func (h *VoteHandler) DeleteVote(c *gin.Context) {
 		return
 	}
 	// Return a success message
-	c.JSON(http.StatusOK, schemas.SuccessResponse{Message: "Vote deleted successfully"})
+	c.JSON(http.StatusOK, schemas.SuccessResponse{Success: true, Code: http.StatusOK, 	Message: "Vote deleted successfully"})
 }
 
 // ForceSwaggoParse is a dummy function to ensure Swaggo parses this file.

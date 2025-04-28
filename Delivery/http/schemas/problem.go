@@ -21,7 +21,7 @@ type CreateProblemRequest struct {
 	Difficulty  Difficulty `json:"difficulty" binding:"required" example:"medium"`
 	Link        string     `json:"link" binding:"required" example:"https://leetcode.com/problems/two-sum"`
 	Platform    string     `json:"platform" binding:"required" example:"leetcode"`
-	Tags        []string   `json:"tags" example:"['array','hash-table']"`
+	Tag        []string   `json:"tags" example:"['array','hash-table']"`
 }
 
 // UpdateProblemRequest represents the request body for updating a problem
@@ -33,7 +33,7 @@ type UpdateProblemRequest struct {
 	Difficulty   *Difficulty `json:"difficulty,omitempty" example:"hard"`
 	Link         *string     `json:"link,omitempty"`
 	Platform     *string     `json:"platform,omitempty" example:"leetcode"`
-	Tags         []string    `json:"tags,omitempty" example:"['array','hash-table','two-pointer']"`
+	Tag         []string    `json:"tag,omitempty" example:"['array','hash-table','two-pointer']"`
 }
 
 // ProblemResponse represents a problem in responses
@@ -45,7 +45,7 @@ type ProblemResponse struct {
 	Difficulty   Difficulty `json:"difficulty" example:"medium"`
 	Link         string     `json:"link" example:"https://leetcode.com/problems/two-sum"`
 	Platform     string     `json:"platform" example:"leetcode"`
-	Tags         []string   `json:"tags" example:"['array','hash-table']"`
+	Tag         []string   `json:"tags" example:"['array','hash-table']"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
@@ -58,7 +58,7 @@ type ProblemListQuery struct {
 	Search     string      `form:"search" example:"two sum"`
 	Difficulty *Difficulty `form:"difficulty" example:"medium"`
 	Platform   *string     `form:"platform" example:"leetcode"`
-	Tags       []string    `form:"tags" example:"array,hash-table"`
+	Tag       []string    `form:"tags" example:"array,hash-table"`
 }
 
 // ProblemListResponse represents paginated problem results

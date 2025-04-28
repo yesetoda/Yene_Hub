@@ -6,6 +6,7 @@ import (
 
 	"a2sv.org/hub/Domain/entity"
 	"a2sv.org/hub/usecases"
+	"a2sv.org/hub/Delivery/http/schemas"
 	"github.com/gin-gonic/gin"
 )
 
@@ -34,20 +35,17 @@ func (h *SuperGroupHandler) CreateSuperGroup(c *gin.Context) {
 	var superGroup *entity.SuperGroup
 
 	if err := c.ShouldBindJSON(&superGroup); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Code: 400, Message: "Invalid request body", Details: err.Error()})
 		return
 	}
 
 	superGroup, err := h.superGroupUseCase.Create(superGroup)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Code: 500, Message: "Internal server error", Details: err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{
-		"message": "Super group created successfully",
-		"data":    superGroup,
-	})
+	c.JSON(http.StatusCreated, schemas.SuccessResponse{Success: true, Code: 201, Message: "Super group created successfully", Data: superGroup})
 }
 
 // GetSuperGroup handles getting a super group by ID
@@ -63,20 +61,17 @@ func (h *SuperGroupHandler) CreateSuperGroup(c *gin.Context) {
 func (h *SuperGroupHandler) GetSuperGroup(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Code: 400, Message: "Invalid ID"})
 		return
 	}
 
 	superGroup, err := h.superGroupUseCase.GetByID(uint(id))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusNotFound, schemas.ErrorResponse{Code: 404, Message: "Super group not found", Details: err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Super group retrieved successfully",
-		"data":    superGroup,
-	})
+	c.JSON(http.StatusOK, schemas.SuccessResponse{Success: true, Code: 200, Message: "Super group retrieved successfully", Data: superGroup})
 }
 
 // UpdateSuperGroup handles updating a super group
@@ -94,27 +89,24 @@ func (h *SuperGroupHandler) GetSuperGroup(c *gin.Context) {
 func (h *SuperGroupHandler) UpdateSuperGroup(c *gin.Context) {
 	_, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Code: 400, Message: "Invalid ID"})
 		return
 	}
 
 	var superGroup *entity.SuperGroup
 
 	if err := c.ShouldBindJSON(&superGroup); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Code: 400, Message: "Invalid request body", Details: err.Error()})
 		return
 	}
 
 	err = h.superGroupUseCase.Update(superGroup)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Code: 500, Message: "Internal server error", Details: err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Super group updated successfully",
-		"data":    superGroup,
-	})
+	c.JSON(http.StatusOK, schemas.SuccessResponse{Success: true, Code: 200, Message: "Super group updated successfully", Data: superGroup})
 }
 
 // DeleteSuperGroup handles deleting a super group
@@ -130,18 +122,16 @@ func (h *SuperGroupHandler) UpdateSuperGroup(c *gin.Context) {
 func (h *SuperGroupHandler) DeleteSuperGroup(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Code: 400, Message: "Invalid ID"})
 		return
 	}
 
 	if err := h.superGroupUseCase.Delete(uint(id)); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Code: 500, Message: "Internal server error", Details: err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Super group deleted successfully",
-	})
+	c.JSON(http.StatusOK, schemas.SuccessResponse{Success: true, Code: 200, Message: "Super group deleted successfully"})
 }
 
 // ListSuperGroups handles listing all super groups
@@ -154,12 +144,9 @@ func (h *SuperGroupHandler) DeleteSuperGroup(c *gin.Context) {
 func (h *SuperGroupHandler) ListSuperGroups(c *gin.Context) {
 	superGroups, err := h.superGroupUseCase.List()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Code: 500, Message: "Internal server error", Details: err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Super groups retrieved successfully",
-		"data":    superGroups,
-	})
+	c.JSON(http.StatusOK, schemas.SuccessResponse{Success: true, Code: 200, Message: "Super groups retrieved successfully", Data: superGroups})
 }

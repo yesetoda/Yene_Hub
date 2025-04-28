@@ -22,7 +22,6 @@ type Contest struct {
 	// Ratings       []Rating       `json:"ratings,omitempty" gorm:"foreignKey:ContestID"`
 	// DivisionUsers []DivisionUser `json:"division_users,omitempty" gorm:"foreignKey:ContestID"`
 	Votes []Vote `json:"votes,omitempty" gorm:"foreignKey:ContestID"`
-
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }

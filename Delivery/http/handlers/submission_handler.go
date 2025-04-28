@@ -44,7 +44,7 @@ func (s *SubmissionHandler) CreateSubmission(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Code: 500, Message: "Internal server error", Details: err.Error()})
 		return
 	}
-	c.JSON(http.StatusCreated, schemas.SuccessResponse{Message: "Submission created successfully", Data: submission})
+	c.JSON(http.StatusCreated, schemas.SuccessResponse{Success: true, Code: 201, Message: "Submission created successfully", Data: submission})
 }
 
 // ListSubmission handles listing all submissions
@@ -60,7 +60,7 @@ func (s *SubmissionHandler) ListSubmission(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Code: 500, Message: "Internal server error", Details: err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, schemas.SuccessResponse{Message: "List of submissions", Data: submission})
+	c.JSON(http.StatusOK, schemas.SuccessResponse{Success: true, Code: 200, Message: "List of submissions", Data: submission})
 }
 
 // GetSubmissionByID handles getting a submission by ID
@@ -86,7 +86,7 @@ func (s *SubmissionHandler) GetSubmissionByID(c *gin.Context) {
 		c.JSON(404, schemas.ErrorResponse{Code: 404, Message: "Submission not found", Details: err.Error()})
 		return
 	}
-	c.JSON(200, schemas.SuccessResponse{Message: "Submission details", Data: submission})
+	c.JSON(200, schemas.SuccessResponse{Success: true, Code: 200, Message: "Submission details", Data: submission})
 }
 
 // GetSubmissionByProblemID handles getting submissions by problem ID
@@ -111,7 +111,7 @@ func (s *SubmissionHandler) GetSubmissionByProblemID(c *gin.Context) {
 		c.JSON(404, schemas.ErrorResponse{Code: 404, Message: "Submission not found", Details: err.Error()})
 		return
 	}
-	c.JSON(200, schemas.SuccessResponse{Message: "Submissions for problem", Data: submission})
+	c.JSON(200, schemas.SuccessResponse{Success: true, Code: 200, Message: "Submissions for problem", Data: submission})
 }
 
 // GetSubmissionByUserID handles getting submissions by user ID
@@ -137,5 +137,5 @@ func (s *SubmissionHandler) GetSubmissionByUserID(c *gin.Context) {
 		c.JSON(404, schemas.ErrorResponse{Code: 404, Message: "Submission not found", Details: err.Error()})
 		return
 	}
-	c.JSON(200, schemas.SuccessResponse{Message: "Submissions for user", Data: submission})
+	c.JSON(200, schemas.SuccessResponse{Success: true, Code: 200, Message: "Submissions for user", Data: submission})
 }

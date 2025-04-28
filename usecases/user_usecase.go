@@ -26,6 +26,7 @@ type UserUseCaseInterface interface {
 	Login(email, password string) (*schemas.LoginResponse, error)
 }
 
+// TODO: Implement the caching in the user and other usecase 
 // UserUseCase implements UserUseCase
 type UserUseCase struct {
 	userRepo repository.UserRepository
@@ -134,7 +135,7 @@ func (u *UserUseCase) Create(input *schemas.CreateUserRequest) (*schemas.UserRes
 
 	// Send welcome email with password
 	emailContent := fmt.Sprintf("Welcome to A2SV Hub!\n\nYour account has been created successfully.\nYour temporary password is: %s\n\nPlease change your password after logging in.", userPassword)
-	if err := email_services.SendEmail(user.Email, "Welcome to A2SV Hub", emailContent, "yene-hub-ls0y.onrender.com/api/auth/login"); err != nil {
+	if err := email_services.SendEmail(user.Email, "Welcome to A2SV Hub", emailContent, "https://yene-hub-ls0y.onrender.com/api/auth/login"); err != nil {
 		// Log the error but don't fail the request
 		fmt.Fprintf(os.Stderr, "Failed to send welcome email: %v\n", err)
 	}
@@ -277,31 +278,21 @@ func (u *UserUseCase) List(query *schemas.UserListQuery) (*schemas.UserListRespo
 // Login handles user authentication
 func (u *UserUseCase) Login(email, password string) (*schemas.LoginResponse, error) {
 	user, err := u.userRepo.GetUserByEmail(email)
-	if err != nil || user == nil {
-		fmt.Println("[DEBUG] User not found for email:", email, "err:", err)
+	if err != nil {
 		return nil, errors.New("invalid credentials")
 	}
 
-	if user.Password == "" {
-		fmt.Println("[DEBUG] User password is empty for email:", email)
-		return nil, errors.New("invalid credentials")
-	}
-
-	fmt.Println("[DEBUG] Comparing hash:", user.Password, "with password:", password)
 	// Verify password
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
-		fmt.Println("[DEBUG] Password comparison failed for email:", email, "err:", err)
 		return nil, errors.New("invalid credentials")
 	}
 
 	// Generate JWT token
 	token, err := token_services.CreateJWTToken(user, os.Getenv("JWT_SECRET"), time.Hour*24)
-	if err != nil || token == "" {
-		fmt.Println("[DEBUG] Failed to generate token for email:", email, "err:", err)
-		return nil, errors.New("failed to generate token")
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate token: %v", err)
 	}
 
-	fmt.Println("[DEBUG] Login successful for email:", email)
 	return &schemas.LoginResponse{
 		Token: token,
 		User:  u.entityToResponse(user),

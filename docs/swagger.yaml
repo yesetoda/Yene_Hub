@@ -28,6 +28,16 @@ definitions:
     - emails
     - group_id
     type: object
+  schemas.AddProblemToTrackRequest:
+    properties:
+      problem_id:
+        type: integer
+      track_id:
+        type: integer
+    required:
+    - problem_id
+    - track_id
+    type: object
   schemas.CreateCountryRequest:
     properties:
       code:
@@ -39,6 +49,19 @@ definitions:
     required:
     - code
     - name
+    type: object
+  schemas.CreateExerciseRequest:
+    properties:
+      group_id:
+        type: integer
+      problem_id:
+        type: integer
+      track_id:
+        type: integer
+    required:
+    - group_id
+    - problem_id
+    - track_id
     type: object
   schemas.CreateGroupRequest:
     properties:
@@ -392,6 +415,12 @@ definitions:
       message:
         example: Invalid request parameters
         type: string
+      success:
+        example: false
+        type: boolean
+      timestamp:
+        example: "2023-01-01T00:00:00Z"
+        type: string
     type: object
   schemas.Language:
     enum:
@@ -419,6 +448,21 @@ definitions:
     - email
     - password
     type: object
+  schemas.PaginationMeta:
+    properties:
+      page:
+        example: 1
+        type: integer
+      page_size:
+        example: 10
+        type: integer
+      total:
+        example: 100
+        type: integer
+      total_pages:
+        example: 10
+        type: integer
+    type: object
   schemas.PaymentMethod:
     enum:
     - bank_transfer
@@ -445,9 +489,20 @@ definitions:
     - PaymentFailed
   schemas.SuccessResponse:
     properties:
+      code:
+        example: 200
+        type: integer
       data: {}
       message:
         example: Operation successful
+        type: string
+      meta:
+        $ref: '#/definitions/schemas.PaginationMeta'
+      success:
+        example: true
+        type: boolean
+      timestamp:
+        example: "2023-01-01T00:00:00Z"
         type: string
     type: object
   schemas.SuperToGroupRequest:
@@ -481,6 +536,18 @@ definitions:
       name:
         example: Ethiopia
         type: string
+    type: object
+  schemas.UpdateExerciseRequest:
+    properties:
+      group_id:
+        type: integer
+      id:
+        example: 1
+        type: integer
+      problem_id:
+        type: integer
+      track_id:
+        type: integer
     type: object
   schemas.UpdateGroupRequest:
     properties:
@@ -519,7 +586,7 @@ definitions:
       platform:
         example: leetcode
         type: string
-      tags:
+      tag:
         example:
         - '[''array'''
         - '''hash-table'''
@@ -747,6 +814,7 @@ definitions:
     x-enum-varnames:
     - Upvote
     - Downvote
+host: https://yene-hub-ls0y.onrender.com
 info:
   contact:
     email: support@hub.a2sv.org
@@ -3202,6 +3270,414 @@ paths:
       summary: Get votes by user ID
       tags:
       - Votes
+  /exercises:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/schemas.SuccessResponse'
+            type: array
+      summary: List all exercises
+      tags:
+      - Exercises
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Exercise
+        in: body
+        name: exercise
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.CreateExerciseRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/schemas.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: Create a new exercise
+      tags:
+      - Exercises
+  /exercises/{id}:
+    delete:
+      parameters:
+      - description: Exercise ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/schemas.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: Delete an exercise
+      tags:
+      - Exercises
+    get:
+      parameters:
+      - description: Exercise ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.SuccessResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: Get an exercise by ID
+      tags:
+      - Exercises
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Exercise ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Exercise
+        in: body
+        name: exercise
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.UpdateExerciseRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: Update an exercise
+      tags:
+      - Exercises
+  /groups/gid/:group_id/exercises:
+    get:
+      parameters:
+      - description: Group ID
+        in: path
+        name: group_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/schemas.SuccessResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: Get exercises by group ID
+      tags:
+      - Exercises
+  /problem-tracks/{id}:
+    delete:
+      description: Remove a problem from a track by ProblemTrack ID
+      parameters:
+      - description: ProblemTrack ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/schemas.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: Remove a problem from a track
+      tags:
+      - ProblemTracks
+  /problems/pid/:problem_id/exercises:
+    get:
+      parameters:
+      - description: Problem ID
+        in: path
+        name: problem_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/schemas.SuccessResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: Get exercises by problem ID
+      tags:
+      - Exercises
+  /tracks/tid/:track_id/exercises:
+    get:
+      parameters:
+      - description: Track ID
+        in: path
+        name: track_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/schemas.SuccessResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: Get exercises by track ID
+      tags:
+      - Exercises
+  /tracks/tid/{track_id}/problems:
+    get:
+      description: Get all problems for a specific track
+      parameters:
+      - description: Track ID
+        in: path
+        name: track_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/schemas.SuccessResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: List problems in a track
+      tags:
+      - ProblemTracks
+    post:
+      consumes:
+      - application/json
+      description: Add a problem to a specific track
+      parameters:
+      - description: Track ID
+        in: path
+        name: track_id
+        required: true
+        type: integer
+      - description: Problem
+        in: body
+        name: problem
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.AddProblemToTrackRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/schemas.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: Add a problem to a track
+      tags:
+      - ProblemTracks
+  /tracks/tid/{track_id}/problems/by-difficulty:
+    get:
+      description: Get problems in a track by difficulty
+      parameters:
+      - description: Track ID
+        in: path
+        name: track_id
+        required: true
+        type: integer
+      - description: Difficulty
+        in: query
+        name: difficulty
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: Get problems in track by difficulty
+      tags:
+      - ProblemTracks
+  /tracks/tid/{track_id}/problems/by-name:
+    get:
+      description: Get a problem in a track by its name
+      parameters:
+      - description: Track ID
+        in: path
+        name: track_id
+        required: true
+        type: integer
+      - description: Problem name
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: Get problem in track by name
+      tags:
+      - ProblemTracks
+  /tracks/tid/{track_id}/problems/by-platform:
+    get:
+      description: Get problems in a track by platform
+      parameters:
+      - description: Track ID
+        in: path
+        name: track_id
+        required: true
+        type: integer
+      - description: Platform
+        in: query
+        name: platform
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: Get problems in track by platform
+      tags:
+      - ProblemTracks
+  /tracks/tid/{track_id}/problems/by-tag:
+    get:
+      description: Get problems in a track by tag
+      parameters:
+      - description: Track ID
+        in: path
+        name: track_id
+        required: true
+        type: integer
+      - description: Tag
+        in: query
+        name: tag
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: Get problems in track by tag
+      tags:
+      - ProblemTracks
 securityDefinitions:
   BearerAuth:
     description: Type "Bearer" followed by a space and JWT token.

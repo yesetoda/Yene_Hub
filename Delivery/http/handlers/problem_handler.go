@@ -43,7 +43,11 @@ func (h *ProblemHandler) CreateProblem(c *gin.Context) {
 		c.JSON(500, schemas.ErrorResponse{Code: http.StatusInternalServerError, Message: "Internal server error"})
 		return
 	}
-	c.JSON(201, schemas.SuccessResponse{Data: problem})
+	c.JSON(201, schemas.SuccessResponse{
+		Success: true,
+		Code:    201,
+		Message: "Problem created successfully",
+		Data:    problem})
 }
 
 // ListProblems handles listing all problems
@@ -60,7 +64,11 @@ func (h *ProblemHandler) ListProblems(c *gin.Context) {
 		c.JSON(500, schemas.ErrorResponse{Code: http.StatusInternalServerError, Message: "Internal server error"})
 		return
 	}
-	c.JSON(200, schemas.SuccessResponse{Data: problems})
+	c.JSON(200, schemas.SuccessResponse{
+		Success: true,
+		Code:    200,
+		Message: "List of problems",
+		Data:    problems})
 }
 
 // GetProblemByName handles getting a problem by name
@@ -80,7 +88,11 @@ func (h *ProblemHandler) GetProblemByName(c *gin.Context) {
 		c.JSON(404, schemas.ErrorResponse{Code: http.StatusNotFound, Message: "Problem not found"})
 		return
 	}
-	c.JSON(200, schemas.SuccessResponse{Data: problem})
+	c.JSON(200, schemas.SuccessResponse{
+		Success: true,
+		Code:    200,
+		Message: "Problem details",
+		Data:    problem})
 }
 
 // GetProblemByID handles getting a problem by ID
@@ -104,7 +116,11 @@ func (h *ProblemHandler) GetProblemByID(c *gin.Context) {
 		c.JSON(404, schemas.ErrorResponse{Code: http.StatusNotFound, Message: "Problem not found"})
 		return
 	}
-	c.JSON(200, schemas.SuccessResponse{Data: problem})
+	c.JSON(200, schemas.SuccessResponse{
+		Success: true,
+		Code:    200,
+		Message: "Problem details",
+		Data:    problem})
 }
 
 // UpdateProblem handles updating a problem
@@ -138,7 +154,11 @@ func (h *ProblemHandler) UpdateProblem(c *gin.Context) {
 		c.JSON(500, schemas.ErrorResponse{Code: http.StatusInternalServerError, Message: "Internal server error"})
 		return
 	}
-	c.JSON(200, schemas.SuccessResponse{Data: problem})
+	c.JSON(200, schemas.SuccessResponse{
+		Success: true,
+		Code:    200,
+		Message: "Problem updated successfully",
+		Data:    problem})
 }
 
 // DeleteProblem handles deleting a problem
@@ -163,29 +183,50 @@ func (h *ProblemHandler) DeleteProblem(c *gin.Context) {
 		c.JSON(404, schemas.ErrorResponse{Code: http.StatusNotFound, Message: "Problem not found"})
 		return
 	}
-	c.JSON(200, schemas.SuccessResponse{Data: gin.H{"message": "Problem deleted successfully"}})
+	c.JSON(200, schemas.SuccessResponse{
+		Success: true,
+		Code:    200,
+		Message: "Problem deleted successfully",
+		Data:    nil})
 }
 
-func (h *ProblemHandler) GetProblemByDifficulty(difficulty string) ([]*entity.Problem, error) {
-	problems, err := h.ProblemUsecase.GetProblemByDifficulty(difficulty)
+func (h *ProblemHandler) GetProblemByDifficulty(c *gin.Context) {
+	problems, err := h.ProblemUsecase.GetProblemByDifficulty(c.Param("difficulty"))
 	if err != nil {
-		return nil, err
+		c.JSON(404, schemas.ErrorResponse{Code: http.StatusNotFound, Message: "Problem not found"})
+		return
 	}
-	return problems, nil
+	c.JSON(200, schemas.SuccessResponse{
+		Success: true,
+		Code:    200,
+		Message: "List of problems by difficulty",
+		Data:    problems})
 }
 
-func (h *ProblemHandler) GetProblemByTag(tag string) ([]*entity.Problem, error) {
+func (h *ProblemHandler) GetProblemByTag(c *gin.Context) {
+	tag := c.Param("tag")
 	problems, err := h.ProblemUsecase.GetProblemByTag(tag)
 	if err != nil {
-		return nil, err
+		c.JSON(404, schemas.ErrorResponse{Code: http.StatusNotFound, Message: "Problem not found"})
+		return
 	}
-	return problems, nil
+	c.JSON(200, schemas.SuccessResponse{
+		Success: true,
+		Code:    200,
+		Message: "List of problems by tag",
+		Data:    problems})
 }
 
-func (h *ProblemHandler) GetProblemByPlatform(platform string) ([]*entity.Problem, error) {
+func (h *ProblemHandler) GetProblemByPlatform(	c *gin.Context) {
+	platform := c.Param("platform")
 	problems, err := h.ProblemUsecase.GetProblemByPlatform(platform)
 	if err != nil {
-		return nil, err
+		c.JSON(404, schemas.ErrorResponse{Code: http.StatusNotFound, Message: "Problem not found"})
+		return
 	}
-	return problems, nil
+	c.JSON(200, schemas.SuccessResponse{
+		Success: true,
+		Code:    200,
+		Message: "List of problems by platform",
+		Data:    problems})
 }

@@ -47,7 +47,11 @@ func (h *GroupHandler) CreateGroup(c *gin.Context) {
 		})
 		return
 	}
-	c.JSON(201, schemas.SuccessResponse{Message: "Group created successfully", Data: createdGroup})
+	c.JSON(201, schemas.SuccessResponse{
+		Success: true,
+		Code:    201,
+		Message: "Group created successfully",
+		Data:    createdGroup})
 }
 
 // GetGroupByID handles getting a group by ID
@@ -81,7 +85,11 @@ func (h *GroupHandler) GetGroupByID(c *gin.Context) {
 		})
 		return
 	}
-	c.JSON(200, schemas.SuccessResponse{Message: "Group details", Data: group})
+	c.JSON(200, schemas.SuccessResponse{
+		Success: true,
+		Code:    200,
+		Message: "Group details",
+		Data:    group})
 }
 
 // UpdateGroup handles updating a group
@@ -126,7 +134,11 @@ func (h *GroupHandler) UpdateGroup(c *gin.Context) {
 		})
 		return
 	}
-	c.JSON(200, schemas.SuccessResponse{Message: "Group updated successfully", Data: updatedGroup})
+	c.JSON(200, schemas.SuccessResponse{
+		Success: true,
+		Code:    200,
+		Message: "Group updated successfully",
+		Data:    updatedGroup})
 }
 
 // DeleteGroup handles deleting a group
@@ -160,7 +172,11 @@ func (h *GroupHandler) DeleteGroup(c *gin.Context) {
 		})
 		return
 	}
-	c.JSON(200, schemas.SuccessResponse{Message: "Group deleted successfully", Data: nil})
+	c.JSON(200, schemas.SuccessResponse{
+		Success: true,
+		Code:    200,
+		Message: "Group deleted successfully",
+		Data:    nil})
 }
 
 // ListGroups handles listing all groups
@@ -181,7 +197,11 @@ func (h *GroupHandler) ListGroups(c *gin.Context) {
 		})
 		return
 	}
-	c.JSON(200, schemas.SuccessResponse{Message: "List of groups", Data: groups})
+	c.JSON(200, schemas.SuccessResponse{
+		Success: true,
+		Code:    200,
+		Message: "List of groups",
+		Data:    groups})
 }
 
 // GetGroupsByCountryID handles listing groups by country ID
@@ -213,5 +233,9 @@ func (h *GroupHandler) GetGroupsByCountryID(c *gin.Context) {
 		})
 		return
 	}
-	c.JSON(200, schemas.SuccessResponse{Message: "List of groups", Data: groups})
+	c.JSON(200, schemas.SuccessResponse{	
+		Success: true,
+		Code:    200,
+		Message: "List of groups",
+		Data:    groups})
 }

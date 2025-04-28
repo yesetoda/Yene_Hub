@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"strconv"
+
+	"a2sv.org/hub/Delivery/http/schemas"
 	"a2sv.org/hub/Domain/entity"
 	"a2sv.org/hub/usecases"
 	"github.com/gin-gonic/gin"
@@ -31,16 +33,16 @@ func (h *StippendHandler) CreateStipend(c *gin.Context) {
 	// Get the request body
 	var stippend entity.Stipend
 	if err := c.ShouldBindJSON(&stippend); err != nil {
-		c.JSON(400, gin.H{"error": "Invalid request body"})
+		c.JSON(400, schemas.ErrorResponse{Code: 400, Message: "Invalid request body", Details: err.Error()})
 		return
 	}
 	// Call the use case to create the stippend
 	if err := h.StippendUsecase.CreateStipend(&stippend); err != nil {
-		c.JSON(400, gin.H{"error": "Failed to create stippend"})
+		c.JSON(400, schemas.ErrorResponse{Code: 400, Message: "Failed to create stippend", Details: err.Error()})
 		return
 	}
 	// Return a success response
-	c.JSON(201, gin.H{"message": "Stippend created successfully"})
+	c.JSON(201, schemas.SuccessResponse{Success: true, Code: 201, Message: "Stippend created successfully"})
 }
 
 // ListStippends handles listing all stipends
@@ -55,11 +57,11 @@ func (h *StippendHandler) ListStippends(c *gin.Context) {
 	// Call the use case to get the list of stippends
 	stippends, err := h.StippendUsecase.ListStipend()
 	if err != nil {
-		c.JSON(400, gin.H{"error": "Failed to fetch stippends"})
+		c.JSON(400, schemas.ErrorResponse{Code: 400, Message: "Failed to fetch stippends", Details: err.Error()})
 		return
 	}
 	// Return the list of stippends
-	c.JSON(200, stippends)
+	c.JSON(200, schemas.SuccessResponse{Success: true, Code: 200, Message: "List of stippends", Data: stippends})
 }
 
 // GetStippendByID handles getting a stipend by ID
@@ -76,23 +78,23 @@ func (h *StippendHandler) GetStippendByID(c *gin.Context) {
 	// Get the stippend ID from the URL parameter
 	sid := c.Param("stippend_id")
 	if sid == "" {
-		c.JSON(400, gin.H{"error": "Stippend ID is required"})
+		c.JSON(400, schemas.ErrorResponse{Code: 400, Message: "Stippend ID is required"})
 		return
 	}
 	// Convert stippend ID to uint
 	stippendID, err := strconv.Atoi(sid)
 	if err != nil {
-		c.JSON(400, gin.H{"error": "Invalid stippend ID"})
+		c.JSON(400, schemas.ErrorResponse{Code: 400, Message: "Invalid stippend ID"})
 		return
 	}
 	// Call the use case to get the stippend by ID
 	stippend, err := h.StippendUsecase.GetStipendByID(uint(stippendID))
 	if err != nil {
-		c.JSON(400, gin.H{"error": "Failed to fetch stippend"})
+		c.JSON(400, schemas.ErrorResponse{Code: 400, Message: "Failed to fetch stippend", Details: err.Error()})
 		return
 	}
 	// Return the stippend details
-	c.JSON(200, stippend)
+	c.JSON(200, schemas.SuccessResponse{Success: true, Code: 200, Message: "Stippend details", Data: stippend})
 }
 
 // UpdateStipend handles updating a stipend
@@ -109,15 +111,15 @@ func (h *StippendHandler) GetStippendByID(c *gin.Context) {
 func (h *StippendHandler) UpdateStipend(c *gin.Context) {
 	var stipend entity.Stipend
 	if err := c.ShouldBindJSON(&stipend); err != nil {
-		c.JSON(400, gin.H{"error": "Invalid request body"})
+		c.JSON(400, schemas.ErrorResponse{Code: 400, Message: "Invalid request body", Details: err.Error()})
 		return
 	}
 	err := h.StippendUsecase.UpdateStipend(&stipend)
 	if err != nil {
-		c.JSON(400, gin.H{"error": "Failed to update stippend"})
+		c.JSON(400, schemas.ErrorResponse{Code: 400, Message: "Failed to update stippend", Details: err.Error()})
 		return
 	}
-	c.JSON(200, gin.H{"message": "Stippend updated successfully"})
+	c.JSON(200, schemas.SuccessResponse{Success: true, Code: 200, Message: "Stippend updated successfully"})
 }
 
 // DeleteStipend handles deleting a stipend
@@ -134,21 +136,21 @@ func (h *StippendHandler) DeleteStipend(c *gin.Context) {
 	// Get the stippend ID from the URL parameter
 	sid := c.Param("stippend_id")
 	if sid == "" {
-		c.JSON(400, gin.H{"error": "Stippend ID is required"})
+		c.JSON(400, schemas.ErrorResponse{Code: 400, Message: "Stippend ID is required"})
 		return
 	}
 	usid, err := strconv.Atoi(sid)
 	if err != nil {
-		c.JSON(400, gin.H{"error": "Invalid stippend ID"})
+		c.JSON(400, schemas.ErrorResponse{Code: 400, Message: "Invalid stippend ID"})
 		return
 	}
 	// Call the use case to delete the stippend by ID
 	err = h.StippendUsecase.DeleteStipend(uint(usid))
 	if err != nil {
-		c.JSON(400, gin.H{"error": "Failed to delete stippend"})
+		c.JSON(400, schemas.ErrorResponse{Code: 400, Message: "Failed to delete stippend", Details: err.Error()})
 		return
 	}
-	c.JSON(200, gin.H{"message": "Stippend deleted successfully"})
+	c.JSON(200, schemas.SuccessResponse{Success: true, Code: 200, Message: "Stippend deleted successfully"})
 }
 
 // ForceSwaggoParse is a dummy function to ensure Swaggo parses this file.

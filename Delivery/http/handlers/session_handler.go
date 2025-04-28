@@ -40,7 +40,7 @@ func (h *SessionHandler) CreateSession(c *gin.Context) {
 		c.JSON(500, schemas.ErrorResponse{Code: 500, Message: "Failed to create session", Details: err.Error()})
 		return
 	}
-	c.JSON(201, schemas.SuccessResponse{Message: "Session created successfully", Data: session})
+	c.JSON(201, schemas.SuccessResponse{Success: true, Code: 201, Message: "Session created successfully", Data: session})
 }
 
 // ListSessions handles listing all sessions
@@ -57,7 +57,7 @@ func (h *SessionHandler) ListSessions(c *gin.Context) {
 		c.JSON(500, schemas.ErrorResponse{Code: 500, Message: "Failed to fetch sessions", Details: err.Error()})
 		return
 	}
-	c.JSON(200, schemas.SuccessResponse{Message: "List of sessions", Data: sessions})
+	c.JSON(200, schemas.SuccessResponse{Success: true, Code: 200, Message: "List of sessions", Data: sessions})
 }
 
 // GetSessionByID handles getting a session by ID
@@ -86,7 +86,7 @@ func (h *SessionHandler) GetSessionByID(c *gin.Context) {
 		c.JSON(404, schemas.ErrorResponse{Code: 404, Message: "Session not found", Details: err.Error()})
 		return
 	}
-	c.JSON(200, schemas.SuccessResponse{Message: "Session details", Data: session})
+	c.JSON(200, schemas.SuccessResponse{Success: true, Code: 200, Message: "Session details", Data: session})
 }
 
 // GetSessionByName handles getting a session by name
@@ -110,7 +110,7 @@ func (h *SessionHandler) GetSessionByName(c *gin.Context) {
 		c.JSON(404, schemas.ErrorResponse{Code: 404, Message: "Session not found", Details: err.Error()})
 		return
 	}
-	c.JSON(200, schemas.SuccessResponse{Message: "Session details", Data: sessions})
+	c.JSON(200, schemas.SuccessResponse{Success: true, Code: 200, Message: "Session details", Data: sessions})
 }
 
 // GetSessionByStartTime handles getting a session by start time
@@ -134,7 +134,7 @@ func (h *SessionHandler) GetSessionByStartTime(c *gin.Context) {
 		c.JSON(404, schemas.ErrorResponse{Code: 404, Message: "Session not found", Details: err.Error()})
 		return
 	}
-	c.JSON(200, schemas.SuccessResponse{Message: "Session details", Data: sessions})
+	c.JSON(200, schemas.SuccessResponse{Success: true, Code: 200, Message: "Session details", Data: sessions})
 }
 
 // UpdateSession handles updating a session
@@ -170,7 +170,7 @@ func (h *SessionHandler) UpdateSession(c *gin.Context) {
 		c.JSON(404, schemas.ErrorResponse{Code: 404, Message: "Session not found", Details: err.Error()})
 		return
 	}
-	c.JSON(200, schemas.SuccessResponse{Message: "Session updated successfully", Data: session})
+	c.JSON(200, schemas.SuccessResponse{Success: true, Code: 200, Message: "Session updated successfully", Data: session})
 }
 
 // DeleteSession handles deleting a session
@@ -198,7 +198,7 @@ func (h *SessionHandler) DeleteSession(c *gin.Context) {
 		c.JSON(404, schemas.ErrorResponse{Code: 404, Message: "Session not found", Details: err.Error()})
 		return
 	}
-	c.JSON(200, schemas.SuccessResponse{Message: "Session deleted successfully"})
+	c.JSON(200, schemas.SuccessResponse{Success: true, Code: 200, Message: "Session deleted successfully"})
 }
 
 // ForceSwaggoParseSessionHandler is a dummy function to ensure Swaggo parses this file.

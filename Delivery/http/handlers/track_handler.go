@@ -43,7 +43,7 @@ func (h *TrackHandler) CreateTrack(c *gin.Context) {
 		return
 	}
 	// Return the created track
-	c.JSON(201, schemas.SuccessResponse{Message: "Track created successfully", Data: track})
+	c.JSON(201, schemas.SuccessResponse{Success: true, Code: 201, Message: "Track created successfully", Data: track})
 }
 
 // ListTrack handles listing all tracks
@@ -61,7 +61,7 @@ func (h *TrackHandler) ListTrack(c *gin.Context) {
 		return
 	}
 	// Return the list of tracks
-	c.JSON(200, schemas.SuccessResponse{Message: "List of tracks", Data: tracks})
+	c.JSON(200, schemas.SuccessResponse{Success: true, Code: 200, Message: "List of tracks", Data: tracks})
 }
 
 // GetTrackByID handles getting a track by ID
@@ -90,7 +90,7 @@ func (h *TrackHandler) GetTrackByID(c *gin.Context) {
 		return
 	}
 	// Return the track
-	c.JSON(200, schemas.SuccessResponse{Message: "Track details", Data: track})
+	c.JSON(200, schemas.SuccessResponse{Success: true, Code: 200, Message: "Track details", Data: track})
 }
 
 // GetTrackByName handles getting a track by name
@@ -113,7 +113,7 @@ func (h *TrackHandler) GetTrackByName(c *gin.Context) {
 		return
 	}
 	// Return the track
-	c.JSON(200, schemas.SuccessResponse{Message: "Track details", Data: track})
+	c.JSON(200, schemas.SuccessResponse{Success: true, Code: 200, Message: "Track details", Data: track})
 }
 
 // UpdateTrack handles updating a track
@@ -151,7 +151,7 @@ func (h *TrackHandler) UpdateTrack(c *gin.Context) {
 		return
 	}
 	// Return the updated track
-	c.JSON(200, schemas.SuccessResponse{Message: "Track updated successfully", Data: track})
+	c.JSON(200, schemas.SuccessResponse{Success: true, Code: 200, Message: "Track updated successfully", Data: track})
 }
 
 // DeleteTrack handles deleting a track
@@ -179,7 +179,7 @@ func (h *TrackHandler) DeleteTrack(c *gin.Context) {
 		return
 	}
 	// Return success message
-	c.JSON(200, schemas.SuccessResponse{Message: "Track deleted successfully"})
+	c.JSON(200, schemas.SuccessResponse{Success: true, Code: 200, Message: "Track deleted successfully"})
 }
 
 // ForceSwaggoParse is a dummy function to ensure Swaggo parses this file.

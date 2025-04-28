@@ -47,7 +47,10 @@ func (h *CountryHandler) CreateCountry(c *gin.Context) {
 		})
 		return
 	}
-	c.JSON(201, schemas.SuccessResponse{Message: "Country created successfully", Data: createdCountry})
+	c.JSON(201, schemas.SuccessResponse{
+		Success: true,
+		Code:    201,
+		Message: "Country created successfully", Data: createdCountry})
 }
 
 // GetCountryByID handles getting a country by ID
@@ -80,14 +83,18 @@ func (h *CountryHandler) GetCountryByID(c *gin.Context) {
 		})
 		return
 	}
-	c.JSON(200, schemas.SuccessResponse{Message: "Country details", Data: country})
+	c.JSON(200, schemas.SuccessResponse{
+		Success: true,
+		Code:    200,
+		Message: "Country details",
+		Data:    country})
 }
 
 // UpdateCountry handles updating a country
 // @Summary Update country
 // @Description Update a country by its ID
 // @Tags Countries
-// @Accept json
+// @Accept json				
 // @Produce json
 // @Param id path int true "Country ID"
 // @Param country body schemas.UpdateCountryRequest true "Country data"
@@ -125,7 +132,11 @@ func (h *CountryHandler) UpdateCountry(c *gin.Context) {
 		})
 		return
 	}
-	c.JSON(200, schemas.SuccessResponse{Message: "Country updated successfully", Data: updatedCountry})
+	c.JSON(200, schemas.SuccessResponse{
+		Success: true,
+		Code:    200,
+		Message: "Country updated successfully",
+		Data:    updatedCountry})
 }
 
 // DeleteCountry handles deleting a country
@@ -158,7 +169,11 @@ func (h *CountryHandler) DeleteCountry(c *gin.Context) {
 		})
 		return
 	}
-	c.JSON(200, schemas.SuccessResponse{Message: "Country deleted successfully", Data: nil})
+	c.JSON(200, schemas.SuccessResponse{
+		Success: true,
+		Code:    200,
+		Message: "Country deleted successfully",
+		Data:    nil})
 }
 
 // ListCountries handles listing all countries
@@ -179,5 +194,9 @@ func (h *CountryHandler) ListCountries(c *gin.Context) {
 		})
 		return
 	}
-	c.JSON(200, schemas.SuccessResponse{Message: "List of countries", Data: countries})
+	c.JSON(200, schemas.SuccessResponse{
+		Success: true,
+		Code:    200,
+		Message: "List of countries",
+		Data:    countries})
 }

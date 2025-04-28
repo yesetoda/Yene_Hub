@@ -104,7 +104,6 @@ func HandleGoogleCallback(c *gin.Context) {
 		})
 		return
 	}
-	fmt.Println(user)
 
 	// Generate JWT token for the user
 	jwtToken, err := token_services.CreateJWTToken(user, os.Getenv("JWT_SECRET"), 24*30*time.Hour)
