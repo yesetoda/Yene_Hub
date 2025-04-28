@@ -81,7 +81,7 @@ func SetupRouter(
 	superToGroupHandler := handlers.NewSuperToGroupHandler(superToGroupUseCase)
 	submissionHandler := handlers.NewSubmissionHandeler(submissionUsecase)
 	stippendHandler := handlers.NewStippendHandler(stippendUsecase)
-	RoleMiddleware := middleware.NewRoleMiddleware(&userUseCase, &roleUseCase)
+	// RoleMiddleware := middleware.NewRoleMiddleware(&userUseCase, &roleUseCase)
 	problemHandler := handlers.NewProblemHandler(&problemUsecase)
 	recentActionHandler := handlers.NewRecentActionHandler(recentActionUseCase)
 	sessionHandler := handlers.NewSessionHandler(sessionUsecase)
