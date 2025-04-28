@@ -5,7 +5,6 @@ import (
 	"strconv"
 
 	"a2sv.org/hub/Delivery/http/schemas"
-	"a2sv.org/hub/Domain/entity"
 	"a2sv.org/hub/usecases"
 	"github.com/gin-gonic/gin"
 )
@@ -77,13 +76,13 @@ func (h *ProblemTrackHandler) ListProblemsInTrack(c *gin.Context) {
 	var problemsResp []schemas.ProblemResponse
 	for _, problem := range problems {
 		problemsResp = append(problemsResp, schemas.ProblemResponse{
-			ID:        problem.ID,
-			Name:      problem.Name,
+			ID:         problem.ID,
+			Name:       problem.Name,
 			Difficulty: schemas.Difficulty(problem.Difficulty),
-			Tag:       []string{problem.Tag},
-			Platform:  problem.Platform,
-			CreatedAt: problem.CreatedAt,
-			UpdatedAt: problem.UpdatedAt,
+			Tag:        []string{problem.Tag},
+			Platform:   problem.Platform,
+			CreatedAt:  problem.CreatedAt,
+			UpdatedAt:  problem.UpdatedAt,
 		})
 	}
 	c.JSON(200, schemas.SuccessResponse{
@@ -126,13 +125,13 @@ func (h *ProblemTrackHandler) GetProblemInTracksByName(c *gin.Context) {
 		Code:    200,
 		Message: "Problem in track by name",
 		Data: schemas.ProblemResponse{
-			ID:        pt.ID,
-			Name:      pt.Name,
+			ID:         pt.ID,
+			Name:       pt.Name,
 			Difficulty: schemas.Difficulty(pt.Difficulty),
-			Tag:       []string{pt.Tag},
-			Platform:  pt.Platform,
-				CreatedAt: pt.CreatedAt,
-			UpdatedAt: pt.UpdatedAt,
+			Tag:        []string{pt.Tag},
+			Platform:   pt.Platform,
+			CreatedAt:  pt.CreatedAt,
+			UpdatedAt:  pt.UpdatedAt,
 		}})
 }
 
@@ -166,13 +165,13 @@ func (h *ProblemTrackHandler) GetProblemInTracksByDifficulty(c *gin.Context) {
 	var problemsResp []schemas.ProblemResponse
 	for _, pt := range pts {
 		problemsResp = append(problemsResp, schemas.ProblemResponse{
-			ID:        pt.ID,
-			Name:      pt.Name,
+			ID:         pt.ID,
+			Name:       pt.Name,
 			Difficulty: schemas.Difficulty(pt.Difficulty),
-			Tag:       []string{pt.Tag},
-			Platform:  pt.Platform,
-			CreatedAt: pt.CreatedAt,
-			UpdatedAt: pt.UpdatedAt,
+			Tag:        []string{pt.Tag},
+			Platform:   pt.Platform,
+			CreatedAt:  pt.CreatedAt,
+			UpdatedAt:  pt.UpdatedAt,
 		})
 	}
 	c.JSON(200, schemas.SuccessResponse{
@@ -212,13 +211,13 @@ func (h *ProblemTrackHandler) GetProblemInTracksByTag(c *gin.Context) {
 	var problemsResp []schemas.ProblemResponse
 	for _, pt := range pts {
 		problemsResp = append(problemsResp, schemas.ProblemResponse{
-			ID:        pt.ID,
-			Name:      pt.Name,
+			ID:         pt.ID,
+			Name:       pt.Name,
 			Difficulty: schemas.Difficulty(pt.Difficulty),
-			Tag:       []string{pt.Tag},
-			Platform:  pt.Platform,
-			CreatedAt: pt.CreatedAt,
-			UpdatedAt: pt.UpdatedAt,
+			Tag:        []string{pt.Tag},
+			Platform:   pt.Platform,
+			CreatedAt:  pt.CreatedAt,
+			UpdatedAt:  pt.UpdatedAt,
 		})
 	}
 	c.JSON(200, schemas.SuccessResponse{
@@ -258,13 +257,13 @@ func (h *ProblemTrackHandler) GetProblemInTracksByPlatform(c *gin.Context) {
 	var problemsResp []schemas.ProblemResponse
 	for _, pt := range pts {
 		problemsResp = append(problemsResp, schemas.ProblemResponse{
-			ID:        pt.ID,
-			Name:      pt.Name,
+			ID:         pt.ID,
+			Name:       pt.Name,
 			Difficulty: schemas.Difficulty(pt.Difficulty),
-			Tag:       []string{pt.Tag},
-			Platform:  pt.Platform,
-			CreatedAt: pt.CreatedAt,
-			UpdatedAt: pt.UpdatedAt,
+			Tag:        []string{pt.Tag},
+			Platform:   pt.Platform,
+			CreatedAt:  pt.CreatedAt,
+			UpdatedAt:  pt.UpdatedAt,
 		})
 	}
 	c.JSON(200, schemas.SuccessResponse{
