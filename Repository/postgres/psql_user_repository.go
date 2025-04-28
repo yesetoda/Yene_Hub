@@ -9,13 +9,13 @@ import (
 
 // userRepository implements the repository.UserRepository interface
 type userRepository struct {
-	BaseRepository
+	db *gorm.DB
 }
 
 // NewUserRepository creates a new UserRepository instance
 func NewUserRepository(db *gorm.DB) repository.UserRepository {
 	return &userRepository{
-		BaseRepository: NewBaseRepository(db, "user"),
+		db: db,
 	}
 }
 
@@ -26,30 +26,30 @@ func (r *userRepository) CreateUser(user *entity.User) error {
 		return err
 	}
 
-	// Cache the newly created user
-	_ = r.cacheDetail("byid", user, user.ID)
-	_ = r.cacheDetail("byemail", user, user.Email)
+	// // Cache the newly created user
+	// _ = r.cacheDetail("byid", user, user.ID)
+	// _ = r.cacheDetail("byemail", user, user.Email)
 
-	// Invalidate list caches
-	r.invalidateCache("list", "byname", "bycountryid", "bygroupid")
+	// // Invalidate list caches
+	// r.invalidateCache("list", "byname", "bycountryid", "bygroupid")
 
 	return nil
 }
 func (r *userRepository) ListUsers(query *schemas.UserListQuery) ([]*entity.User, int, error) {
 	var users []*entity.User
-	err := r.getCachedList("list", &users, func() error {
-		return r.db.Order("created_at desc").Find(&users).Error
-	}, query)
+	// err := r.getCachedList("list", &users, func() error {
+	err:=r.db.Order("created_at desc").Find(&users).Error
+	// }, query)
 
-	return users, 0, err
+	return users, len(users), err
 }
 
 // GetUserByID retrieves a user by ID using the cache
 func (r *userRepository) GetUserByID(id uint) (*entity.User, error) {
 	var user entity.User
-	err := r.getCachedDetail("byid", &user, func() error {
-		return r.db.First(&user, id).Error
-	}, id)
+	// err := r.getCachedDetail("byid", &user, func() error {
+		err:= r.db.First(&user, id).Error
+	// }, id)
 
 	return &user, err
 }
@@ -57,9 +57,9 @@ func (r *userRepository) GetUserByID(id uint) (*entity.User, error) {
 // GetUserByName retrieves users by name using the cache
 func (r *userRepository) GetUserByName(name string) ([]*entity.User, error) {
 	var users []*entity.User
-	err := r.getCachedList("byname", &users, func() error {
-		return r.db.Where("name LIKE ?", "%"+name+"%").Find(&users).Error
-	}, name)
+	// err := r.getCachedList("byname", &users, func() error {
+		err:= r.db.Where("name LIKE ?", "%"+name+"%").Find(&users).Error
+	// }, name)
 
 	return users, err
 }
@@ -67,9 +67,9 @@ func (r *userRepository) GetUserByName(name string) ([]*entity.User, error) {
 // GetUserByUniversity retrieves users by university
 func (r *userRepository) GetUserByUniversity(university string) ([]*entity.User, error) {
 	var users []*entity.User
-	err := r.getCachedList("byuniversity", &users, func() error {
-		return r.db.Where("university = ?", university).Find(&users).Error
-	}, university)
+	// err := r.getCachedList("byuniversity", &users, func() error {
+		err:= r.db.Where("university = ?", university).Find(&users).Error
+	// }, university)
 
 	return users, err
 }
@@ -77,9 +77,9 @@ func (r *userRepository) GetUserByUniversity(university string) ([]*entity.User,
 // GetUserByCountryID retrieves users by country ID using the cache
 func (r *userRepository) GetUserByCountryID(countryID uint) ([]*entity.User, error) {
 	var users []*entity.User
-	err := r.getCachedList("bycountryid", &users, func() error {
-		return r.db.Where("country_id = ?", countryID).Find(&users).Error
-	}, countryID)
+	// err := r.getCachedList("bycountryid", &users, func() error {
+		err:= r.db.Where("country_id = ?", countryID).Find(&users).Error
+	// }, countryID)
 
 	return users, err
 }
@@ -87,9 +87,9 @@ func (r *userRepository) GetUserByCountryID(countryID uint) ([]*entity.User, err
 // GetUserByGroupID retrieves users by group ID using the cache
 func (r *userRepository) GetUserByGroupID(groupID uint) ([]*entity.User, error) {
 	var users []*entity.User
-	err := r.getCachedList("bygroupid", &users, func() error {
-		return r.db.Where("group_id = ?", groupID).Find(&users).Error
-	}, groupID)
+	// err := r.getCachedList("bygroupid", &users, func() error {
+		err:= r.db.Where("group_id = ?", groupID).Find(&users).Error
+	// }, groupID)
 
 	return users, err
 }
@@ -97,9 +97,9 @@ func (r *userRepository) GetUserByGroupID(groupID uint) ([]*entity.User, error) 
 // GetUserByEmail retrieves a user by email using the cache
 func (r *userRepository) GetUserByEmail(email string) (*entity.User, error) {
 	var user entity.User
-	err := r.getCachedDetail("byemail", &user, func() error {
-		return r.db.Where("email = ?", email).First(&user).Error
-	}, email)
+	// err := r.getCachedDetail("byemail", &user, func() error {
+		err:= r.db.Where("email = ?", email).First(&user).Error
+	// }, email)
 
 	return &user, err
 }
@@ -109,9 +109,9 @@ func (r *userRepository) ListUser(page, pageSize int) ([]*entity.User, error) {
 	var users []*entity.User
 	offset := (page - 1) * pageSize
 
-	err := r.getCachedList("list", &users, func() error {
-		return r.db.Offset(offset).Limit(pageSize).Find(&users).Error
-	}, page, pageSize)
+	// err := r.getCachedList("list", &users, func() error {
+		err:= r.db.Offset(offset).Limit(pageSize).Find(&users).Error
+	// }, page, pageSize)
 
 	return users, err
 }
@@ -124,11 +124,11 @@ func (r *userRepository) UpdateUser(user *entity.User) error {
 	}
 
 	// Update detail caches
-	_ = r.cacheDetail("byid", user, user.ID)
-	_ = r.cacheDetail("byemail", user, user.Email)
+	// _ = r.cacheDetail("byid", user, user.ID)
+	// _ = r.cacheDetail("byemail", user, user.Email)
 
 	// Invalidate list caches
-	r.invalidateCache("list", "byname", "bycountryid", "bygroupid")
+	// r.invalidateCache("list", "byname", "bycountryid", "bygroupid")
 
 	return nil
 }
@@ -145,7 +145,7 @@ func (r *userRepository) DeleteUser(id uint) error {
 	}
 
 	// Invalidate all caches for this user
-	r.invalidateAllCache()
+	// r.invalidateAllCache()
 
 	return nil
 }
